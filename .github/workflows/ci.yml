@@ -9,9 +9,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# job의 `name:`을 지정하면 그 값이 status check 이름이 되고,
+# 브랜치 보호의 required check와 어긋나면 PR이 영원히 대기한다.
+# job id를 그대로 check 이름으로 쓰기 위해 `name:`을 두지 않는다.
 jobs:
   verify:
-    name: typecheck · lint · test · build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +30,6 @@ jobs:
       - run: pnpm build
 
   e2e:
-    name: e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
