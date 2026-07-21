@@ -121,10 +121,34 @@ ErrorBoundary는 **렌더링 중 에러만** 잡는다. 이벤트 핸들러와 �
 
 `.github/workflows/ci.yml` - `verify`(typecheck·lint·format·test·build)와 `e2e` 2개 job.
 
-> **필수 설정:** GitHub Settings → Branches → `main` 보호 규칙에서 `verify`와 `e2e`를
-> required status check로 등록해야 한다. 안 하면 빨간 CI로도 머지된다.
+job에 `name:`을 붙이지 않는다. GitHub은 required status check를 job id가 아니라 `name:` 값으로
+식별하기 때문에, 이름을 붙였다가 나중에 다듬으면 보호 규칙이 조용히 깨져 PR이 무한 대기한다.
 
 Husky는 로컬 편의일 뿐 게이트가 아니다 (`--no-verify`로 뚫린다). CI가 방어선이다.
+
+## 브랜치 보호 (`main`) — 적용 완료
+
+| 항목                              | 값              |
+| --------------------------------- | --------------- |
+| Required status checks            | `verify`, `e2e` |
+| Strict (머지 전 main 최신화 요구) | 켬              |
+| PR 필수                           | 켬              |
+| 승인 필요 인원                    | **0명**         |
+| 오래된 승인 자동 해제             | 켬              |
+| force push / 브랜치 삭제          | 차단            |
+| 미해결 리뷰 코멘트 시 머지 차단   | 켬              |
+| 관리자에게도 적용                 | 끔              |
+
+**승인이 0명인 이유:** GitHub은 자기 PR을 자기가 승인할 수 없다. 현재 리포에 계정이 하나뿐이라
+승인을 1명으로 두면 모든 PR이 관리자 우회로만 머지된다. 그러면 "우회가 기본값"이 되어
+정작 팀원이 합류했을 때 규칙이 무력해진다. PR과 CI 통과는 그대로 강제된다.
+
+**두 번째 사람이 합류하면 되돌린다:**
+
+```bash
+gh api -X PATCH repos/dev0leee/dev0leee-setup-react/branches/main/protection/required_pull_request_reviews \
+  -f required_approving_review_count=1
+```
 
 ## 아직 안 정한 것
 
