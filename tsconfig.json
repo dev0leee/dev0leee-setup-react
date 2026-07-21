@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.e2e.json" }
+  ],
+
+  // 빌드에는 쓰이지 않는다(files: []). shadcn CLI가 alias를 이 파일에서 읽기 때문에 필요하다.
+  // 없으면 컴포넌트를 리터럴 "@/" 폴더에 생성한다.
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

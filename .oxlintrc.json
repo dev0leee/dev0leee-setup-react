@@ -1,0 +1,58 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "import", "promise"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "eqeqeq": ["error", "smart"],
+
+    // jsx: "react-jsx"(automatic runtime)라 React를 import하지 않는다.
+    "react/react-in-jsx-scope": "off",
+    // `import './index.css'` 같은 사이드이펙트 import가 정상 패턴이다.
+    "import/no-unassigned-import": "off",
+    // axios.create / axios.isAxiosError 는 공식 사용법이다.
+    "import/no-named-as-default-member": "off",
+    // _retried 는 axios config에 심는 내부 플래그다.
+    "no-underscore-dangle": ["warn", { "allow": ["_retried"] }]
+  },
+  "overrides": [
+    {
+      // shadcn이 생성/갱신하는 파일. 직접 수정하지 않으므로 규칙을 끈다.
+      // 여기 경고를 고치면 다음 `shadcn add` 때 되돌아온다.
+      "files": ["src/components/ui/**"],
+      "rules": {
+        "typescript/no-explicit-any": "off",
+        "react/only-export-components": "off",
+        "react/jsx-no-constructed-context-values": "off",
+        "react/no-array-index-key": "off",
+        "no-shadow": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx", "src/test/**", "src/mocks/**", "e2e/**"],
+      "rules": {
+        "no-console": "off",
+        "typescript/no-explicit-any": "off",
+        "react/only-export-components": "off"
+      }
+    },
+    {
+      "files": ["src/config/env.ts"],
+      "rules": { "no-console": "off" }
+    }
+  ],
+  "ignorePatterns": ["dist", "coverage", "node_modules", "playwright-report", "public"]
+}
