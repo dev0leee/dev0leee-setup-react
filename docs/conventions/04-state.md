@@ -1,5 +1,19 @@
 # 04. 상태 관리
 
+## 지금 커뮤니티는 (2026-07 기준)
+
+**서버 상태와 클라이언트 상태를 분리하는 것이 2026년의 컨센서스다.** 이 문서에서 가장 확신 있게 말할 수 있는 규칙이 이것이다.
+
+- **서버 상태 → TanStack Query.** 페칭·캐싱·뮤테이션·낙관적 업데이트·페이지네이션을 전부 가져간다.
+- **클라이언트 상태 → Zustand.** 앱 안에서만 살고 사용자가 통제하는 값, 동기적이고 캐싱이 필요 없는 값.
+- **절대 규칙:** _"Never store server data in client state libraries. TanStack Query handles caching, refetching, and invalidation — duplicating in Zustand creates synchronization bugs."_
+
+TanStack Query 공식 문서도 같은 선을 긋는다("Does TanStack Query replace Redux?" — 서버 상태는 대체하지만 클라이언트 상태는 대체하지 않는다).
+
+**전역 상태 자체에 대한 피로감도 크다.** r/reactjs "그만 쓰게 된 패턴" 스레드 1위([u/Major-Front](https://reddit.com/r/reactjs/comments/1uqqy52/comment/ow9z2ce/), 142 upvotes): _"Redux and global state in general. Multiple contributors to a single app is a nightmare when a change in global reducers can break an unrelated part of the app."_
+
+동시에 **"무조건 Zustand"도 아니다.** [@CertificatesDev](https://x.com/CertificatesDev/status/2077715586209984780): _"Not every React app needs Zustand. Not every state belongs in Context. And `useState` definitely isn't the answer to everything."_ 그래서 아래 결정 트리가 필요하다.
+
 ## 결정 트리 (MUST)
 
 상태를 어디에 둘지는 **출처와 수명**이 정한다. 취향이 아니다.
@@ -56,16 +70,10 @@ function DashboardPage() {
 ### Query Key 규칙 (MUST)
 
 ```ts
-;[
-  'dashboard',
-] // 도메인
-[
-  ('dashboard', 'orders')
-] // 리소스
-[
-  ('dashboard', 'orders', orderId)
-] // 개별
-[('dashboard', 'orders', { page, sort })] // 파라미터는 마지막에 객체로
+const domainKey = ['dashboard'] as const // 도메인
+const listKey = ['dashboard', 'orders'] as const // 리소스
+const detailKey = ['dashboard', 'orders', orderId] as const // 개별
+const pagedKey = ['dashboard', 'orders', { page, sort }] as const // 파라미터는 마지막에 객체로
 ```
 
 - **넓은 것 → 좁은 것 순서.** 접두 매칭 무효화를 위해서다.

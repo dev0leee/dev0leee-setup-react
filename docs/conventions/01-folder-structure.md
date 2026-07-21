@@ -1,10 +1,21 @@
 # 01. 폴더구조
 
+## 지금 커뮤니티는 (2026-07 기준)
+
+**feature 기반이 이겼고, 남은 논쟁은 "얼마나 규범적일 것인가"다.**
+
+- **Feature-Sliced Design(FSD)**이 2026년의 이름 붙은 패러다임으로 자주 언급된다. 핵심 가치는 폴더 이름이 아니라 **레이어 간 의존이 한 방향으로만 흐른다**는 규칙이고, 그게 순환 의존을 구조적으로 막는다. 다만 layers/slices/segments라는 고유 어휘와 규범이 무겁다.
+- **[Bulletproof React](https://github.com/alan2207/bulletproof-react)**(36K stars)는 덜 규범적인 대안이다. 대부분의 코드를 `features/` 아래 두고, 각 feature가 자기 슬라이스를 통째로 소유한다.
+- **[Robin Wieruch](https://www.robinwieruch.de/react-folder-structure/)**의 2026 가이드가 요약하는 원칙은 **"Colocate first, extract later"** — 미리 구조를 파지 말고 같이 바뀌는 파일을 붙여두라는 것. 중첩은 2~3단계까지.
+- 2026년의 실용적 흐름은 **점진적 채택**이다: FSD의 아이디어(단방향 의존)는 가져가되 전면 규범은 필요한 곳에만 적용한다.
+
+**이 프로젝트는 그 절충점에 있다.** 폴더 구조는 Bulletproof React에 가깝고, **의존 방향 규칙은 FSD에서 가져왔다.** 아래 "의존 방향"이 이 문서에서 가장 중요한 규칙인 이유가 그것이다 — 폴더 이름은 취향이지만 의존 방향은 순환 참조를 막는 실제 장치다.
+
 ## 레이어
 
 ```
 src/
-├── main.tsx          # 진입점. StrictMode, MSW 부팅, App 마운트만.
+├── main.tsx          # 진입점. Sentry init, MSW 부팅, StrictMode + App 마운트.
 ├── index.css         # Tailwind import + @theme 토큰 정의
 ├── app/              # 앱 조립 계층
 ├── api/              # HTTP 하부구조

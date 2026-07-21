@@ -1,5 +1,15 @@
 # 03. API 함수
 
+## 지금 커뮤니티는 (2026-07 기준)
+
+**TanStack Query가 서버 상태의 기본값이다** (50K stars). X에서 반복되는 정서가 [@alexdeliadev](https://x.com/alexdeliadev/status/2079097205089013804): _"Never moving away from tanstack query"_, [@liamvandra](https://x.com/liamvandra/status/2079064824672391381): _"Move away from graphql. Don't move away from tanstack query."_
+
+**콜로케이션 도구는 `queryOptions`다.** TanStack 공식 문서의 표현: _"The queryOptions helper is one of the best ways to share queryKey and queryFn between multiple places while keeping them co-located."_ 런타임에는 그냥 인자를 돌려주지만, TS 추론이 `useQuery` / `useSuspenseQuery` / `prefetchQuery` / `invalidateQueries` 전체에 걸린다.
+
+**무효화는 수동 refetch가 아니라 접두 매칭이다.** 실무 사례([@KavishSriv90549](https://x.com/KavishSriv90549/status/2078917897574035566)): _"TanStack Query with prefix-matching query keys - one invalidation call covers related queries. Mutations invalidate cache instead of manual refetch. Also gated queries with `enabled` to avoid firing on unresolved route params."_ 이 문장 하나에 이 문서의 규칙 셋(계층 키 · invalidate · `enabled`)이 다 들어 있다.
+
+**axios vs fetch는 승부가 안 났다.** 어느 쪽이든 커뮤니티가 공통으로 말하는 건 **인스턴스/래퍼를 하나 두고 화면 코드가 HTTP 클라이언트를 모르게 하라**는 것이다. 이 프로젝트는 axios 인스턴스를 쓴다.
+
 ## 대원칙
 
 **화면 코드는 axios를 몰라야 한다.**

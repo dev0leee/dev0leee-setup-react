@@ -1,5 +1,15 @@
 # 05. 타입
 
+## 지금 커뮤니티는 (2026-07 기준)
+
+**세 가지가 사실상 정리됐다.**
+
+1. **`interface`로 시작한다.** [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)의 문구 그대로다: _"Always start with an interface."_ 그리고 _"Do not prefix interfaces with I."_ 유니온·튜플·매핑처럼 interface로 표현 못 하는 것만 `type`.
+2. **`enum` 대신 `as const` 또는 문자열 리터럴 유니온.** 2026년 스타일 가이드들의 공통 결론이고, 문자열 리터럴 유니온이 _"the most common and often preferred alternative"_ — 추가 JS를 생성하지 않으면서 같은 타입 안전성을 준다. 런타임에 값 목록을 순회해야 할 때만 `as const` 객체를 만든다.
+3. **props는 가능한 한 필수로.** _"Strive to have majority of props required and use optional props sparingly."_ 옵셔널이 많을수록 불가능한 조합이 늘어난다.
+
+**참고 — TypeScript 7이 2026-07-08에 발표됐다** (HN 720pts / 301 댓글). 이 레포의 `tsconfig.app.json`에 이미 관련 주석이 있다: _"TypeScript 7에서 baseUrl이 제거되어 paths만 사용한다."_ 업그레이드는 팀 결정으로 하고, 개인 판단으로 올리지 않는다.
+
 ## tsconfig가 이미 강제하는 것
 
 `tsconfig.app.json`이 켜둔 옵션은 협상 대상이 아니다. 왜 켜져 있는지만 알아둔다.

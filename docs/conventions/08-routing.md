@@ -2,6 +2,23 @@
 
 react-router-dom 7, `createBrowserRouter`. 라우트 정의는 `src/app/router.tsx` 한 곳뿐이다.
 
+## 지금 커뮤니티는 (2026-07 기준)
+
+**React Router 7에는 세 가지 모드가 있고, 어느 모드인지 모르면 남의 조언이 안 맞는다.**
+
+| 모드        | 무엇                                                            | 데이터             |
+| ----------- | --------------------------------------------------------------- | ------------------ |
+| Declarative | `<Link>`, `useNavigate`, `useLocation`, URL↔컴포넌트 매칭까지만 | 컴포넌트가 알아서  |
+| **Data**    | 라우트를 렌더 밖에서 설정 → loader/action 사용 가능             | 라우터가 로딩 담당 |
+| Framework   | Data 모드 + SSR/정적생성/타입안전 설정을 패키징한 풀스택        | 라우터가 전부      |
+
+**이 프로젝트는 `createBrowserRouter`를 쓰므로 Data 모드다.** SSR 없는 SPA다.
+
+**loader와 TanStack Query를 같이 쓸 것인가 —** 실제로 자주 나오는 질문이다([remix-run/react-router #14037](https://github.com/remix-run/react-router/discussions/14037)). 답변의 요지는 **하이브리드로 가지 말고 주 데이터 패턴을 하나만 고르라**는 것이다. RR7의 loader는 그 자체가 데이터 레이어로 설계됐고(`useLoaderData` + `revalidate`), TanStack Query도 캐시·무효화를 자기가 소유한다. 둘을 섞으면 캐시가 두 개가 되고 상호운용 에러가 따라온다.
+
+**이 프로젝트의 결정: TanStack Query가 데이터 레이어다. loader를 쓰지 않는다.**
+(참고로 TanStack **Router**는 loader가 Query와 맞물리도록 설계돼 있어 조합이 자연스럽다. 라우터 교체를 논의하게 되면 그게 근거가 된다.)
+
 ## 라우트 트리 구조
 
 ```
