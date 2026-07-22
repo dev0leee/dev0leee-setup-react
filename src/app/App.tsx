@@ -2,14 +2,13 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RouterProvider } from 'react-router-dom'
 
-import { QueryErrorBoundary } from '@/components/errors/QueryErrorBoundary'
+import { queryClient } from '@/app/queryClient'
+import { router } from '@/app/router'
 import { RootErrorFallback } from '@/components/errors/fallbacks'
+import { QueryErrorBoundary } from '@/components/errors/QueryErrorBoundary'
 import { Toaster } from '@/components/ui/sonner'
 import { env } from '@/config/env'
 import { AuthProvider } from '@/features/auth/AuthProvider'
-
-import { queryClient } from './queryClient'
-import { router } from './router'
 
 export function App() {
   return (

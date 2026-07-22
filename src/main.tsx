@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 import { App } from '@/app/App'
 import { env } from '@/config/env'
 
-import './index.css'
+import '@/index.css'
 
 if (env.VITE_SENTRY_DSN) {
   Sentry.init({

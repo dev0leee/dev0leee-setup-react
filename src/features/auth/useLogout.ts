@@ -3,9 +3,8 @@ import { useCallback } from 'react'
 
 import { broadcastLogout } from '@/api/authChannel'
 import { setAccessToken } from '@/api/tokenStore'
-
-import { logout as logoutRequest } from './api'
-import { useAuthStore } from './store'
+import { logout as logoutRequest } from '@/features/auth/api'
+import { useAuthStore } from '@/features/auth/store'
 
 /**
  * 로그아웃. 서버 폐기 -> 다른 탭 전파 -> 로컬 정리 순서.

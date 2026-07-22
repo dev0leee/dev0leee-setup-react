@@ -1,11 +1,10 @@
 import { Suspense } from 'react'
 
-import { QueryErrorBoundary } from '@/components/errors/QueryErrorBoundary'
 import { WidgetErrorFallback } from '@/components/errors/fallbacks'
+import { QueryErrorBoundary } from '@/components/errors/QueryErrorBoundary'
 import { Card, CardContent } from '@/components/ui/card'
-
-import { OrdersTable } from './OrdersTable'
-import { RevenueChart } from './RevenueChart'
+import { OrdersTable } from '@/features/dashboard/OrdersTable'
+import { RevenueChart } from '@/features/dashboard/RevenueChart'
 
 /**
  * 3계층 바운더리 - 위젯 단위.

@@ -1,10 +1,9 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
+import { broadcastToken } from '@/api/authChannel'
+import { toApiError } from '@/api/errors'
+import { getAccessToken, setAccessToken } from '@/api/tokenStore'
 import { env } from '@/config/env'
-
-import { broadcastToken } from './authChannel'
-import { toApiError } from './errors'
-import { getAccessToken, setAccessToken } from './tokenStore'
 
 type RetriableConfig = InternalAxiosRequestConfig & { _retried?: boolean }
 

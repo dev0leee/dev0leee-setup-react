@@ -25,10 +25,14 @@ axios를 아는 곳은 `src/api/client.ts`와 `src/api/errors.ts` 둘뿐이다.
 ```ts
 // GOOD
 import { api } from '@/api/client'
-const { data } = await api.get<Order[]>('/dashboard/orders')
 
+const { data } = await api.get<Order[]>('/dashboard/orders')
+```
+
+```ts
 // BAD
 import axios from 'axios'
+
 const { data } = await axios.get('/dashboard/orders') // 토큰도, refresh도, 에러 정규화도 없다
 ```
 
@@ -79,6 +83,7 @@ export async function login(payload: LoginPayload) {
 ```ts
 // features/dashboard/api.ts
 import { queryOptions } from '@tanstack/react-query'
+
 import { api } from '@/api/client'
 
 export interface Order {

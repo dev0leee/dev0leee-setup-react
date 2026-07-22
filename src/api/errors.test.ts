@@ -1,7 +1,7 @@
 import { AxiosError, AxiosHeaders } from 'axios'
 import { describe, expect, it } from 'vitest'
 
-import { ApiError, toApiError } from './errors'
+import { ApiError, toApiError } from '@/api/errors'
 
 describe('toApiError', () => {
   it('서버가 내려준 message와 code를 그대로 옮긴다', () => {

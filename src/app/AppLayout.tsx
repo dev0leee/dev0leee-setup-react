@@ -1,8 +1,8 @@
 import { LogOut } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 
-import { QueryErrorBoundary } from '@/components/errors/QueryErrorBoundary'
 import { RouteErrorFallback } from '@/components/errors/fallbacks'
+import { QueryErrorBoundary } from '@/components/errors/QueryErrorBoundary'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/features/auth/store'
 import { useLogout } from '@/features/auth/useLogout'

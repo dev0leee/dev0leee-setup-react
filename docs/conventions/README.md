@@ -42,6 +42,8 @@
 | ---------------------------------------------- | ----------------------------------------------------- |
 | 세미콜론 없음, 홑따옴표, 100칸, trailing comma | Prettier (`.prettierrc.json`)                         |
 | Tailwind 클래스 정렬                           | `prettier-plugin-tailwindcss`                         |
+| import 그룹 순서 · 멤버 정렬                   | `@ianvs/prettier-plugin-sort-imports`                 |
+| 상대경로 import 금지 (`@/` 강제)               | oxlint `no-restricted-imports`                        |
 | `any` 금지, `import type` 강제, `eqeqeq`       | oxlint (`.oxlintrc.json`)                             |
 | 훅 규칙, exhaustive-deps                       | oxlint `react/*`                                      |
 | 미사용 변수/파라미터, 인덱스 접근 안전성       | tsconfig `noUnusedLocals`, `noUncheckedIndexedAccess` |

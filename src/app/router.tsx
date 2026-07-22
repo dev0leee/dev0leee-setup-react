@@ -1,11 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
 
+import { AppLayout } from '@/app/AppLayout'
+import { NotFoundPage } from '@/app/NotFoundPage'
+import { ProtectedRoute } from '@/app/ProtectedRoute'
 import { FullPageSpinner } from '@/components/common/FullPageSpinner'
 import { LoginPage } from '@/features/auth/LoginPage'
-
-import { AppLayout } from './AppLayout'
-import { NotFoundPage } from './NotFoundPage'
-import { ProtectedRoute } from './ProtectedRoute'
 
 export const router = createBrowserRouter([
   {

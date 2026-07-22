@@ -182,6 +182,7 @@ import만으로 무언가 실행되는 모듈은 최소화한다.
 
 ```ts
 import { format, parseISO } from 'date-fns'
+
 format(parseISO(order.createdAt), 'yyyy-MM-dd')
 ```
 

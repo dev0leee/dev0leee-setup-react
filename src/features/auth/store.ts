@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { AuthStatus, User } from './types'
+import type { AuthStatus, User } from '@/features/auth/types'
 
 interface AuthState {
   status: AuthStatus

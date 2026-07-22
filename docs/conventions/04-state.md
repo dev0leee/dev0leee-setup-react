@@ -116,7 +116,8 @@ useQuery({ ...orderQuery(orderId!), enabled: Boolean(orderId) })
 ```ts
 // features/auth/store.ts
 import { create } from 'zustand'
-import type { AuthStatus, User } from './types'
+
+import type { AuthStatus, User } from '@/features/auth/types'
 
 interface AuthState {
   status: AuthStatus
@@ -154,6 +155,7 @@ const { status, setAuthenticated } = useAuthStore()
 
 ```ts
 import { useShallow } from 'zustand/react/shallow'
+
 const { status, user } = useAuthStore(useShallow((s) => ({ status: s.status, user: s.user })))
 ```
 

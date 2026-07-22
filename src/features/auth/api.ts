@@ -1,6 +1,5 @@
 import { api, REFRESH_ENDPOINT } from '@/api/client'
-
-import type { User } from './types'
+import type { User } from '@/features/auth/types'
 
 interface SessionResponse {
   accessToken: string

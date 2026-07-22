@@ -1,4 +1,4 @@
-import { setAccessToken } from './tokenStore'
+import { setAccessToken } from '@/api/tokenStore'
 
 type AuthMessage = { type: 'token'; token: string } | { type: 'logout' }
 

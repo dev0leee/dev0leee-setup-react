@@ -4,9 +4,8 @@ import { useCallback, useEffect, type ReactNode } from 'react'
 import { initAuthChannel } from '@/api/authChannel'
 import { setAccessToken } from '@/api/tokenStore'
 import { FullPageSpinner } from '@/components/common/FullPageSpinner'
-
-import { restoreSession } from './api'
-import { useAuthStore } from './store'
+import { restoreSession } from '@/features/auth/api'
+import { useAuthStore } from '@/features/auth/store'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const status = useAuthStore((s) => s.status)

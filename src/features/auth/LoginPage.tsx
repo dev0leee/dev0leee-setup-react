@@ -9,9 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
-import { login } from './api'
-import { useAuthStore } from './store'
+import { login } from '@/features/auth/api'
+import { useAuthStore } from '@/features/auth/store'
 
 const schema = z.object({
   email: z.email('올바른 이메일을 입력하세요.'),

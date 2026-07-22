@@ -8,8 +8,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart'
-
-import { revenueQuery } from './api'
+import { revenueQuery } from '@/features/dashboard/api'
 
 const chartConfig = {
   revenue: { label: '매출', color: 'var(--chart-1)' },
