@@ -2,3 +2,6 @@
 # 여기서 true가 아닌 패키지의 postinstall은 실행되지 않는다(공급망 공격 방어).
 allowBuilds:
   msw: true
+  # eslint-import-resolver-typescript가 쓰는 네이티브 리졸버.
+  # postinstall이 플랫폼별 바이너리를 링크하므로 빌드를 허용해야 동작한다.
+  unrs-resolver: true

@@ -6,7 +6,7 @@ React 19 + TypeScript + Vite SPA 템플릿.
 
 | 영역            | 선택                                        |
 | --------------- | ------------------------------------------- |
-| 빌드            | Vite 6, pnpm 11, Node 24 (`.nvmrc`)         |
+| 빌드            | Vite 8, TypeScript 6, pnpm 11, Node 24      |
 | 라우팅          | react-router-dom 7 (`createBrowserRouter`)  |
 | 서버 상태       | TanStack Query 5                            |
 | 클라이언트 상태 | Zustand 5                                   |
@@ -14,7 +14,7 @@ React 19 + TypeScript + Vite SPA 템플릿.
 | 폼              | react-hook-form + zod 4 (`zodResolver`)     |
 | UI              | Base UI + shadcn(`base-nova` 스타일) + CVA  |
 | 스타일          | Tailwind CSS 4 (CSS-first `@theme`)         |
-| 검증            | oxlint, Prettier, Vitest, Playwright, MSW   |
+| 검증            | ESLint 9, Prettier, Vitest, Playwright, MSW |
 | 모니터링        | Sentry                                      |
 
 ## 절대 규칙
@@ -22,7 +22,7 @@ React 19 + TypeScript + Vite SPA 템플릿.
 1. **`import.meta.env`를 직접 읽지 않는다.** `@/config/env`의 `env` 객체만 쓴다. 부팅 시 zod로 검증된다.
 2. **`axios`를 직접 import하지 않는다.** `@/api/client`의 `api` 인스턴스만 쓴다. 인터셉터가 토큰/refresh/에러 정규화를 담당한다.
 3. **서버 데이터를 Zustand에 넣지 않는다.** 서버에서 온 것은 전부 TanStack Query 캐시가 소유한다. 복사하는 순간 동기화 버그가 시작된다.
-4. **`any` 금지** (`typescript/no-explicit-any: error`). 모르면 `unknown` 쓰고 좁힌다.
+4. **`any` 금지** (`@typescript-eslint/no-explicit-any: error`). 모르면 `unknown` 쓰고 좁힌다.
 5. **타입 import는 `import type`.** `verbatimModuleSyntax`가 켜져 있다.
 6. **`enum`, 생성자 파라미터 프로퍼티, `namespace` 금지.** `erasableSyntaxOnly` 위반이다. `as const` 객체를 쓴다.
 7. **`src/components/ui/**`는 직접 수정하지 않는다.** shadcn CLI가 덮어쓴다. 커스텀은 래퍼 컴포넌트로 뺀다.
@@ -77,7 +77,7 @@ feature가 다른 feature를 import하지 않는다. 필요하면 공용으로 �
 ```bash
 pnpm dev              # 개발 서버
 pnpm typecheck        # tsc -b
-pnpm lint             # oxlint
+pnpm lint             # eslint .
 pnpm format:check     # prettier --check
 pnpm test             # vitest run
 pnpm test:e2e         # playwright

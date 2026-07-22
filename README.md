@@ -23,7 +23,7 @@ pnpm dev
 | `pnpm build`                   | 타입체크 + 프로덕션 빌드 |
 | `pnpm preview`                 | 빌드 결과 미리보기       |
 | `pnpm typecheck`               | `tsc -b`                 |
-| `pnpm lint` / `lint:fix`       | oxlint                   |
+| `pnpm lint` / `lint:fix`       | ESLint                   |
 | `pnpm format` / `format:check` | Prettier                 |
 | `pnpm test` / `test:watch`     | Vitest (jsdom + MSW)     |
 | `pnpm test:e2e`                | Playwright               |
@@ -46,7 +46,7 @@ pnpm dev
 | Charts            | shadcn/ui Chart (Recharts)                  |
 | Date              | date-fns                                    |
 | Error Handling    | react-error-boundary + Query `throwOnError` |
-| Lint / Format     | oxlint + Prettier                           |
+| Lint / Format     | ESLint + Prettier                           |
 | Test              | Vitest + RTL + Playwright + MSW             |
 | Monitoring        | Sentry                                      |
 | Package Manager   | pnpm                                        |

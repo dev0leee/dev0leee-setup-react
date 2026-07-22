@@ -122,7 +122,7 @@ components/
 
 `ui/`와 `common/`의 경계: **shadcn CLI가 만들었으면 `ui/`, 우리가 만들었으면 `common/`.**
 `ui/` 컴포넌트를 커스터마이즈해야 하면 수정하지 말고 `common/`에 래퍼를 만든다.
-(`.oxlintrc.json`이 `ui/**`의 린트 규칙을 꺼둔 이유가 이것이다 — 어차피 덮어써진다.)
+(`eslint.config.js`가 `ui/**`의 린트 규칙을 꺼둔 이유가 이것이다 — 어차피 덮어써진다.)
 
 ### `src/lib/` vs `src/config/`
 

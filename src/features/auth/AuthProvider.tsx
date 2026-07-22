@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useEffect, type ReactNode } from 'react'
+import { type ReactNode, useCallback, useEffect } from 'react'
 
 import { initAuthChannel } from '@/api/authChannel'
 import { setAccessToken } from '@/api/tokenStore'

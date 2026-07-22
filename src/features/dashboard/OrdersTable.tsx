@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ordersQuery, type Order } from '@/features/dashboard/api'
+import { type Order, ordersQuery } from '@/features/dashboard/api'
 
 const columnHelper = createColumnHelper<Order>()
 

@@ -1,13 +1,13 @@
 # 09. import / export
 
-import 순서와 멤버 정렬은 **사람이 지키지 않는다.** `pnpm format`이 고쳐준다.
+import 순서와 멤버 정렬은 **사람이 지키지 않는다.** `pnpm lint:fix`가 고쳐준다.
 이 문서는 도구가 못 잡는 나머지를 다룬다.
 
 ## MUST 규칙
 
 ### 1. 상대경로를 쓰지 않는다 — `@/` 절대경로만
 
-oxlint `no-restricted-imports`가 에러로 잡는다.
+ESLint `no-restricted-imports`가 에러로 잡는다.
 
 ```ts
 // GOOD
@@ -26,16 +26,16 @@ import { login } from './api'
 확실하게 깨진다. 그리고 import만 보고 그 모듈이 어느 레이어 것인지 알 수 있다.
 
 **유일한 예외는 `e2e/`다.** e2e는 `tsconfig.e2e.json`을 쓰는 별도 프로젝트라 `@/` alias가
-없다. `.oxlintrc.json`의 override에서 이 규칙을 꺼둔다.
+없다. `eslint.config.js`의 override에서 이 규칙을 꺼둔다.
 
 ### 2. `import type`으로 타입을 가져온다
 
 `verbatimModuleSyntax`가 켜져 있어서 값과 타입을 구분하지 않으면 런타임에 없는 모듈을
-import하게 된다. oxlint `typescript/consistent-type-imports`가 잡는다.
+import하게 된다. `@typescript-eslint/consistent-type-imports`가 잡는다.
 
 ```ts
 // GOOD
-import { clsx, type ClassValue } from 'clsx' // 값과 섞일 때는 인라인 type
+import { type ClassValue, clsx } from 'clsx' // 값과 섞일 때는 인라인 type
 
 import type { User } from '@/features/auth/types'
 ```
@@ -102,14 +102,14 @@ lazy: async () => {
 
 ## 자동으로 처리되는 것 — 신경 쓰지 말 것
 
-`@ianvs/prettier-plugin-sort-imports`가 `pnpm format`에서 정리한다.
+`import/order`와 `sort-imports`가 담당한다. `pnpm lint:fix`가 전부 고쳐준다.
 
-**그룹 순서** (그룹 사이 빈 줄 하나):
+**그룹 순서** (그룹 사이 빈 줄 하나, 그룹 안은 알파벳 오름차순·대소문자 무시):
 
-1. Node 빌트인 (`node:url`)
-2. 외부 패키지 (`react`, `axios`, ...)
-3. 내부 절대경로 (`@/...`)
-4. 상대경로 (`./...` — e2e에서만 나온다)
+1. `builtin` — Node 빌트인 (`node:url`)
+2. `external` — 외부 패키지 (`react`, `axios`, ...)
+3. `internal` — `@/...` (`import/internal-regex`로 지정)
+4. `parent` / `sibling` / `index` — 상대경로 (e2e에서만 나온다)
 
 ```ts
 import { fileURLToPath } from 'node:url'
@@ -121,41 +121,46 @@ import { api } from '@/api/client'
 import { cn } from '@/lib/utils'
 ```
 
-**멤버 정렬**은 플러그인이 알파벳순으로 맞추되 인라인 `type` 지정자를 뒤로 모은다
-(`{ clsx, type ClassValue }`).
+**멤버 정렬**은 `sort-imports`가 순수 알파벳순으로 맞춘다. 인라인 `type` 지정자도
+이름 기준으로 섞인다.
 
-> oxlint의 `sort-imports`를 같이 켜면 안 된다. 그 규칙은 순수 알파벳순
-> (`{ type ClassValue, clsx }`)을 요구해서 `format`과 `lint`가 서로를 무한히 되돌린다.
-> 정렬의 소유자는 자동 수정이 되는 prettier 하나뿐이다.
+```ts
+import { type ClassValue, clsx } from 'clsx'
+```
+
+> prettier는 import 순서에 관여하지 않는다. 정렬의 소유자는 ESLint 하나뿐이다.
+> `@ianvs/prettier-plugin-sort-imports`를 다시 넣으면 안 된다 — 그 플러그인은
+> `type` 지정자를 뒤로 모아서(`{ clsx, type ClassValue }`) `sort-imports`와
+> 서로를 무한히 되돌린다.
 
 ## 함정
 
-### `no-restricted-imports`의 글롭 패턴은 oxlint에서 동작하지 않는다
+### `import/parsers`가 없으면 export 기반 규칙이 조용히 죽는다
 
-ESLint에서 쓰던 `"patterns": [".*"]`를 그대로 옮기면 **에러 없이 조용히 통과한다.**
-설정은 파싱되지만 아무것도 매칭하지 않는다. `regex` 형태로 써야 한다.
+`eslint-plugin-import`는 `.ts`/`.tsx`를 스스로 파싱하지 못한다. 파서를 알려주지 않으면
+import한 모듈의 export 목록을 만들지 못하고, 거기에 의존하는 규칙이
+**에러 없이 전부 통과한다.** `no-named-as-default-member`가 대표적이다.
 
-```jsonc
-// 동작 안 함 — 켜져 있는 줄 알지만 꺼져 있다
-{ "patterns": [".*"] }
-{ "patterns": ["./*", "../*"] }
-
-// 동작함
-{ "patterns": [{ "regex": "^\\.", "message": "상대경로 대신 '@/' 절대경로를 쓴다." }] }
+```js
+settings: {
+  'import/parsers': { '@typescript-eslint/parser': ['.ts', '.tsx'] },
+  'import/extensions': ['.ts', '.tsx', '.js', '.jsx'],
+}
 ```
 
-이 규칙을 건드렸다면 `src/`에 상대경로 import가 든 파일을 하나 만들어 `pnpm lint`가
-실제로 잡는지 확인하고 지운다.
+규칙을 추가했으면 일부러 위반하는 파일을 `src/`에 만들어 `pnpm lint`가 실제로 잡는지
+확인하고 지운다. **설정이 파싱된다고 규칙이 동작하는 건 아니다.**
 
-### `import/order`는 oxlint에 없다
+### 버전 조합이 좁다
 
-`Rule 'order' not found in plugin 'import'`로 설정 파싱 자체가 실패한다.
-그래서 그룹 정렬을 prettier 플러그인에 맡긴 것이다.
+| 조합                               | 결과                                                          |
+| ---------------------------------- | ------------------------------------------------------------- |
+| ESLint 10 + `eslint-plugin-import` | `import/order`가 크래시한다 (`getTokenOrCommentAfter` 제거됨) |
+| TypeScript 7 + `typescript-eslint` | 파서가 모듈 로드 시점에 하드 에러로 죽는다                    |
 
-### 문서의 GOOD/BAD 예시는 코드블럭을 나눈다
-
-prettier는 마크다운 안의 ` ```ts ` 블럭도 포맷한다. GOOD과 BAD를 한 블럭에 넣으면
-import가 전부 블럭 맨 위로 끌려올라가 대비 구조가 망가진다. 블럭을 두 개로 나눈다.
+그래서 이 프로젝트는 **ESLint 9 + TypeScript 6**에 고정돼 있다. 둘 중 하나를 올리려면
+`eslint-plugin-import`의 ESLint 10 지원과 typescript-eslint의 TS 7 지원
+([#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940))을 먼저 확인한다.
 
 ## 관련 문서
 

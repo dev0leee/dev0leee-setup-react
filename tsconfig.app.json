@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
 
     /* Path alias - vite.config.ts의 resolve.alias와 반드시 같이 유지할 것.
-       TypeScript 7에서 baseUrl이 제거되어 paths만 사용한다(tsconfig 기준 상대경로). */
+       baseUrl 없이 paths만 쓴다(tsconfig 기준 상대경로). TypeScript 7이 baseUrl을
+       제거하므로, 나중에 7로 올릴 때 이 설정을 그대로 쓸 수 있다. */
     "paths": {
       "@/*": ["./src/*"]
     },
