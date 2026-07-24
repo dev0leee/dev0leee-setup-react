@@ -41,6 +41,10 @@ fallbackInflight ??= performRefresh(failedToken)
 
 > **MUST — 기본값에 `||`를 쓰지 않는다.** `0`, `''`, `false`가 기본값으로 덮어써진다.
 > `??`를 쓴다.
+>
+> **빈 문자열도 폴백하고 싶으면 조건을 드러낸다.** `??`는 `''`를 통과시킨다(널이 아니라서).
+> 빈 문자열까지 기본값으로 바꾸려면 `name.trim() ? name : '이름 없음'`처럼 명시한다 —
+> `name || '이름 없음'`은 `0`·`false`까지 삼켜 의도가 흐려진다.
 
 ## 숫자 리터럴
 
@@ -49,6 +53,19 @@ fallbackInflight ??= performRefresh(failedToken)
 ```ts
 timeout: 10_000
 staleTime: 60_000
+```
+
+> **MUST — 의미 있는 숫자는 이름을 주고 `constants/`에 둔다.** 도메인·설정 의미가 있는 값은
+> 한 곳에서만 써도 상수로 뽑는다 ([12-constants](./12-constants.md)). 인라인 매직넘버를 남기지 않는다.
+> (구조적 리터럴 — 배열 인덱스 `0`, `+ 1` 같은 건 상수가 아니다.)
+
+```ts
+// BAD - 10000이 무슨 값인지 안 보인다
+getMileageList({ hours: queryString.hours ?? 10000 })
+
+// GOOD - features/<f>/constants/ 또는 shared/constants/
+export const MAX_HOURS = 10_000
+getMileageList({ hours: queryString.hours ?? MAX_HOURS })
 ```
 
 ## 불변성 (MUST)
@@ -61,14 +78,19 @@ const next = [...orders, newOrder]
 const sorted = orders.toSorted((a, b) => a.amount - b.amount)
 const updated = { ...order, amount: 100 }
 const without = orders.filter((o) => o.id !== id)
+const { [couponId]: _removed, ...rest } = selectedCoupons // 키 제거
 
 // BAD
 orders.push(newOrder)
-orders.sort(...)        // 원본을 바꾼다
+orders.sort(...)          // 원본을 바꾼다
 order.amount = 100
+delete selectedCoupons[couponId]
 ```
 
 ES2023의 `toSorted` / `toReversed` / `toSpliced` / `with`를 쓸 수 있다. `sort`/`reverse` 대신 이것들을 쓴다.
+
+> **MUST — `delete`로 키를 지우지 않는다.** 구조분해로 남길 것만 뽑아 새 객체를 만든다.
+> React state에 `delete`를 쓰면 참조가 안 바뀌어 리렌더가 안 되는, 재현 어려운 버그가 된다.
 
 ## 배열 다루기
 
@@ -92,7 +114,7 @@ orders.reduce(...)   // 접기 - 위 것들로 안 될 때만
 
 ```ts
 // GOOD
-export async function login(payload: LoginPayload): Promise<SessionResponse> {
+export const login = async (payload: LoginPayload): Promise<SessionResponse> => {
   const { data } = await api.post<SessionResponse>('/login', payload)
   return data
 }
@@ -135,7 +157,7 @@ try {
 try {
   await restoreSession()
 } catch {
-  setAccessToken(null)
+  setAccessToken({ token: null })
   setAnonymous() // 실패를 명시적인 상태로 전이시킨다
 }
 ```
@@ -165,10 +187,25 @@ throw new ApiError(message, status, code)
 
 ## 함수
 
-- **SHOULD — 인자 3개를 넘으면 객체로 받는다.**
+- **MUST — 화살표 함수 + `const`로 쓴다.** 함수 선언문(`function foo() {}`)을 쓰지 않는다.
+  컴포넌트·훅·유틸·API 함수 전부 통일한다. 화살표는 호이스팅되지 않으니 **정의가 사용보다 앞에**
+  와야 한다 — 파일 안에서 헬퍼를 먼저, 그걸 쓰는 쪽을 뒤에 둔다. 유일한 예외는
+  `src/shared/components/ui/**`(shadcn 생성물)다.
+- **MUST — 인자는 개수와 무관하게 객체로 받는다.** 인자가 1개여도 객체로 감싼다.
+  순서 의존 위치 인자를 만들지 않는다. 호출부에서 각 인자의 의미가 이름으로 드러나고,
+  기본값 선언과 인자 추가가 자유롭다. (예외 없음 — 0개면 그냥 인자 없는 함수다.)
 - **SHOULD — 불리언 인자를 만들지 않는다.** `doThing(true)`는 호출부에서 뜻을 모른다.
   옵션 객체나 별도 함수로 나눈다.
 - **MUST — 파라미터를 재할당하지 않는다.** 지역 변수를 만든다.
+
+```ts
+// GOOD - 인자 1개여도 객체로
+formatDate({ date })
+getMileageList({ hours })
+
+// BAD - 순서 의존 위치 인자
+formatDate(date, '.', false)
+```
 
 ## 모듈 부수효과
 
@@ -188,3 +225,33 @@ format(parseISO(order.createdAt), 'yyyy-MM-dd')
 
 서버와 주고받는 형식은 ISO 8601 문자열이다 (`createdAt: string`).
 표시 직전에만 포맷한다. 상태에는 ISO 문자열로 보관한다.
+
+> **MUST — "현재 시각"은 상수가 아니라 함수로.** `const TODAY = new Date()`는 모듈 로드
+> 시점에 고정된다. SPA는 탭을 며칠씩 열어두므로 자정을 넘기면 날짜가 어긋난다. 호출 시점에
+> 계산한다.
+
+```ts
+// BAD - 모듈 로드 시점에 고정. 자정을 넘겨도 어제다.
+const TODAY = startOfDay(new Date())
+
+// GOOD
+export const getToday = () => {
+  return startOfDay(new Date())
+}
+```
+
+## 포맷 함수
+
+**MUST — 표시용 포맷 함수를 컴포넌트마다 다시 만들지 않는다.** 통화·숫자·날짜 포맷은
+`shared/utils/`에 한 번 정의하고 import한다. 컴포넌트 안에서 `formatPrice`를 새로 만들거나
+`toLocaleString()`을 직접 부르지 않는다.
+
+컴포넌트마다 포맷이 갈리면(`1,000원` / `1000원` / `₩1,000`) 타입체커도 린터도 못 잡고 QA에서야 드러난다.
+
+```ts
+// GOOD - 유틸에서 가져온다
+import { formatPrice } from '@/shared/utils/formatNumber'
+
+// BAD - 컴포넌트 안에 로컬 정의 / 직접 toLocaleString
+const formatPrice = (price: number) => `${price.toLocaleString()}원`
+```

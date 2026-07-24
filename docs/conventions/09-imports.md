@@ -93,8 +93,25 @@ lazy: async () => {
 }
 ```
 
-예외는 `vite.config.ts`와 `playwright.config.ts`뿐이다. 두 도구가 default export를
-요구하므로 어쩔 수 없다.
+예외는 `vite.config.ts`·`playwright.config.ts`·`eslint.config.js`뿐이다. 세 도구가
+default export를 요구한다. 전부 `src/` 밖이라 규칙에서 자연히 빠진다.
+
+`eslint.config.js`의 `import/no-default-export`가 `src/**`에 이걸 강제한다. 리뷰가 아니라
+CI가 막는다 — `src/`에 `export default`를 쓰면 `Prefer named exports` 에러가 난다.
+
+**이름을 바꿔 내보내지 않는다.** `export { login as signIn }`은 같은 것을 두 이름으로
+부르게 만들어 검색·리네임을 깨뜨린다([02-naming](./02-naming.md)).
+
+```ts
+// BAD - alias export
+export { login as signIn } from '@/features/auth/api/auth'
+
+// GOOD - feature 공개 API의 재export는 이름을 그대로 넘긴다 (alias 아님)
+export { login } from '@/features/auth/api/auth'
+```
+
+feature `index.ts`의 `export { X } from '...'` 재export 자체는 정상이다
+([01-folder-structure](./01-folder-structure.md)). 금지되는 건 `as`로 이름을 바꾸는 것뿐이다.
 
 ### 7. 사이드이펙트 import는 최소화하고 진입점에만 둔다
 

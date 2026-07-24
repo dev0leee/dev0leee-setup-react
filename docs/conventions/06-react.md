@@ -4,20 +4,60 @@ React 19. `jsx: "react-jsx"`라 **`import React`를 쓰지 않는다.**
 
 ## 컴포넌트 정의 (MUST)
 
-**함수 선언문을 쓴다.** 화살표 함수 + `const` 조합은 쓰지 않는다.
+**화살표 함수 + `const`로 쓴다.** 프로젝트 전체를 화살표 함수로 통일했다
+([07-javascript](./07-javascript.md) 참고). 함수 선언문은 쓰지 않는다.
 
 ```tsx
 // GOOD
-export function LoginPage() {}
-function Button({ className, ...props }: ButtonProps) {}
+export const LoginPage = () => {}
+const Button = ({ className, ...props }: ButtonProps) => {}
 
 // BAD
-export const LoginPage = () => {}
+export function LoginPage() {}
 const Button: React.FC<ButtonProps> = () => {}
 ```
 
-이유: 호이스팅이 되어 파일 안에서 정의 순서에 덜 민감하고, 스택 트레이스에 이름이 남는다.
-`React.FC`는 children을 암묵적으로 넣던 과거 유산이라 쓰지 않는다.
+`React.FC`는 children을 암묵적으로 넣던 과거 유산이라 쓰지 않는다. props는 매개변수에서 타입을
+붙이되, **props 타입 선언은 `types/`에 둔다** ([05-types](./05-types.md)) — 매개변수에는 import한
+이름만 쓴다.
+
+> **화살표 함수는 호이스팅되지 않는다.** 정의가 사용보다 앞에 와야 하므로, 파일 안에서 헬퍼
+> 컴포넌트를 먼저 정의하고 그걸 쓰는 컴포넌트를 뒤에 둔다.
+
+## 컴포넌트 본문 순서 (SHOULD)
+
+훅과 로직이 뒤섞이면 읽는 순서가 무너진다. 본문은 아래 순서로 쓴다.
+
+```tsx
+const OrderDetailPage = () => {
+  // 1. props 구조분해
+  // 2. 라우터 / 전역 훅
+  const { orderId } = useParams()
+  const navigate = useNavigate()
+
+  // 3. 서버 상태(Query) → 클라이언트 상태(Zustand 셀렉터)
+  const { data: order } = useQuery({
+    ...orderQuery({ orderId: orderId! }),
+    enabled: Boolean(orderId),
+  })
+  const status = useAuthStore((s) => s.status)
+
+  // 4. 로컬 상태(useState / useRef)
+  const [isEditing, setIsEditing] = useState(false)
+
+  // 5. 파생값 — 렌더 중 계산 (파생 상태 금지 참고)
+  const total = order?.items.reduce((sum, item) => sum + item.amount, 0) ?? 0
+
+  // 6. 핸들러
+  const handleSubmit = () => {}
+
+  // 7. useEffect — 있다면 마지막
+  // 8. 이른 반환 → JSX
+}
+```
+
+값이 변하지 않는 정적 상수(`TIME_SLOTS` 같은 것)는 컴포넌트 **바깥** 모듈 스코프로 올린다.
+매 렌더 재생성되지 않게.
 
 ## useEffect (MUST — 가장 자주 틀리는 곳)
 
@@ -36,7 +76,7 @@ useEffect가 정당한 경우 (이 레포의 실제 사례):
 ```tsx
 // AuthProvider - BroadcastChannel 구독 + 부팅 시 세션 복원
 useEffect(() => {
-  const unsubscribe = initAuthChannel(clearSession)
+  const unsubscribe = initAuthChannel({ onLogout: clearSession })
   void restore()
   return unsubscribe // 정리 함수를 반드시 반환
 }, [clearSession, setAnonymous, setAuthenticated])
@@ -114,7 +154,7 @@ if (status === 'authenticated') return <Navigate to="/" replace />
 React 19는 `ref`를 일반 prop으로 받는다. **`forwardRef`를 새로 쓰지 않는다.**
 
 ```tsx
-function Input({ ref, ...props }: React.ComponentProps<'input'>) {
+const Input = ({ ref, ...props }: React.ComponentProps<'input'>) => {
   return <input ref={ref} {...props} />
 }
 ```

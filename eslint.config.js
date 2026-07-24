@@ -42,6 +42,10 @@ export default tseslint.config(
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'smart'],
       'no-underscore-dangle': ['warn', { allow: ['_retried'] }],
+      // 콜백 파라미터가 외부 스코프 변수를 가리는 것 금지 (docs/conventions/02-naming.md).
+      // base 규칙은 TS 문법을 이해 못 해 오탐이 나므로 끄고 typescript-eslint 판을 쓴다.
+      'no-shadow': 'off',
+      '@typescript-eslint/no-shadow': 'error',
 
       // /////////////////////////////////////////////////////////////////////////
       // `import/recommended`
@@ -126,7 +130,16 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'off',
       'react-refresh/only-export-components': 'off',
       'no-shadow': 'off',
+      '@typescript-eslint/no-shadow': 'off',
     },
+  },
+
+  {
+    // src 전체는 named export만. default는 이름이 고정되지 않아 검색·리네임·자동 import가
+    // 부정확해진다(09-imports 규칙 6). 도구가 default를 요구하는 루트 설정 파일은
+    // src/ 밖이라 자연히 예외다.
+    files: ['src/**/*.{ts,tsx}'],
+    rules: { 'import/no-default-export': 'error' },
   },
 
   {

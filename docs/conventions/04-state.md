@@ -87,7 +87,7 @@ queryClient.invalidateQueries({ queryKey: ['dashboard'] })
 라우트 파라미터가 아직 없을 때 요청이 나가지 않게 한다.
 
 ```ts
-useQuery({ ...orderQuery(orderId!), enabled: Boolean(orderId) })
+useQuery({ ...orderQuery({ orderId: orderId! }), enabled: Boolean(orderId) })
 ```
 
 ### 캐시 비우기

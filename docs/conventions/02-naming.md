@@ -42,6 +42,26 @@
 
 > **MUST — 타입에 `I`/`T` 접두사를 붙이지 않는다.** `IUser`, `TUser` 금지. 그냥 `User`.
 
+## 훅 이름과 도메인 (SHOULD)
+
+**feature 안의 훅은 이름에 도메인을 넣지 않는다.** 폴더 위치가 이미 도메인을 말한다.
+
+```ts
+// GOOD - features/facility/hooks/useCoupon.ts
+export const useCoupon = ({ facilityId }: { facilityId: string }) => { ... }
+
+// BAD - 위치가 이미 facility인데 이름에 또 박는다
+export const useFacilityCoupon = ...
+```
+
+**`shared/hooks/`의 훅은 도메인을 몰라야 하므로 이름에도 도메인이 없다.** 공용이라는 건
+곧 도메인 무관이라는 뜻이다 — `useNativeBackButton`, `useDebounce`처럼 이름이 순수 기능이다.
+훅 이름에 도메인을 넣고 싶어지면, 그건 `shared/`에 있으면 안 된다는 신호다
+([01-folder-structure](./01-folder-structure.md)).
+
+> 인자는 개수와 무관하게 객체로 받는다. `useCoupon({ facilityId })`처럼.
+> 규칙은 [07-javascript](./07-javascript.md) "함수" 절에 있다.
+
 ## 도메인 어휘 (SHOULD)
 
 같은 개념에 같은 단어를 쓴다. 이 레포의 어휘:
@@ -64,7 +84,7 @@
 // GOOD
 export const login = async (payload: LoginPayload): Promise<SessionResponse> => { ... }
 export const restoreSession = async (): Promise<SessionResponse> => { ... }
-export const toApiError = (error: unknown): ApiError => { ... }
+export const toApiError = ({ error }: { error: unknown }): ApiError => { ... }
 
 // BAD
 export const userLogin = async () => {} // 명사 시작
@@ -112,6 +132,22 @@ const OrdersTable = ({ onRowClick }: { onRowClick: (id: string) => void }) => {
 
 접두 매칭으로 한 번에 무효화할 수 있게 만드는 것이 목적이다.
 자세한 건 [04-state](./04-state.md).
+
+## 콜백 파라미터 (SHOULD)
+
+**한 글자 약어를 쓰지 않는다.** `map`/`filter`/`find`의 콜백 인자에 무엇을 순회하는지 이름을 준다.
+
+```ts
+// GOOD
+orders.filter((order) => order.id !== id)
+notices.find((notice) => notice.noticeUuid === id)
+
+// BAD
+orders.filter((o) => o.id !== id)
+notices.find((n) => n.noticeUuid === id)
+```
+
+`reduce`의 누산기도 `acc` 대신 뜻이 있는 이름(`sum`, `total`, `result`)을 쓴다.
 
 ## 금지
 

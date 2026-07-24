@@ -78,7 +78,8 @@ const config = useMatches().reduce((acc, m) => ({ ...acc, ...(m.handle ?? {}) })
 features/<name>/
 ├── api/               # 이 도메인의 요청 함수
 ├── queries/           # 이 도메인의 TanStack Query 훅 · queryOptions
-├── components/        # 이 도메인의 컴포넌트·페이지
+├── pages/             # 라우트에 마운트되는 화면 (~Page)
+├── components/        # 이 도메인의 재사용 컴포넌트·조각
 ├── constants/         # 이 도메인의 상수
 ├── hooks/             # 쿼리와 무관한 재사용 로직
 ├── schemas/           # 이 도메인의 zod 스키마
@@ -86,6 +87,9 @@ features/<name>/
 ├── types/             # 이 도메인의 타입
 └── index.ts           # 공개 API
 ```
+
+**`pages/` vs `components/`:** 라우트에 걸리는 화면(`~Page`)만 `pages/`, 나머지 재사용 조각은
+`components/`다 ([10-components](./10-components.md)).
 
 **필요한 폴더만 만든다.** 전부 만들 필요 없다. `dashboard/`는 상태도 훅도 스키마도 없다.
 
@@ -96,8 +100,9 @@ features/dashboard/
 ├── queries/
 │   ├── ordersQuery.ts
 │   └── revenueQuery.ts
+├── pages/
+│   └── DashboardPage.tsx
 ├── components/
-│   ├── DashboardPage.tsx
 │   ├── OrdersTable.tsx
 │   └── RevenueChart.tsx
 ├── types/
@@ -131,7 +136,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: ({ accessToken, user }) => {
-      setAccessToken(accessToken)
+      setAccessToken({ token: accessToken })
       setAuthenticated(user)
     },
   })
@@ -282,6 +287,9 @@ shared/lib/
 `ui/` 컴포넌트를 커스터마이즈해야 하면 수정하지 말고 `common/`에 래퍼를 만든다.
 (`eslint.config.js`가 `ui/**`의 린트 규칙을 꺼둔 이유가 이것이다 — 어차피 덮어써진다.)
 
+> **MUST — 오버레이(모달·바텀시트)는 반드시 공통 래퍼를 경유한다.** 딤 배경·포털·스크롤 잠금은
+> 래퍼가 담당하고, 자식 컴포넌트가 직접 만들지 않는다. 오버레이 상세 규칙은 11-overlay에서 다룬다.
+
 ### zod 스키마 (MUST)
 
 **스키마는 무조건 파일로 분리한다.** 길이는 기준이 아니다. 컴포넌트 안에 인라인으로 두지 않는다.
@@ -322,21 +330,21 @@ feature 간 import와 같은 판단을 한다 — 합치거나, 상위에서 조
 
 ### 상수는 어디에 두나
 
-**쓰는 범위가 위치를 정한다.** 좁은 쪽에서 시작해서, 두 번째 사용처가 생기면 올린다.
+**예외 없이 `constants/`에 둔다.** 로직 파일 안에서 `const`로 선언하지 않는다 — 한 파일에서만
+쓰는 값이든 매직넘버든 전부 뺀다 ([12-constants](./12-constants.md)).
 
-| 범위                 | 위치                                |
-| -------------------- | ----------------------------------- |
-| 한 파일에서만        | 그 파일 상단 `const` (export 안 함) |
-| feature 안 여러 파일 | `features/<name>/constants/`        |
-| 여러 feature         | `shared/constants/`                 |
-| 환경마다 다름        | `config/env.ts`                     |
+| 범위          | 위치                         |
+| ------------- | ---------------------------- |
+| 한 도메인     | `features/<name>/constants/` |
+| 여러 feature  | `shared/constants/`          |
+| 환경마다 다름 | `config/env.ts` (예외)       |
 
 ```ts
-// 한 파일에서만 쓴다 - shared/lib/authChannel.ts
-const CHANNEL_NAME = 'auth'
-
 // features/dashboard/constants/order.ts
 export const ORDER_STATUS_LABEL = { pending: '대기', shipped: '배송중' } as const
+
+// shared/lib/authChannel.ts - 한 곳만 써도 constants로
+import { CHANNEL_NAME } from '@/shared/constants/channel'
 ```
 
 > **MUST — 엔드포인트 경로는 `constants/`에 두지 않는다.**
@@ -404,16 +412,18 @@ testing/
 
 ## 안티패턴
 
-| 하지 말 것                       | 이유                                                             |
-| -------------------------------- | ---------------------------------------------------------------- |
-| feature 내부 파일 직접 import    | `index.ts`가 공개 API다. 내부는 언제든 바뀐다.                   |
-| feature가 다른 feature를 import  | `shared/`로 올리거나 `app/`에서 조립한다.                        |
-| `shared/`가 feature를 import     | 방향이 뒤집힌다. 그 순간 공용이 아니다.                          |
-| `shared/utils.ts` 한 파일에 쌓기 | 쓰레기통이 된다. 기능별로 파일을 나눈다.                         |
-| 엔드포인트 경로를 `constants/`로 | 쓰는 모듈이 소유한다. 모으면 전역 `endpoints.ts`가 된다.         |
-| zod 스키마를 컴포넌트에 인라인   | 무조건 `schemas/`로 분리한다. 길이는 기준이 아니다.              |
-| 도메인 스키마를 `shared/`로      | `shared/`는 도메인을 모른다. 경계를 잘못 그은 신호다.            |
-| 최상위 셸을 `LayoutBase`로 분리  | Provider·전역 오버레이는 `App.tsx` 담당이다. 책임이 겹친다.      |
-| 레이아웃 조각이 feature를 참조   | `shared/`에 못 있게 된다. props로 내린다.                        |
-| 미리 폴더 파두기                 | 파일 1개짜리 폴더는 만들지 않는다. 2개가 되면 그때 만든다.       |
-| 타입을 무조건 `shared/types/`로  | 타입은 쓰는 곳 옆에 있어야 한다. [05-types](./05-types.md) 참고. |
+| 하지 말 것                        | 이유                                                                                                           |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| feature 내부 파일 직접 import     | `index.ts`가 공개 API다. 내부는 언제든 바뀐다.                                                                 |
+| feature가 다른 feature를 import   | `shared/`로 올리거나 `app/`에서 조립한다.                                                                      |
+| `shared/`가 feature를 import      | 방향이 뒤집힌다. 그 순간 공용이 아니다.                                                                        |
+| `shared/utils.ts` 한 파일에 쌓기  | 쓰레기통이 된다. 기능별로 파일을 나눈다.                                                                       |
+| 엔드포인트 경로를 `constants/`로  | 쓰는 모듈이 소유한다. 모으면 전역 `endpoints.ts`가 된다.                                                       |
+| zod 스키마를 컴포넌트에 인라인    | 무조건 `schemas/`로 분리한다. 길이는 기준이 아니다.                                                            |
+| 도메인 스키마를 `shared/`로       | `shared/`는 도메인을 모른다. 경계를 잘못 그은 신호다.                                                          |
+| 최상위 셸을 `LayoutBase`로 분리   | Provider·전역 오버레이는 `App.tsx` 담당이다. 책임이 겹친다.                                                    |
+| 레이아웃 조각이 feature를 참조    | `shared/`에 못 있게 된다. props로 내린다.                                                                      |
+| 미리 폴더 파두기                  | 파일 1개짜리 폴더는 만들지 않는다. 2개가 되면 그때 만든다.                                                     |
+| 레이어 우선 플랫 구조             | `interfaces/`·`apis/`·`queries/`를 전역에 두지 않는다. 도메인 우선이다 — feature를 통째로 옮기고 지운다.       |
+| 도메인 타입을 `shared/types/`로   | `shared/types/`는 여러 feature가 공유하는 것만. 도메인 타입은 `features/<f>/types/`. [05-types](./05-types.md) |
+| 로직 파일에 타입/상수 인라인 선언 | 선언 타입은 `types/`, 상수는 `constants/`로. z.infer·typeof-const 파생만 소스 옆. [05-types](./05-types.md)    |

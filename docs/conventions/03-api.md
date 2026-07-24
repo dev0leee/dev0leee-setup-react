@@ -111,7 +111,7 @@ const { data: orders } = useQuery(ordersQuery)
 파라미터가 있으면 함수로 감싼다:
 
 ```ts
-export const orderQuery = (orderId: string) => {
+export const orderQuery = ({ orderId }: { orderId: string }) => {
   return queryOptions({
     queryKey: ['dashboard', 'orders', orderId] as const,
     queryFn: async () => {
@@ -197,3 +197,18 @@ if (error instanceof ApiError) {
 `VITE_ENABLE_MSW=true`면 개발 서버가 이걸 쓴다. 테스트는 `src/testing/mocks/server.ts`를 쓴다.
 
 엔드포인트를 추가하고 핸들러를 안 만들면 테스트가 실제 네트워크를 때린다.
+
+### 핸들러가 돌려주는 데이터 (SHOULD)
+
+핸들러는 **서버가 실제로 줄 응답**을 흉내내는 것이다. 그 계약을 흐리지 않는다.
+
+- **단일 진실 공급원.** 같은 데이터를 핸들러마다 따로 하드코딩하지 않는다. fixture 하나를
+  두고 거기서 파생시킨다. 두 핸들러가 어긋나면 재현 안 되는 버그가 된다.
+- **raw 값만 준다. label 변환은 하지 않는다.** 서버는 `'AVAILABLE'`을 주지 `'예약 가능'`을
+  주지 않는다. 표시 문구 변환은 화면에서 한다.
+- **enum은 상수에서 import한다.** 핸들러에 `'SUBSCRIPTION'` 같은 리터럴을 직접 박지 않는다.
+- **없는 필드는 넣지 않는다.** optional 필드를 `undefined`로 명시하지 말고, 값이 있을 때만
+  포함한다 — 서버 응답과 같은 모양이어야 한다.
+
+UI 전용 텍스트(유의사항·안내문 등 서버가 주지 않는 것)는 핸들러나 응답 타입에 끼우지 않는다.
+그건 상수다 (12-constants).

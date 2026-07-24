@@ -57,39 +57,56 @@ if (first) {
 
 `orders[0]!`는 정말 확실할 때만. 대부분은 확실하지 않다.
 
-## 타입을 어디에 두나 (MUST)
-
-**쓰는 곳 옆에 둔다.** 전역 `src/types/`를 만들지 않는다.
-
-| 타입                  | 위치                                                  |
-| --------------------- | ----------------------------------------------------- |
-| 도메인 엔티티         | `features/<f>/types.ts`                               |
-| API 요청/응답         | 그 요청을 만드는 `features/<f>/api.ts`                |
-| 컴포넌트 props        | 그 컴포넌트 파일 안                                   |
-| 앱 전역 하부구조 타입 | 소유 모듈 안 (`shared/lib/apiErrors.ts`의 `ApiError`) |
+배열에서 `undefined`를 걸러낼 때는 **type guard filter**로 타입까지 좁힌다. 조인·`find` 결과에서
+자주 나온다.
 
 ```ts
-// shared/types/auth.ts - 여러 feature가 공유하는 타입(스토어와 함께 승격됐다)
-export interface User {
-  id: string
-  email: string
-  name: string
-}
-export type AuthStatus = 'booting' | 'authenticated' | 'anonymous'
+// GOOD - filter가 T | undefined를 T로 좁힌다
+const orders = ids
+  .map((id) => orderMap.get(id))
+  .filter((order): order is Order => order !== undefined)
 
-// features/auth/api/auth.ts - 이 파일에서만 쓰는 요청/응답 타입
-interface SessionResponse {
-  accessToken: string
-  user: User
-} // 미export
-export interface LoginPayload {
-  email: string
-  password: string
-} // 호출부가 씀
+// BAD - 걸러도 타입은 여전히 (Order | undefined)[]
+const orders = ids.map((id) => orderMap.get(id)).filter((order) => order !== undefined)
 ```
 
-> **SHOULD — 한 파일에서만 쓰는 타입은 export하지 않는다.** export는 계약이다.
-> `SessionResponse`가 미export인 이유가 이것이다.
+## 타입을 어디에 두나 (MUST)
+
+**선언한 타입은 예외 없이 `types/`에 둔다.** 로직 파일(컴포넌트·훅·api·스토어·lib) 안에서
+`interface`/`type`을 선언하지 않는다. 그 파일 하나만 쓰더라도 타입은 `types/`에서 import한다.
+
+| 타입                                              | 위치                        |
+| ------------------------------------------------- | --------------------------- |
+| 도메인 엔티티·모델 (`User`, `Order`)              | `features/<f>/types/`       |
+| API 요청/응답 (`LoginPayload`, `SessionResponse`) | `features/<f>/types/`       |
+| 컴포넌트 props (`OrdersTableProps`)               | 그 컴포넌트가 속한 `types/` |
+| 모듈 내부 타입 (`AuthState`, `NativeWindow`)      | 그 모듈이 속한 `types/`     |
+| 여러 feature가 공유                               | `shared/types/`             |
+
+feature 것은 `features/<f>/types/`, shared 것은 `shared/types/`에 둔다.
+
+```ts
+// features/auth/types/auth.ts - 이 도메인의 타입을 전부 모은다
+export interface User { ... }
+export interface LoginPayload { ... }
+export interface SessionResponse { ... }
+
+// features/auth/api/auth.ts - 선언하지 않고 import해서 쓴다
+import type { LoginPayload, SessionResponse } from '@/features/auth/types/auth'
+```
+
+### 예외 — 타입이 "정의 소스"를 따라갈 때 (MUST)
+
+정의가 다른 곳에 있고 타입은 거기서 **파생만** 되면, `types/`로 옮기지 않고 소스 옆에 둔다.
+소스를 `types/`로 거꾸로 import해서 파생시키는 게 더 나쁘기 때문이다.
+
+| 파생 타입                            | 소스            | 타입 위치           |
+| ------------------------------------ | --------------- | ------------------- |
+| `z.infer<typeof schema>`             | zod 스키마      | `schemas/`          |
+| `(typeof CONST)[keyof typeof CONST]` | `as const` 상수 | `constants/`        |
+| shadcn 생성 타입 (`ChartConfig`)     | shadcn CLI      | `ui/` (손대지 않음) |
+
+이 셋만 예외다. 그 밖의 모든 선언 타입은 `types/`로 간다.
 
 ## `interface` vs `type` (SHOULD)
 
@@ -100,19 +117,21 @@ export interface LoginPayload {
 
 ## props 타입
 
-```tsx
-// 인라인 - 필드 1~2개
-const AuthProvider = ({ children }: { children: ReactNode }) => {}
+**props 타입도 인라인으로 선언하지 않는다.** 명명한 인터페이스를 `types/`에 두고 import한다.
 
-// 별도 인터페이스 - 3개 이상이거나 재사용
-interface OrdersTableProps {
+```tsx
+// features/dashboard/types/ordersTable.ts
+export interface OrdersTableProps {
   orders: Order[]
   onRowClick?: (id: string) => void
 }
+
+// features/dashboard/components/OrdersTable.tsx
+import type { OrdersTableProps } from '@/features/dashboard/types/ordersTable'
 const OrdersTable = ({ orders, onRowClick }: OrdersTableProps) => {}
 ```
 
-`React.FC`는 쓰지 않는다. 함수 선언 + props 타입이면 충분하다.
+`React.FC`는 쓰지 않는다. 매개변수에 props 타입을 붙인다 ([06-react](./06-react.md)).
 
 기본 HTML 속성을 받으려면 확장한다:
 
@@ -160,10 +179,10 @@ zod 4를 쓴다. `z.string().email()`이 아니라 `z.email()`, 에러 출력은
 
 ```ts
 // BAD
-const toApiError = (error: any) => {}
+const toApiError = ({ error }: { error: any }) => {}
 
 // GOOD - unknown으로 받고 좁힌다
-export const toApiError = (error: unknown): ApiError => {
+export const toApiError = ({ error }: { error: unknown }): ApiError => {
   if (error instanceof ApiError) return error
   if (axios.isAxiosError(error)) {
     /* ... */
@@ -184,6 +203,10 @@ export const toApiError = (error: unknown): ApiError => {
 - 라우터 `location.state`처럼 타입이 없는 API (`location.state as LocationState | null`)
 
 `as unknown as T` 이중 단언은 금지다. 그 지점의 설계가 틀린 것이다.
+
+**느슨한 인덱스 타입을 `as`로 때우지 않는다.** `Record<string, string>`이라 좁혀지지 않으면
+`as`가 아니라 **타입을 제대로 잡는다** — `as const` 객체나 zod 스키마에서 `typeof`/`z.infer`로
+파생시키면 단언이 필요 없다. JSX는 그냥 TS 표현식이라 템플릿이 타입을 못 좁히는 문제 자체가 없다.
 
 ## 제네릭 (SHOULD)
 

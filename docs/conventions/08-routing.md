@@ -24,15 +24,16 @@ react-router-dom 7, `createBrowserRouter`. 라우트 정의는 `src/app/router.t
 
 ### 페이지는 feature가 소유한다
 
-라우트 파일은 페이지를 **가리키기만** 한다. 페이지 자체는 `src/features/<f>/`에 있다.
+라우트 파일은 페이지를 **가리키기만** 한다. 페이지 자체는 그 feature의 `pages/`에 있다
+(라우트에 걸리는 화면만 `pages/`, 나머지 조각은 `components/` — [10-components](./10-components.md)).
 
 ```
-features/auth/LoginPage.tsx
-features/dashboard/DashboardPage.tsx
+features/auth/pages/LoginPage.tsx
+features/dashboard/pages/DashboardPage.tsx
 app/NotFoundPage.tsx        ← 도메인이 없는 페이지만 app/
 ```
 
-`src/pages/` 폴더를 만들지 않는다. 페이지는 그 도메인의 일부다.
+전역 `src/pages/`를 만들지 않는다. 페이지는 그 도메인의 일부다.
 
 ### 페이지 컴포넌트 이름은 `~Page`로 끝난다
 
@@ -64,7 +65,7 @@ Query 캐시가 있어서 여러 컴포넌트가 같은 쿼리를 불러도 요�
 {
   path: '/orders',
   lazy: async () => {
-    const { OrdersPage } = await import('@/features/orders/OrdersPage')
+    const { OrdersPage } = await import('@/features/orders/pages/OrdersPage')
     return { Component: OrdersPage }
   },
 }
@@ -77,16 +78,26 @@ Query 캐시가 있어서 여러 컴포넌트가 같은 쿼리를 불러도 요�
 
 ## 네비게이션
 
-| 상황                 | 방법                                     |
-| -------------------- | ---------------------------------------- |
-| 사용자가 누르는 이동 | `<Link to="...">` / `<NavLink>`          |
-| 렌더 중 리다이렉트   | `<Navigate to="..." replace />`          |
-| 이벤트/콜백에서 이동 | `void navigate(path, { replace: true })` |
+| 상황                 | 방법                                       |
+| -------------------- | ------------------------------------------ |
+| 사용자가 누르는 이동 | `<Link to="...">` / `<NavLink>`            |
+| 렌더 중 리다이렉트   | `<Navigate to="..." replace />`            |
+| 이벤트/콜백에서 이동 | `void navigate(path, { replace: true })`   |
+| 탭·필터·정렬 전환    | `setSearchParams(next, { replace: true })` |
 
 > **MUST — 렌더 중에 `navigate()`를 호출하지 않는다.** `<Navigate>`를 반환한다.
 > `LoginPage`의 `if (status === 'authenticated') return <Navigate to="/" replace />`가 그 예다.
 
-> **SHOULD — 로그인/리다이렉트에는 `replace`.** 뒤로가기로 로그인 화면에 다시 갇히지 않게 한다.
+> **SHOULD — 리다이렉트와 같은 화면 안의 상태 전환에는 `replace`.**
+> 로그인·리다이렉트는 뒤로가기로 다시 갇히지 않게, 탭·필터 전환은 히스토리를 쌓지 않게 한다.
+> 탭을 `push`로 바꾸면 열 번 누른 게 뒤로가기 열 번이 되어, 한 번에 이전 페이지로 못 나간다.
+
+```tsx
+// 탭 전환 - 같은 페이지의 뷰 변경이지 새 페이지 이동이 아니다
+function selectTab(next: string) {
+  setSearchParams({ tab: next }, { replace: true }) // 히스토리 쌓지 않는다
+}
+```
 
 `navigate`는 Promise를 반환하므로 `void`를 붙인다 ([07-javascript](./07-javascript.md)).
 
@@ -101,10 +112,31 @@ const [searchParams, setSearchParams] = useSearchParams()
 
 ```tsx
 const { orderId } = useParams()
-const { data } = useQuery({ ...orderQuery(orderId!), enabled: Boolean(orderId) })
+const { data } = useQuery({ ...orderQuery({ orderId: orderId! }), enabled: Boolean(orderId) })
 ```
 
 필터·정렬·페이지·탭은 URL에 둔다 ([04-state](./04-state.md)). 새로고침과 공유가 공짜로 된다.
+
+## state로 데이터 전달
+
+URL에 노출하고 싶지 않은 값은 `navigate`의 `state`로 넘긴다. react-router가 `history.state`를 감싼다.
+
+```tsx
+// 전달
+void navigate(`/orders/${orderId}/payment`, { state: { selectedDate } })
+
+// 수신 - 타입 없는 API라 단언이 허용되는 자리다 ([05-types](./05-types.md))
+const location = useLocation()
+const state = location.state as { selectedDate?: string } | null
+const selectedDate = state?.selectedDate ?? ''
+```
+
+> **MUST — `state`에만 의존하는 화면을 만들지 않는다.** 사용자가 그 URL로 **직접 들어오면
+> `state`는 `null`**이다(북마크·새로고침·링크 공유). 없으면 다시 조회하거나 이전 화면으로 돌린다.
+
+**뒤로가기해도 남아야 하거나 공유돼야 하는 값은 `state`가 아니라 URL에 둔다.** `state`는
+"이번 이동에만 딸려 보내는 힌트"다 — 예: 목록에서 고른 날짜를 결제 화면에 미리 채워주되,
+없어도 화면이 동작하는 경우.
 
 ## 라우트에서 데이터 로딩
 
@@ -115,7 +147,7 @@ loader와 Query를 섞으면 캐시가 두 개가 된다.
 
 ```tsx
 lazy: async () => {
-  const { OrdersPage } = await import('@/features/orders/OrdersPage')
+  const { OrdersPage } = await import('@/features/orders/pages/OrdersPage')
   void queryClient.prefetchQuery(ordersQuery)
   return { Component: OrdersPage }
 }
@@ -123,8 +155,8 @@ lazy: async () => {
 
 ## 페이지 추가 체크리스트
 
-1. `src/features/<도메인>/XxxPage.tsx` 생성 (named export)
-2. 필요한 쿼리를 `features/<도메인>/api.ts`에 `queryOptions`로 추가
+1. `src/features/<도메인>/pages/XxxPage.tsx` 생성 (named export)
+2. 필요한 쿼리를 `features/<도메인>/queries/`에 `queryOptions`로 추가
 3. `src/testing/mocks/handlers.ts`에 MSW 핸들러 추가
 4. `src/app/router.tsx`에 `lazy` 라우트 추가 — 인증 필요하면 `AppLayout` children 아래
 5. e2e가 필요하면 `e2e/`에 `.spec.ts` 추가
