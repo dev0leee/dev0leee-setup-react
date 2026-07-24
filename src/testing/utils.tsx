@@ -21,7 +21,13 @@ const Wrapper = ({ children }: { children: ReactNode }) => {
   )
 }
 
-export const renderWithProviders = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) => {
+export const renderWithProviders = ({
+  ui,
+  options,
+}: {
+  ui: ReactElement
+  options?: Omit<RenderOptions, 'wrapper'>
+}) => {
   return render(ui, { wrapper: Wrapper, ...options })
 }
 

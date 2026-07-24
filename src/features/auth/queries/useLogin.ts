@@ -14,7 +14,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: ({ accessToken, user }) => {
-      setAccessToken(accessToken)
+      setAccessToken({ token: accessToken })
       setAuthenticated(user)
     },
   })

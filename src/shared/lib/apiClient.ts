@@ -32,25 +32,25 @@ export const api = axios.create({
 /** Web Locks를 못 쓰는 환경(비 secure context)용 폴백 */
 let fallbackInflight: Promise<string> | null = null
 
-const performRefresh = async (failedToken: string | null): Promise<string> => {
+const performRefresh = async ({ failedToken }: { failedToken: string | null }): Promise<string> => {
   // 락 획득 시점에 토큰이 이미 바뀌었다면 다른 요청/다른 탭이 갱신을 끝낸 것이다.
   // 이 비교 한 줄이 탭 내부 동시성과 탭 간 동시성을 동시에 해결한다.
   const current = getAccessToken()
   if (current && current !== failedToken) return current
 
   const { data } = await refreshClient.post<RefreshResponse>(REFRESH_ENDPOINT)
-  setAccessToken(data.accessToken)
-  broadcastToken(data.accessToken)
+  setAccessToken({ token: data.accessToken })
+  broadcastToken({ token: data.accessToken })
   return data.accessToken
 }
 
-const refreshAccessToken = (failedToken: string | null): Promise<string> => {
+const refreshAccessToken = ({ failedToken }: { failedToken: string | null }): Promise<string> => {
   if ('locks' in navigator) {
     // Web Locks는 origin 단위라 탭을 가로질러 직렬화된다.
-    return navigator.locks.request('auth:refresh', () => performRefresh(failedToken))
+    return navigator.locks.request('auth:refresh', () => performRefresh({ failedToken }))
   }
 
-  fallbackInflight ??= performRefresh(failedToken).finally(() => {
+  fallbackInflight ??= performRefresh({ failedToken }).finally(() => {
     fallbackInflight = null
   })
   return fallbackInflight
@@ -70,21 +70,21 @@ api.interceptors.response.use(
     // 재시도는 딱 1회. _retried 플래그가 없으면 401 루프에 빠진다.
     // 백엔드가 "권한 부족"까지 401로 주면 여기서 무한히 돈다 - 403이어야 한다.
     if (error.response?.status !== 401 || !config || config._retried) {
-      return Promise.reject(toApiError(error))
+      return Promise.reject(toApiError({ error }))
     }
 
     config._retried = true
     const failedToken = config.headers.Authorization?.toString().replace('Bearer ', '') ?? null
 
     try {
-      const token = await refreshAccessToken(failedToken)
+      const token = await refreshAccessToken({ failedToken })
       config.headers.Authorization = `Bearer ${token}`
       return await api(config)
     } catch (refreshError) {
       // Refresh 실패 = 세션 종료.
       // 여기서 화면을 전환하지 않는다. 라우팅은 AuthProvider가 담당한다(관심사 분리).
-      setAccessToken(null)
-      return Promise.reject(toApiError(refreshError))
+      setAccessToken({ token: null })
+      return Promise.reject(toApiError({ error: refreshError }))
     }
   },
 )

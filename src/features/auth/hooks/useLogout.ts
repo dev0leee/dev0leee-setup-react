@@ -19,7 +19,7 @@ export const useLogout = () => {
       await logoutRequest()
     } finally {
       broadcastLogout()
-      setAccessToken(null)
+      setAccessToken({ token: null })
       queryClient.clear()
       setAnonymous()
     }

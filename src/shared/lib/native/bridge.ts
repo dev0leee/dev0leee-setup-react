@@ -30,7 +30,7 @@ export const isNativeApp = (): boolean => {
  * 네이티브로 메시지를 보낸다. 브라우저에서는 조용히 무시한다.
  * 네이티브가 없다고 앱이 죽으면 안 된다 — 개발 중에는 늘 브라우저다.
  */
-export const sendToNative = (type: string, payload?: unknown): void => {
+export const sendToNative = ({ type, payload }: { type: string; payload?: unknown }): void => {
   const body = JSON.stringify({ type, payload })
   const w = getNativeWindow()
 
@@ -47,15 +47,19 @@ export const sendToNative = (type: string, payload?: unknown): void => {
  * 네이티브에서 오는 값은 신뢰할 수 없는 입력이므로 zod로 검증한다
  * (환경변수·폼 입력과 같은 범주 — docs/conventions/05-types.md).
  */
-export const subscribeToNative = <T>(
-  type: string,
-  schema: z.ZodType<T>,
-  handler: (payload: T) => void,
-): (() => void) => {
+export const subscribeToNative = <T>({
+  type,
+  schema,
+  handler,
+}: {
+  type: string
+  schema: z.ZodType<T>
+  handler: (payload: T) => void
+}): (() => void) => {
   const onMessage = (event: MessageEvent<string>) => {
     const parsed = z
       .object({ type: z.string(), payload: z.unknown() })
-      .safeParse(safeJsonParse(event.data))
+      .safeParse(safeJsonParse({ raw: event.data }))
     if (!parsed.success || parsed.data.type !== type) return
 
     const result = schema.safeParse(parsed.data.payload)
@@ -70,7 +74,7 @@ export const subscribeToNative = <T>(
   return () => window.removeEventListener('message', onMessage)
 }
 
-const safeJsonParse = (raw: string): unknown => {
+const safeJsonParse = ({ raw }: { raw: string }): unknown => {
   try {
     return JSON.parse(raw)
   } catch {

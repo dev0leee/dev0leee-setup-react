@@ -14,23 +14,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient()
 
   const clearSession = useCallback(() => {
-    setAccessToken(null)
+    setAccessToken({ token: null })
     // 이전 사용자 데이터가 다음 로그인 화면에 새어나가지 않도록 캐시를 비운다.
     queryClient.clear()
     setAnonymous()
   }, [queryClient, setAnonymous])
 
   useEffect(() => {
-    const unsubscribe = initAuthChannel(clearSession)
+    const unsubscribe = initAuthChannel({ onLogout: clearSession })
 
     // 새로고침으로 사라진 메모리 Access Token을 RT 쿠키로 복원한다.
     const restore = async () => {
       try {
         const { accessToken, user } = await restoreSession()
-        setAccessToken(accessToken)
+        setAccessToken({ token: accessToken })
         setAuthenticated(user)
       } catch {
-        setAccessToken(null)
+        setAccessToken({ token: null })
         setAnonymous()
       }
     }

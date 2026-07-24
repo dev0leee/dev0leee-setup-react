@@ -13,7 +13,7 @@ describe('toApiError', () => {
       data: { message: '이메일 형식이 올바르지 않습니다.', code: 'INVALID_EMAIL' },
     })
 
-    const result = toApiError(axiosError)
+    const result = toApiError({ error: axiosError })
 
     expect(result).toBeInstanceOf(ApiError)
     expect(result.status).toBe(400)
@@ -22,7 +22,7 @@ describe('toApiError', () => {
   })
 
   it('응답이 없는 네트워크 에러는 status 0으로 정규화한다', () => {
-    const result = toApiError(new AxiosError('Network Error'))
+    const result = toApiError({ error: new AxiosError('Network Error') })
 
     expect(result.status).toBe(0)
     expect(result.isNetworkError).toBe(true)
@@ -30,11 +30,11 @@ describe('toApiError', () => {
 
   it('이미 ApiError면 그대로 돌려준다', () => {
     const original = new ApiError('중복 방지', 409, 'CONFLICT')
-    expect(toApiError(original)).toBe(original)
+    expect(toApiError({ error: original })).toBe(original)
   })
 
   it('알 수 없는 값도 ApiError로 감싼다', () => {
-    const result = toApiError('그냥 문자열')
+    const result = toApiError({ error: '그냥 문자열' })
     expect(result).toBeInstanceOf(ApiError)
     expect(result.status).toBe(0)
   })

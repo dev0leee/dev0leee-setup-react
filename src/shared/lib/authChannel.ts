@@ -20,16 +20,16 @@ const getChannel = (): BroadcastChannel | null => {
  * 한쪽이 폐기된 RT를 쓰게 되어 서버가 재사용 공격으로 판정하고 세션을 통째로 날린다.
  * 갱신된 토큰을 즉시 전파해서 그 상황을 막는다.
  */
-export const initAuthChannel = (onLogout: () => void): (() => void) => {
+export const initAuthChannel = ({ onLogout }: { onLogout: () => void }): (() => void) => {
   const ch = getChannel()
   if (!ch) return () => {}
 
   const handler = (e: MessageEvent<AuthMessage>) => {
     if (e.data.type === 'token') {
-      setAccessToken(e.data.token)
+      setAccessToken({ token: e.data.token })
       return
     }
-    setAccessToken(null)
+    setAccessToken({ token: null })
     onLogout()
   }
 
@@ -37,7 +37,7 @@ export const initAuthChannel = (onLogout: () => void): (() => void) => {
   return () => ch.removeEventListener('message', handler)
 }
 
-export const broadcastToken = (token: string): void => {
+export const broadcastToken = ({ token }: { token: string }): void => {
   getChannel()?.postMessage({ type: 'token', token } satisfies AuthMessage)
 }
 

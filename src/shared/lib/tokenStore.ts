@@ -13,6 +13,6 @@ export const getAccessToken = (): string | null => {
   return accessToken
 }
 
-export const setAccessToken = (token: string | null): void => {
+export const setAccessToken = ({ token }: { token: string | null }): void => {
   accessToken = token
 }
