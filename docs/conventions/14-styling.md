@@ -90,3 +90,15 @@ const badgeVariants = cva('rounded px-1', {
 // BAD - 마크업 안 중첩 삼항 / 백틱 결합
 <div className={`... ${tone === 'info' ? 'bg-cyan-50' : tone === 'warning' ? 'bg-amber-500' : '...'}`} />
 ```
+
+## 텍스트 오버플로·레이아웃 견고성 (MUST)
+
+**짧은 더미가 아니라 실제로 긴 값을 넣어 레이아웃이 안 터지는지 확인한다.** 사용자 이름·주소·
+URL은 얼마든지 길어진다.
+
+- **말줄임표.** 한 줄은 `truncate`, 여러 줄은 `line-clamp-2`처럼. flex/grid 안에서는 컨테이너에
+  `min-w-0`이 없으면 `truncate`가 안 먹는다(자식이 안 줄어든다).
+- **긴 단어·URL 줄바꿈.** 공백 없는 긴 문자열은 `break-words`(필요하면 `break-all`)로 컨테이너
+  밖으로 삐져나가지 않게 한다.
+- **최하단 여백.** 하단 고정 바(`BottomNavigation`)·모바일 safe-area가 마지막 콘텐츠를 가리지
+  않게 스크롤 영역에 `padding-bottom`(또는 `pb-[env(safe-area-inset-bottom)]`)을 준다.
