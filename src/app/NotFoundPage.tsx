@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { Button } from '@/shared/components/ui/button'
 
-export function NotFoundPage() {
+export const NotFoundPage = () => {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-semibold">404</h1>

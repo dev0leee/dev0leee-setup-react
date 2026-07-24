@@ -126,7 +126,7 @@ features/dashboard/
 
 ```ts
 // features/auth/queries/useLogin.ts
-export function useLogin() {
+export const useLogin = () => {
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
   return useMutation({
     mutationFn: login,
@@ -185,7 +185,7 @@ feature A가 feature B를 import하고 싶어지면 셋 중 하나다.
 import { useAuthStore } from '@/features/auth'
 
 // GOOD - 필요한 값을 props로 받는다
-function DashboardPage({ userName }: { userName: string }) {}
+const DashboardPage = ({ userName }: { userName: string }) => {}
 ```
 
 > **예외:** `app/`이 `features/*`를 import하는 것은 `features` → `app` 방향이라 허용된다.

@@ -102,14 +102,14 @@ export interface LoginPayload {
 
 ```tsx
 // 인라인 - 필드 1~2개
-function AuthProvider({ children }: { children: ReactNode }) {}
+const AuthProvider = ({ children }: { children: ReactNode }) => {}
 
 // 별도 인터페이스 - 3개 이상이거나 재사용
 interface OrdersTableProps {
   orders: Order[]
   onRowClick?: (id: string) => void
 }
-function OrdersTable({ orders, onRowClick }: OrdersTableProps) {}
+const OrdersTable = ({ orders, onRowClick }: OrdersTableProps) => {}
 ```
 
 `React.FC`는 쓰지 않는다. 함수 선언 + props 타입이면 충분하다.
@@ -125,7 +125,7 @@ interface FieldProps extends React.ComponentProps<'input'> {
 Base UI 컴포넌트를 감쌀 때는 그 primitive의 Props를 확장한다 (`button.tsx` 참고):
 
 ```tsx
-function Button(props: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {}
+const Button = (props: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) => {}
 ```
 
 ## zod와 타입의 관계 (MUST)
@@ -160,10 +160,10 @@ zod 4를 쓴다. `z.string().email()`이 아니라 `z.email()`, 에러 출력은
 
 ```ts
 // BAD
-function toApiError(error: any) {}
+const toApiError = (error: any) => {}
 
 // GOOD - unknown으로 받고 좁힌다
-export function toApiError(error: unknown): ApiError {
+export const toApiError = (error: unknown): ApiError => {
   if (error instanceof ApiError) return error
   if (axios.isAxiosError(error)) {
     /* ... */

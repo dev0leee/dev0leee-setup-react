@@ -10,7 +10,7 @@ import { useAuthStore } from '@/shared/stores/authStore'
  * 로그아웃. 서버 폐기 -> 다른 탭 전파 -> 로컬 정리 순서.
  * 서버 호출이 실패해도 로컬 세션은 반드시 정리한다(finally).
  */
-export function useLogout() {
+export const useLogout = () => {
   const queryClient = useQueryClient()
   const setAnonymous = useAuthStore((s) => s.setAnonymous)
 

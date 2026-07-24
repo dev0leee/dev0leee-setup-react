@@ -10,7 +10,7 @@ import { QueryErrorBoundary } from '@/shared/components/errors/QueryErrorBoundar
 import { Toaster } from '@/shared/components/ui/sonner'
 import { queryClient } from '@/shared/lib/queryClient'
 
-export function App() {
+export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       {/* 1계층 바운더리 - 최후의 보루. QueryClientProvider 안쪽이어야

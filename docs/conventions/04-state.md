@@ -42,7 +42,7 @@ mutations.throwOnError: false   // 변경 에러 → 폼/토스트에서 개별 
 
 ```tsx
 // GOOD - 에러 분기가 없다
-function DashboardPage() {
+const DashboardPage = () => {
   const { data } = useQuery(ordersQuery)
   return <OrdersTable orders={data} />
 }

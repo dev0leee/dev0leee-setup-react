@@ -10,7 +10,7 @@ interface AppBarProps {
   className?: string
 }
 
-export function AppBar({ title, hasBackButton = false, onBack, className }: AppBarProps) {
+export const AppBar = ({ title, hasBackButton = false, onBack, className }: AppBarProps) => {
   return (
     <header
       className={cn(

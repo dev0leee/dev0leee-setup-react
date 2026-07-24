@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 import { useAuthStore } from '@/shared/stores/authStore'
 
-export function ProtectedRoute() {
+export const ProtectedRoute = () => {
   const status = useAuthStore((s) => s.status)
   const location = useLocation()
 

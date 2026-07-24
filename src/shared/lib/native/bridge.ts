@@ -16,12 +16,12 @@ interface NativeWindow {
 
 const NATIVE_HANDLER = 'appBridge'
 
-function getNativeWindow(): NativeWindow {
+const getNativeWindow = (): NativeWindow => {
   return window as unknown as NativeWindow
 }
 
 /** 네이티브 셸 안에서 실행 중인지. 브라우저에서 열었으면 false. */
-export function isNativeApp(): boolean {
+export const isNativeApp = (): boolean => {
   const w = getNativeWindow()
   return Boolean(w.AndroidBridge ?? w.webkit?.messageHandlers?.[NATIVE_HANDLER])
 }
@@ -30,7 +30,7 @@ export function isNativeApp(): boolean {
  * 네이티브로 메시지를 보낸다. 브라우저에서는 조용히 무시한다.
  * 네이티브가 없다고 앱이 죽으면 안 된다 — 개발 중에는 늘 브라우저다.
  */
-export function sendToNative(type: string, payload?: unknown): void {
+export const sendToNative = (type: string, payload?: unknown): void => {
   const body = JSON.stringify({ type, payload })
   const w = getNativeWindow()
 
@@ -47,12 +47,12 @@ export function sendToNative(type: string, payload?: unknown): void {
  * 네이티브에서 오는 값은 신뢰할 수 없는 입력이므로 zod로 검증한다
  * (환경변수·폼 입력과 같은 범주 — docs/conventions/05-types.md).
  */
-export function subscribeToNative<T>(
+export const subscribeToNative = <T>(
   type: string,
   schema: z.ZodType<T>,
   handler: (payload: T) => void,
-): () => void {
-  function onMessage(event: MessageEvent<string>) {
+): (() => void) => {
+  const onMessage = (event: MessageEvent<string>) => {
     const parsed = z
       .object({ type: z.string(), payload: z.unknown() })
       .safeParse(safeJsonParse(event.data))
@@ -70,7 +70,7 @@ export function subscribeToNative<T>(
   return () => window.removeEventListener('message', onMessage)
 }
 
-function safeJsonParse(raw: string): unknown {
+const safeJsonParse = (raw: string): unknown => {
   try {
     return JSON.parse(raw)
   } catch {

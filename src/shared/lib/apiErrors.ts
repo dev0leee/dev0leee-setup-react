@@ -29,7 +29,7 @@ interface ServerErrorBody {
   code?: string
 }
 
-export function toApiError(error: unknown): ApiError {
+export const toApiError = (error: unknown): ApiError => {
   if (error instanceof ApiError) return error
 
   if (axios.isAxiosError(error)) {

@@ -3,12 +3,12 @@ import { z } from 'zod'
 import { sendToNative, subscribeToNative } from '@/shared/lib/native/bridge'
 
 /** 앱 종료. 네이티브만 할 수 있다. */
-export function exitApp(): void {
+export const exitApp = (): void => {
   sendToNative('exitApp')
 }
 
 /** 네이티브 하단 안전영역 높이 등 화면 정보 요청 */
-export function requestSafeAreaInsets(): void {
+export const requestSafeAreaInsets = (): void => {
   sendToNative('requestSafeAreaInsets')
 }
 
@@ -21,7 +21,7 @@ const backButtonSchema = z.object({
  * 네이티브 하드웨어 뒤로가기 구독.
  * 컴포넌트에서 쓸 때는 반환된 해제 함수를 effect cleanup으로 돌려준다.
  */
-export function subscribeToBackButton(handler: (canGoBack: boolean) => void): () => void {
+export const subscribeToBackButton = (handler: (canGoBack: boolean) => void): (() => void) => {
   return subscribeToNative('backButton', backButtonSchema, ({ canGoBack }) => {
     handler(canGoBack)
   })

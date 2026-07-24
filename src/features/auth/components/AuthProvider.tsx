@@ -7,7 +7,7 @@ import { initAuthChannel } from '@/shared/lib/authChannel'
 import { setAccessToken } from '@/shared/lib/tokenStore'
 import { useAuthStore } from '@/shared/stores/authStore'
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const status = useAuthStore((s) => s.status)
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
   const setAnonymous = useAuthStore((s) => s.setAnonymous)
@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = initAuthChannel(clearSession)
 
     // 새로고침으로 사라진 메모리 Access Token을 RT 쿠키로 복원한다.
-    async function restore() {
+    const restore = async () => {
       try {
         const { accessToken, user } = await restoreSession()
         setAccessToken(accessToken)

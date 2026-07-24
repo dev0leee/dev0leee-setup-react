@@ -15,7 +15,7 @@ if (env.VITE_SENTRY_DSN) {
   })
 }
 
-async function enableMocking(): Promise<void> {
+const enableMocking = async (): Promise<void> => {
   // import.meta.env.DEV는 빌드 타임에 상수로 치환된다.
   // 이 가드가 없으면 msw 400KB가 프로덕션 번들에 그대로 딸려간다
   // (env.VITE_ENABLE_MSW는 Zod transform을 거쳐 정적 분석이 안 되기 때문).
@@ -31,7 +31,7 @@ async function enableMocking(): Promise<void> {
   }
 }
 
-async function bootstrap(): Promise<void> {
+const bootstrap = async (): Promise<void> => {
   const rootElement = document.getElementById('root')
   if (!rootElement) throw new Error('#root 엘리먼트를 찾을 수 없습니다.')
 

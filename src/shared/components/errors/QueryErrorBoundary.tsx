@@ -16,7 +16,7 @@ interface Props {
  * ErrorBoundary만 리셋하면 컴포넌트는 다시 렌더되지만 Query 캐시에는 에러가 남아
  * 즉시 다시 터진다. 두 리셋을 연결해야 "다시 시도"가 실제로 동작한다.
  */
-export function QueryErrorBoundary({ FallbackComponent, resetKeys, children }: Props) {
+export const QueryErrorBoundary = ({ FallbackComponent, resetKeys, children }: Props) => {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (

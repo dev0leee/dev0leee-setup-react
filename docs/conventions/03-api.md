@@ -43,13 +43,13 @@ const { data } = await axios.get('/dashboard/orders') // 토큰도, refresh도, 
 
 ```ts
 // GOOD
-export async function login(payload: LoginPayload): Promise<SessionResponse> {
+export const login = async (payload: LoginPayload): Promise<SessionResponse> => {
   const { data } = await api.post<SessionResponse>('/login', payload)
   return data
 }
 
 // BAD
-export function login(payload: LoginPayload) {
+export const login = (payload: LoginPayload) => {
   return api.post('/login', payload) // 반환 타입 any, 호출부가 .data를 알아야 함
 }
 ```
@@ -60,7 +60,7 @@ export function login(payload: LoginPayload) {
 
 ```ts
 // BAD
-export async function login(payload: LoginPayload) {
+export const login = async (payload: LoginPayload) => {
   try {
     const { data } = await api.post<SessionResponse>('/login', payload)
     return data
@@ -85,7 +85,7 @@ export async function login(payload: LoginPayload) {
 // features/dashboard/api/dashboard.ts - 요청 함수
 import { api } from '@/shared/lib/apiClient'
 
-export async function getOrders(): Promise<Order[]> {
+export const getOrders = async (): Promise<Order[]> => {
   const { data } = await api.get<Order[]>('/dashboard/orders')
   return data
 }
@@ -111,7 +111,7 @@ const { data: orders } = useQuery(ordersQuery)
 파라미터가 있으면 함수로 감싼다:
 
 ```ts
-export function orderQuery(orderId: string) {
+export const orderQuery = (orderId: string) => {
   return queryOptions({
     queryKey: ['dashboard', 'orders', orderId] as const,
     queryFn: async () => {
@@ -127,7 +127,7 @@ export function orderQuery(orderId: string) {
 `useMutation`에 그대로 넘길 수 있는 모양이어야 한다.
 
 ```ts
-export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
+export const createOrder = async (payload: CreateOrderPayload): Promise<Order> => {
   const { data } = await api.post<Order>('/dashboard/orders', payload)
   return data
 }

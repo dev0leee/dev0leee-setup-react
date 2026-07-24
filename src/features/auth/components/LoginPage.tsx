@@ -14,7 +14,7 @@ interface LocationState {
   from?: { pathname: string }
 }
 
-export function LoginPage() {
+export const LoginPage = () => {
   const status = useAuthStore((s) => s.status)
   const navigate = useNavigate()
   const location = useLocation()

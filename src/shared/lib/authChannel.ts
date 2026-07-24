@@ -6,7 +6,7 @@ const CHANNEL_NAME = 'auth'
 
 let channel: BroadcastChannel | null = null
 
-function getChannel(): BroadcastChannel | null {
+const getChannel = (): BroadcastChannel | null => {
   if (typeof BroadcastChannel === 'undefined') return null
   channel ??= new BroadcastChannel(CHANNEL_NAME)
   return channel
@@ -20,7 +20,7 @@ function getChannel(): BroadcastChannel | null {
  * 한쪽이 폐기된 RT를 쓰게 되어 서버가 재사용 공격으로 판정하고 세션을 통째로 날린다.
  * 갱신된 토큰을 즉시 전파해서 그 상황을 막는다.
  */
-export function initAuthChannel(onLogout: () => void): () => void {
+export const initAuthChannel = (onLogout: () => void): (() => void) => {
   const ch = getChannel()
   if (!ch) return () => {}
 
@@ -37,10 +37,10 @@ export function initAuthChannel(onLogout: () => void): () => void {
   return () => ch.removeEventListener('message', handler)
 }
 
-export function broadcastToken(token: string): void {
+export const broadcastToken = (token: string): void => {
   getChannel()?.postMessage({ type: 'token', token } satisfies AuthMessage)
 }
 
-export function broadcastLogout(): void {
+export const broadcastLogout = (): void => {
   getChannel()?.postMessage({ type: 'logout' } satisfies AuthMessage)
 }

@@ -9,10 +9,10 @@
  */
 let accessToken: string | null = null
 
-export function getAccessToken(): string | null {
+export const getAccessToken = (): string | null => {
   return accessToken
 }
 
-export function setAccessToken(token: string | null): void {
+export const setAccessToken = (token: string | null): void => {
   accessToken = token
 }

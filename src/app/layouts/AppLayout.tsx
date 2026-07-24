@@ -7,7 +7,7 @@ import { QueryErrorBoundary } from '@/shared/components/errors/QueryErrorBoundar
 import { Button } from '@/shared/components/ui/button'
 import { useAuthStore } from '@/shared/stores/authStore'
 
-export function AppLayout() {
+export const AppLayout = () => {
   const user = useAuthStore((s) => s.user)
   const logout = useLogout()
   const { pathname } = useLocation()

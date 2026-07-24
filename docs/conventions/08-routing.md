@@ -43,7 +43,7 @@ app/NotFoundPage.tsx        ← 도메인이 없는 페이지만 app/
 **조합과 배치.** 로직은 아래로 내린다.
 
 ```tsx
-export function DashboardPage() {
+export const DashboardPage = () => {
   return (
     <div className="flex flex-col gap-6 p-6">
       <RevenueChart />

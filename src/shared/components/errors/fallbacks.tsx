@@ -4,14 +4,14 @@ import type { FallbackProps } from 'react-error-boundary'
 import { env } from '@/config/env'
 import { Button } from '@/shared/components/ui/button'
 
-function DevDetail({ error }: { error: unknown }) {
+const DevDetail = ({ error }: { error: unknown }) => {
   if (env.VITE_ENV === 'production') return null
   const message = error instanceof Error ? error.message : String(error)
   return <pre className="mt-2 text-xs break-all text-muted-foreground">{message}</pre>
 }
 
 /** 1계층 - 앱 루트. 여기까지 왔으면 화면 전체가 살아남지 못한 상태다. */
-export function RootErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+export const RootErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
       <AlertTriangle className="size-10 text-destructive" />
@@ -30,7 +30,7 @@ export function RootErrorFallback({ error, resetErrorBoundary }: FallbackProps) 
 }
 
 /** 2계층 - 라우트. 헤더/사이드바는 살아있고 페이지 영역만 대체된다. */
-export function RouteErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+export const RouteErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-12 text-center">
       <AlertTriangle className="size-8 text-destructive" />
@@ -46,7 +46,7 @@ export function RouteErrorFallback({ error, resetErrorBoundary }: FallbackProps)
 }
 
 /** 3계층 - 위젯. 차트 하나가 죽어도 나머지 대시보드는 그대로 동작한다. */
-export function WidgetErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+export const WidgetErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   return (
     <div className="flex h-full min-h-32 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border p-4 text-center">
       <p className="text-sm text-muted-foreground">데이터를 불러오지 못했습니다</p>

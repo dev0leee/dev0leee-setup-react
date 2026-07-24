@@ -14,7 +14,7 @@ interface BottomNavigationProps {
   className?: string
 }
 
-export function BottomNavigation({ items, className }: BottomNavigationProps) {
+export const BottomNavigation = ({ items, className }: BottomNavigationProps) => {
   return (
     <nav
       className={cn(

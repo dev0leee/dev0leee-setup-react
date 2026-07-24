@@ -76,10 +76,11 @@ import {} from '@/shared/utils/cn'
 
 ```ts
 // GOOD
-export function LoginPage() {}
+export const LoginPage = () => {}
 
 // BAD
-export default function LoginPage() {}
+const LoginPage = () => {}
+export default LoginPage
 ```
 
 코드 스플리팅도 default export를 요구하지 않는다. `src/app/router.tsx`의 `lazy` 라우트는

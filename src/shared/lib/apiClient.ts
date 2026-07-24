@@ -32,7 +32,7 @@ export const api = axios.create({
 /** Web Locks를 못 쓰는 환경(비 secure context)용 폴백 */
 let fallbackInflight: Promise<string> | null = null
 
-async function performRefresh(failedToken: string | null): Promise<string> {
+const performRefresh = async (failedToken: string | null): Promise<string> => {
   // 락 획득 시점에 토큰이 이미 바뀌었다면 다른 요청/다른 탭이 갱신을 끝낸 것이다.
   // 이 비교 한 줄이 탭 내부 동시성과 탭 간 동시성을 동시에 해결한다.
   const current = getAccessToken()
@@ -44,7 +44,7 @@ async function performRefresh(failedToken: string | null): Promise<string> {
   return data.accessToken
 }
 
-function refreshAccessToken(failedToken: string | null): Promise<string> {
+const refreshAccessToken = (failedToken: string | null): Promise<string> => {
   if ('locks' in navigator) {
     // Web Locks는 origin 단위라 탭을 가로질러 직렬화된다.
     return navigator.locks.request('auth:refresh', () => performRefresh(failedToken))

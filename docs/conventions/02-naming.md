@@ -62,14 +62,14 @@
 
 ```ts
 // GOOD
-export async function login(payload: LoginPayload): Promise<SessionResponse>
-export async function restoreSession(): Promise<SessionResponse>
-export function toApiError(error: unknown): ApiError
+export const login = async (payload: LoginPayload): Promise<SessionResponse> => { ... }
+export const restoreSession = async (): Promise<SessionResponse> => { ... }
+export const toApiError = (error: unknown): ApiError => { ... }
 
 // BAD
-export async function userLogin() // 명사 시작
-export async function session() // 무엇을 하는지 모름
-export function apiError() // 만드는 건지 던지는 건지 모름
+export const userLogin = async () => {} // 명사 시작
+export const session = async () => {} // 무엇을 하는지 모름
+export const apiError = () => {} // 만드는 건지 던지는 건지 모름
 ```
 
 API 함수의 동사 관례:
@@ -89,8 +89,8 @@ API 함수의 동사 관례:
 - **컴포넌트 내부 정의**: `handle` 접두 → `handleSubmit`, `handleRowClick`
 
 ```tsx
-function OrdersTable({ onRowClick }: { onRowClick: (id: string) => void }) {
-  function handleRowClick(order: Order) {
+const OrdersTable = ({ onRowClick }: { onRowClick: (id: string) => void }) => {
+  const handleRowClick = (order: Order) => {
     onRowClick(order.id)
   }
 }

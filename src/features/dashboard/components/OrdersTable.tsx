@@ -34,7 +34,7 @@ const columns = [
   }),
 ]
 
-export function OrdersTable() {
+export const OrdersTable = () => {
   const { data } = useSuspenseQuery(ordersQuery)
 
   const table = useReactTable({
