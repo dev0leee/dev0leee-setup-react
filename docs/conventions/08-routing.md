@@ -125,7 +125,7 @@ lazy: async () => {
 
 1. `src/features/<도메인>/XxxPage.tsx` 생성 (named export)
 2. 필요한 쿼리를 `features/<도메인>/api.ts`에 `queryOptions`로 추가
-3. `src/mocks/handlers.ts`에 MSW 핸들러 추가
+3. `src/testing/mocks/handlers.ts`에 MSW 핸들러 추가
 4. `src/app/router.tsx`에 `lazy` 라우트 추가 — 인증 필요하면 `AppLayout` children 아래
 5. e2e가 필요하면 `e2e/`에 `.spec.ts` 추가
 6. `pnpm typecheck && pnpm lint && pnpm test` 통과 확인

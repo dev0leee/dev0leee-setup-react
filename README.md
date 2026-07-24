@@ -37,7 +37,7 @@ pnpm dev
 | Language          | TypeScript 7                                |
 | Routing           | React Router v7 (library mode)              |
 | Server State      | TanStack Query v5                           |
-| HTTP              | axios + `src/api/client.ts`                 |
+| HTTP              | axios + `src/shared/lib/apiClient.ts`       |
 | Client State      | Zustand                                     |
 | Form / Validation | React Hook Form + Zod                       |
 | UI / Component    | Tailwind CSS v4 + shadcn/ui (Base UI)       |
@@ -87,9 +87,9 @@ e2e/            Playwright
 
 ## 인증
 
-- Access Token은 **메모리**(`src/api/tokenStore.ts`). localStorage 금지
+- Access Token은 **메모리**(`src/shared/lib/tokenStore.ts`). localStorage 금지
 - Refresh Token은 **HttpOnly 쿠키**. 프론트는 건드리지 않는다
-- 401 → `/token-refresh` → RTR → 원요청 1회 재시도 (`src/api/client.ts`)
+- 401 → `/token-refresh` → RTR → 원요청 1회 재시도 (`src/shared/lib/apiClient.ts`)
 - 동시 401과 **멀티탭**은 Web Locks + BroadcastChannel로 직렬화. RTR에서 폐기된 RT를
   두 번 쓰면 서버가 재사용 공격으로 판정해 세션을 통째로 날리기 때문이다
 - 새로고침 시 `AuthProvider`가 `/token-refresh`로 세션을 복원하고, 그 전까지 렌더를 막는다

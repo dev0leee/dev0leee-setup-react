@@ -15,13 +15,13 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/testing/setup.ts'],
     // e2e는 Playwright가 담당한다. Vitest가 긁어가지 않도록 제외.
     exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      exclude: ['**/*.config.*', 'src/test/**', 'src/mocks/**'],
+      exclude: ['**/*.config.*', 'src/testing/**'],
     },
   },
 })

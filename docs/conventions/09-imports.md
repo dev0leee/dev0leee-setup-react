@@ -11,18 +11,18 @@ ESLint `no-restricted-imports`가 에러로 잡는다.
 
 ```ts
 // GOOD
-import { login } from '@/features/auth/api'
-import { useAuthStore } from '@/features/auth/store'
+import { login } from '@/features/auth/api/auth'
+import { useAuthStore } from '@/shared/stores/authStore'
 ```
 
 ```ts
 // BAD
-import { api } from '../../api/client'
-import { login } from './api'
+import { api } from '../../shared/lib/apiClient'
+import { login } from './api/auth'
 ```
 
 같은 폴더 안이라도 예외가 없다. 이유는 파일을 옮길 때 드러난다 — `./api`는 폴더가 바뀌면
-조용히 다른 파일을 가리키거나 깨지지만, `@/features/auth/api`는 옮겨도 그대로거나
+조용히 다른 파일을 가리키거나 깨지지만, `@/features/auth/api/auth`는 옮겨도 그대로거나
 확실하게 깨진다. 그리고 import만 보고 그 모듈이 어느 레이어 것인지 알 수 있다.
 
 **유일한 예외는 `e2e/`다.** e2e는 `tsconfig.e2e.json`을 쓰는 별도 프로젝트라 `@/` alias가
@@ -37,7 +37,7 @@ import하게 된다. `@typescript-eslint/consistent-type-imports`가 잡는다.
 // GOOD
 import { type ClassValue, clsx } from 'clsx' // 값과 섞일 때는 인라인 type
 
-import type { User } from '@/features/auth/types'
+import type { User } from '@/shared/types/auth'
 ```
 
 ### 3. `export let` 금지
@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>(...)
 <!-- prettier-ignore -->
 ```ts
 // BAD
-import {} from '@/lib/utils'
+import {} from '@/shared/utils/cn'
 ```
 
 ### 5. AMD(`require` / `define`) 금지
@@ -87,7 +87,7 @@ named export를 그대로 꺼내 쓴다.
 
 ```ts
 lazy: async () => {
-  const { DashboardPage } = await import('@/features/dashboard/DashboardPage')
+  const { DashboardPage } = await import('@/features/dashboard')
   return { Component: DashboardPage }
 }
 ```
@@ -117,8 +117,8 @@ import { fileURLToPath } from 'node:url'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import { api } from '@/api/client'
-import { cn } from '@/lib/utils'
+import { api } from '@/shared/lib/apiClient'
+import { cn } from '@/shared/utils/cn'
 ```
 
 **멤버 정렬**은 `sort-imports`가 순수 알파벳순으로 맞춘다. 인라인 `type` 지정자도

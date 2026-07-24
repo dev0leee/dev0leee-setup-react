@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
-import { useAuthStore } from '@/features/auth/store'
+import { useAuthStore } from '@/shared/stores/authStore'
 
 export function ProtectedRoute() {
   const status = useAuthStore((s) => s.status)

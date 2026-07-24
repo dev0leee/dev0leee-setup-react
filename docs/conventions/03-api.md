@@ -3,20 +3,21 @@
 ## 대원칙
 
 **화면 코드는 axios를 몰라야 한다.**
-axios를 아는 곳은 `src/api/client.ts`와 `src/api/errors.ts` 둘뿐이다.
+axios를 아는 곳은 `src/shared/lib/apiClient.ts`와 `src/shared/lib/apiErrors.ts` 둘뿐이다.
 
 ```
-컴포넌트  →  queryOptions / mutationFn  →  feature api.ts  →  @/api/client의 api  →  서버
+컴포넌트  →  feature queries/  →  feature api/  →  @/shared/lib/apiClient의 api  →  서버
 ```
 
 ## 계층별 책임
 
-| 계층       | 파일                      | 책임                                                   |
-| ---------- | ------------------------- | ------------------------------------------------------ |
-| 인스턴스   | `src/api/client.ts`       | baseURL, 타임아웃, 토큰 주입, 401 refresh, 에러 정규화 |
-| 에러       | `src/api/errors.ts`       | `ApiError` 타입, `toApiError` 변환                     |
-| 엔드포인트 | `src/features/<f>/api.ts` | 개별 요청 함수 + `queryOptions`                        |
-| 소비       | 컴포넌트                  | `useQuery` / `useMutation`                             |
+| 계층       | 파일                          | 책임                                                   |
+| ---------- | ----------------------------- | ------------------------------------------------------ |
+| 인스턴스   | `src/shared/lib/apiClient.ts` | baseURL, 타임아웃, 토큰 주입, 401 refresh, 에러 정규화 |
+| 에러       | `src/shared/lib/apiErrors.ts` | `ApiError` 타입, `toApiError` 변환                     |
+| 엔드포인트 | `src/features/<f>/api/`       | 개별 요청 함수. React를 모른다.                        |
+| 쿼리       | `src/features/<f>/queries/`   | `queryOptions` · `useQuery`/`useMutation` 훅           |
+| 소비       | 컴포넌트                      | `useQuery(xxxQuery)` / `useXxxMutation()`              |
 
 ## MUST 규칙
 
@@ -24,7 +25,7 @@ axios를 아는 곳은 `src/api/client.ts`와 `src/api/errors.ts` 둘뿐이다.
 
 ```ts
 // GOOD
-import { api } from '@/api/client'
+import { api } from '@/shared/lib/apiClient'
 
 const { data } = await api.get<Order[]>('/dashboard/orders')
 ```
@@ -53,7 +54,7 @@ export function login(payload: LoginPayload) {
 }
 ```
 
-### 3. 에러를 feature api.ts에서 try/catch하지 않는다
+### 3. 에러를 feature api/에서 try/catch하지 않는다
 
 인터셉터가 이미 `ApiError`로 정규화한다. 여기서 또 잡으면 Query의 재시도/에러 바운더리가 죽는다.
 
@@ -75,30 +76,30 @@ export async function login(payload: LoginPayload) {
 - 조회 실패 → `throwOnError: true`라 ErrorBoundary가 잡는다
 - 변경 실패 → `useMutation`의 `onError`에서 폼 에러/토스트로 표시한다
 
-### 4. 조회는 `queryOptions`로 정의한다
+### 4. 조회는 `queries/`에서 `queryOptions`로 정의한다
 
 `queryKey`와 `queryFn`을 한 곳에 묶어 타입 추론까지 가져간다.
 `useQuery`, `useSuspenseQuery`, `prefetchQuery`, `invalidateQueries`가 전부 같은 객체를 쓴다.
 
 ```ts
-// features/dashboard/api.ts
+// features/dashboard/api/dashboard.ts - 요청 함수
+import { api } from '@/shared/lib/apiClient'
+
+export async function getOrders(): Promise<Order[]> {
+  const { data } = await api.get<Order[]>('/dashboard/orders')
+  return data
+}
+```
+
+```ts
+// features/dashboard/queries/ordersQuery.ts - 쿼리 정의
 import { queryOptions } from '@tanstack/react-query'
 
-import { api } from '@/api/client'
-
-export interface Order {
-  id: string
-  customer: string
-  amount: number
-  createdAt: string
-}
+import { getOrders } from '@/features/dashboard/api/dashboard'
 
 export const ordersQuery = queryOptions({
   queryKey: ['dashboard', 'orders'] as const,
-  queryFn: async () => {
-    const { data } = await api.get<Order[]>('/dashboard/orders')
-    return data
-  },
+  queryFn: getOrders,
 })
 ```
 
@@ -150,7 +151,7 @@ const mutation = useMutation({
 전역 `endpoints.ts`를 만들지 않는다. 두 곳 이상에서 쓰는 경로만 상수로 뽑는다.
 
 ```ts
-// src/api/client.ts - refresh는 client.ts와 auth/api.ts 둘 다 쓴다
+// src/shared/lib/apiClient.ts - refresh는 client.ts와 auth/api/auth.ts 둘 다 쓴다
 export const REFRESH_ENDPOINT = '/token-refresh'
 ```
 
@@ -158,7 +159,7 @@ export const REFRESH_ENDPOINT = '/token-refresh'
 
 ## 인터셉터를 건드릴 때 (주의)
 
-`src/api/client.ts`의 401 refresh 로직은 세 가지 동시성을 동시에 처리한다.
+`src/shared/lib/apiClient.ts`의 401 refresh 로직은 세 가지 동시성을 동시에 처리한다.
 **고치기 전에 주석을 전부 읽는다.**
 
 1. `_retried` 플래그 — 재시도는 요청당 1회. 없으면 401 무한 루프.
@@ -173,7 +174,7 @@ export const REFRESH_ENDPOINT = '/token-refresh'
 ## 에러 다루기
 
 ```ts
-import { ApiError } from '@/api/errors'
+import { ApiError } from '@/shared/lib/apiErrors'
 
 if (error instanceof ApiError) {
   if (error.isNetworkError) {
@@ -192,7 +193,7 @@ if (error instanceof ApiError) {
 
 ## MSW 목킹
 
-새 엔드포인트를 만들면 `src/mocks/handlers.ts`에 핸들러를 추가한다.
-`VITE_ENABLE_MSW=true`면 개발 서버가 이걸 쓴다. 테스트는 `src/mocks/server.ts`를 쓴다.
+새 엔드포인트를 만들면 `src/testing/mocks/handlers.ts`에 핸들러를 추가한다.
+`VITE_ENABLE_MSW=true`면 개발 서버가 이걸 쓴다. 테스트는 `src/testing/mocks/server.ts`를 쓴다.
 
 엔드포인트를 추가하고 핸들러를 안 만들면 테스트가 실제 네트워크를 때린다.

@@ -1,10 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
 
-import { AppLayout } from '@/app/AppLayout'
+import { AppLayout } from '@/app/layouts/AppLayout'
 import { NotFoundPage } from '@/app/NotFoundPage'
 import { ProtectedRoute } from '@/app/ProtectedRoute'
-import { FullPageSpinner } from '@/components/common/FullPageSpinner'
-import { LoginPage } from '@/features/auth/LoginPage'
+import { LoginPage } from '@/features/auth'
+import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
 
 export const router = createBrowserRouter([
   {
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
                 // 라우트 단위 코드 스플리팅. recharts / react-table 같은 무거운
                 // 의존성이 초기 번들에서 빠진다. 새 페이지도 이 패턴을 따를 것.
                 lazy: async () => {
-                  const { DashboardPage } = await import('@/features/dashboard/DashboardPage')
+                  const { DashboardPage } = await import('@/features/dashboard')
                   return { Component: DashboardPage }
                 },
               },

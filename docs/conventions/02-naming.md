@@ -12,7 +12,7 @@
 | 테스트                   | 대상 파일명 + `.test.ts(x)` | `errors.test.ts`                                        |
 | e2e                      | `kebab-case.spec.ts`        | `auth.spec.ts`                                          |
 
-**예외: `src/components/ui/**`는 `kebab-case.tsx`다.** shadcn CLI가 그렇게 만든다.
+**예외: `src/shared/components/ui/**`는 `kebab-case.tsx`다.** shadcn CLI가 그렇게 만든다.
 우리 규칙이 아니라 도구 규칙이니 맞추지 말고 그대로 둔다.
 
 파일명은 **주 export와 정확히 일치**시킨다.
@@ -74,14 +74,14 @@ export function apiError() // 만드는 건지 던지는 건지 모름
 
 API 함수의 동사 관례:
 
-| 동사                  | 의미                |
-| --------------------- | ------------------- |
-| `get~` / `fetch~`     | 조회                |
-| `create~`             | 생성                |
-| `update~`             | 부분 수정           |
-| `replace~`            | 전체 교체           |
-| `delete~` / `remove~` | 삭제                |
-| `to~`                 | 변환 (`toApiError`) |
+| 동사       | 의미                |
+| ---------- | ------------------- |
+| `get~`     | 조회                |
+| `create~`  | 생성                |
+| `update~`  | 부분 수정           |
+| `replace~` | 전체 교체           |
+| `delete~`  | 삭제                |
+| `to~`      | 변환 (`toApiError`) |
 
 ## 이벤트 핸들러
 

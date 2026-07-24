@@ -70,6 +70,25 @@ export default tseslint.config(
           patterns: ['.*'],
         },
       ],
+      // 의존 방향 강제: shared → features → app
+      // @see docs/conventions/01-folder-structure.md
+      'import/no-restricted-paths': [
+        'error',
+        {
+          zones: [
+            // feature 는 다른 feature 를 모른다.
+            { target: './src/features/auth', from: './src/features', except: ['./auth'] },
+            {
+              target: './src/features/dashboard',
+              from: './src/features',
+              except: ['./dashboard'],
+            },
+            // 역방향 금지. app 은 features 를 알지만 그 반대는 아니다.
+            { target: './src/features', from: './src/app' },
+            { target: './src/shared', from: ['./src/features', './src/app'] },
+          ],
+        },
+      ],
       // import 순서
       'import/order': [
         'error',
@@ -102,7 +121,7 @@ export default tseslint.config(
 
   {
     // shadcn이 생성/갱신하는 파일. 직접 수정하지 않으므로 규칙을 끈다.
-    files: ['src/components/ui/**'],
+    files: ['src/shared/components/ui/**'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'react-refresh/only-export-components': 'off',
@@ -111,7 +130,13 @@ export default tseslint.config(
   },
 
   {
-    files: ['**/*.test.ts', '**/*.test.tsx', 'src/test/**', 'src/mocks/**', 'e2e/**'],
+    // feature 공개 API. 컴포넌트와 훅을 같이 내보내는 게 목적인 파일이다.
+    files: ['src/features/*/index.ts'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx', 'src/testing/**', 'e2e/**'],
     rules: {
       'no-console': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

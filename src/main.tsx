@@ -22,7 +22,7 @@ async function enableMocking(): Promise<void> {
   if (!import.meta.env.DEV || !env.VITE_ENABLE_MSW) return
 
   try {
-    const { worker } = await import('@/mocks/browser')
+    const { worker } = await import('@/testing/mocks/browser')
     await worker.start({ onUnhandledRequest: 'bypass' })
   } catch (error) {
     // 서비스워커를 못 쓰는 환경(e2e에서 차단, 비 secure context 등)에서도

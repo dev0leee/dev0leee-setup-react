@@ -158,7 +158,7 @@ React 19 + React Compiler가 아직 이 프로젝트에 켜져 있지 않다.
 
 ## 테스트에서의 컴포넌트 (MUST)
 
-`renderWithProviders`(`src/test/utils.tsx`)를 쓴다. Query·Router 컨텍스트가 붙는다.
+`renderWithProviders`(`src/testing/utils.tsx`)를 쓴다. Query·Router 컨텍스트가 붙는다.
 
 **셀렉터는 role/label/text로 잡는다. 클래스명이나 `data-slot`으로 잡지 않는다.**
 

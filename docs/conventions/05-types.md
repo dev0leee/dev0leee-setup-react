@@ -39,7 +39,7 @@ class ApiError extends Error {
 }
 ```
 
-`src/api/errors.ts`에 이 이유가 주석으로 남아 있다.
+`src/shared/lib/apiErrors.ts`에 이 이유가 주석으로 남아 있다.
 
 ### `noUncheckedIndexedAccess` 다루기
 
@@ -61,15 +61,15 @@ if (first) {
 
 **쓰는 곳 옆에 둔다.** 전역 `src/types/`를 만들지 않는다.
 
-| 타입                  | 위치                                        |
-| --------------------- | ------------------------------------------- |
-| 도메인 엔티티         | `features/<f>/types.ts`                     |
-| API 요청/응답         | 그 요청을 만드는 `features/<f>/api.ts`      |
-| 컴포넌트 props        | 그 컴포넌트 파일 안                         |
-| 앱 전역 하부구조 타입 | 소유 모듈 안 (`api/errors.ts`의 `ApiError`) |
+| 타입                  | 위치                                                  |
+| --------------------- | ----------------------------------------------------- |
+| 도메인 엔티티         | `features/<f>/types.ts`                               |
+| API 요청/응답         | 그 요청을 만드는 `features/<f>/api.ts`                |
+| 컴포넌트 props        | 그 컴포넌트 파일 안                                   |
+| 앱 전역 하부구조 타입 | 소유 모듈 안 (`shared/lib/apiErrors.ts`의 `ApiError`) |
 
 ```ts
-// features/auth/types.ts - 여러 파일이 공유하는 도메인 타입
+// shared/types/auth.ts - 여러 feature가 공유하는 타입(스토어와 함께 승격됐다)
 export interface User {
   id: string
   email: string
@@ -77,7 +77,7 @@ export interface User {
 }
 export type AuthStatus = 'booting' | 'authenticated' | 'anonymous'
 
-// features/auth/api.ts - 이 파일에서만 쓰는 요청/응답 타입
+// features/auth/api/auth.ts - 이 파일에서만 쓰는 요청/응답 타입
 interface SessionResponse {
   accessToken: string
   user: User
@@ -156,7 +156,7 @@ zod 4를 쓴다. `z.string().email()`이 아니라 `z.email()`, 에러 출력은
 
 ## `any` 대신
 
-`typescript/no-explicit-any: error`. 예외는 `src/components/ui/**`(shadcn 생성물)와 테스트뿐이다.
+`typescript/no-explicit-any: error`. 예외는 `src/shared/components/ui/**`(shadcn 생성물)와 테스트뿐이다.
 
 ```ts
 // BAD

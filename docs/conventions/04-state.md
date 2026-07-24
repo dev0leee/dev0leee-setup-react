@@ -108,16 +108,16 @@ useQuery({ ...orderQuery(orderId!), enabled: Boolean(orderId) })
 
 - **서버 데이터** — Query가 소유
 - **폼 값** — react-hook-form이 소유
-- **Access Token** — `src/api/tokenStore.ts`가 소유 (스토어에 넣으면 리렌더가 도미노로 번진다)
+- **Access Token** — `src/shared/lib/tokenStore.ts`가 소유 (스토어에 넣으면 리렌더가 도미노로 번진다)
 - **한 컴포넌트만 쓰는 값** — `useState`
 
 ### 스토어 작성 규칙
 
 ```ts
-// features/auth/store.ts
+// shared/stores/authStore.ts
 import { create } from 'zustand'
 
-import type { AuthStatus, User } from '@/features/auth/types'
+import type { AuthStatus, User } from '@/shared/types/auth'
 
 interface AuthState {
   status: AuthStatus
