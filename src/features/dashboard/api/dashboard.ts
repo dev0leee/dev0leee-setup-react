@@ -1,6 +1,7 @@
 import type {
   CreateOrderPayload,
   Order,
+  OrderListParams,
   RevenuePoint,
   UpdateOrderPayload,
 } from '@/features/dashboard/types/dashboard'
@@ -11,8 +12,10 @@ export const getRevenue = async (): Promise<RevenuePoint[]> => {
   return data
 }
 
-export const getOrders = async (): Promise<Order[]> => {
-  const { data } = await api.get<Order[]>('/dashboard/orders')
+// 쿼리 파라미터는 문자열로 이어붙이지 말고 요청의 params로 넘긴다.
+// 직렬화(배열 repeat 등)는 apiClient의 paramsSerializer가 담당한다 (03-api).
+export const getOrders = async (params: OrderListParams = {}): Promise<Order[]> => {
+  const { data } = await api.get<Order[]>('/dashboard/orders', { params })
   return data
 }
 

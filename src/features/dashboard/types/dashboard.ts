@@ -16,6 +16,12 @@ export interface Order {
   createdAt: string
 }
 
+/** 주문 목록 쿼리 파라미터. 요청의 params로 전달된다. */
+export interface OrderListParams {
+  page?: number
+  status?: string
+}
+
 export interface CreateOrderPayload {
   customer: string
   amount: number

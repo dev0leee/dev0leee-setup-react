@@ -1,4 +1,5 @@
 import axios, { type AxiosError } from 'axios'
+import { stringify } from 'qs'
 
 import { env } from '@/config/env'
 import { API_TIMEOUT_MS, REFRESH_TIMEOUT_MS } from '@/shared/constants/http'
@@ -10,21 +11,28 @@ import type { RefreshResponse, RetriableConfig } from '@/shared/types/api'
 export const REFRESH_ENDPOINT = '/token-refresh'
 
 /**
+ * 세 인스턴스가 공유하는 설정.
+ *
+ * paramsSerializer: 배열 파라미터를 `?state=A&state=B`(repeat)로 직렬화한다.
+ * axios 기본값은 `state[]=A&state[]=B`라 백엔드가 못 받는 경우가 많다.
+ * 쿼리 파라미터는 문자열로 이어붙이지 말고 요청의 `params`로 넘긴다(03-api).
+ */
+const baseConfig = {
+  baseURL: env.VITE_API_URL,
+  withCredentials: true, // Refresh Token 쿠키 전송
+  paramsSerializer: (params: Record<string, unknown>) => {
+    return stringify(params, { arrayFormat: 'repeat' })
+  },
+}
+
+/**
  * 인터셉터가 붙지 않은 전용 인스턴스.
  * refresh 요청을 api 인스턴스로 보내면 401 시 인터셉터가 또 refresh를 불러 무한 루프가 된다.
  */
-const refreshClient = axios.create({
-  baseURL: env.VITE_API_URL,
-  withCredentials: true, // Refresh Token 쿠키 전송
-  timeout: REFRESH_TIMEOUT_MS,
-})
+const refreshClient = axios.create({ ...baseConfig, timeout: REFRESH_TIMEOUT_MS })
 
 /** 인증이 필요한 요청. 토큰 주입 + 401 refresh + 에러 정규화가 붙는다. */
-export const api = axios.create({
-  baseURL: env.VITE_API_URL,
-  withCredentials: true,
-  timeout: API_TIMEOUT_MS,
-})
+export const api = axios.create({ ...baseConfig, timeout: API_TIMEOUT_MS })
 
 /**
  * 인증이 필요 없는 요청. 토큰을 붙이지 않고 401 refresh도 하지 않는다.
@@ -33,11 +41,7 @@ export const api = axios.create({
  * 세션 복원처럼 refresh 엔드포인트를 직접 부르는 요청은 반드시 여기를 써야 한다.
  * api로 보내면 401 시 인터셉터가 같은 엔드포인트로 또 refresh를 걸어 루프가 된다.
  */
-export const publicApi = axios.create({
-  baseURL: env.VITE_API_URL,
-  withCredentials: true,
-  timeout: API_TIMEOUT_MS,
-})
+export const publicApi = axios.create({ ...baseConfig, timeout: API_TIMEOUT_MS })
 
 publicApi.interceptors.response.use(
   (response) => {

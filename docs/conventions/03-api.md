@@ -11,13 +11,13 @@ axios를 아는 곳은 `src/shared/lib/apiClient.ts`와 `src/shared/lib/apiError
 
 ## 계층별 책임
 
-| 계층       | 파일                          | 책임                                                   |
-| ---------- | ----------------------------- | ------------------------------------------------------ |
-| 인스턴스   | `src/shared/lib/apiClient.ts` | baseURL, 타임아웃, 토큰 주입, 401 refresh, 에러 정규화 |
-| 에러       | `src/shared/lib/apiErrors.ts` | `ApiError` 타입, `toApiError` 변환                     |
-| 엔드포인트 | `src/features/<f>/api/`       | 개별 요청 함수. React를 모른다.                        |
-| 쿼리       | `src/features/<f>/queries/`   | `queryOptions` · `useQuery`/`useMutation` 훅           |
-| 소비       | 컴포넌트                      | `useQuery(xxxQuery)` / `useXxxMutation()`              |
+| 계층       | 파일                          | 책임                                                                    |
+| ---------- | ----------------------------- | ----------------------------------------------------------------------- |
+| 인스턴스   | `src/shared/lib/apiClient.ts` | baseURL, 타임아웃, 토큰 주입, 401 refresh, 에러 정규화, 파라미터 직렬화 |
+| 에러       | `src/shared/lib/apiErrors.ts` | `ApiError` 타입, `toApiError` 변환                                      |
+| 엔드포인트 | `src/features/<f>/api/`       | 개별 요청 함수. React를 모른다.                                         |
+| 쿼리       | `src/features/<f>/queries/`   | `queryOptions` · `useQuery`/`useMutation` 훅                            |
+| 소비       | 컴포넌트                      | `useQuery(xxxQuery)` / `useXxxMutation()`                               |
 
 ## MUST 규칙
 
@@ -110,40 +110,44 @@ export const login = async (payload: LoginPayload) => {
 // features/dashboard/api/dashboard.ts - 요청 함수
 import { api } from '@/shared/lib/apiClient'
 
-export const getOrders = async (): Promise<Order[]> => {
-  const { data } = await api.get<Order[]>('/dashboard/orders')
+export const getRevenue = async (): Promise<RevenuePoint[]> => {
+  const { data } = await api.get<RevenuePoint[]>('/dashboard/revenue')
   return data
 }
 ```
 
 ```ts
-// features/dashboard/queries/ordersQuery.ts - 쿼리 정의
+// features/dashboard/queries/revenueQuery.ts - 쿼리 정의
 import { queryOptions } from '@tanstack/react-query'
 
-import { getOrders } from '@/features/dashboard/api/dashboard'
+import { getRevenue } from '@/features/dashboard/api/dashboard'
 
-export const ordersQuery = queryOptions({
-  queryKey: ['dashboard', 'orders'] as const,
-  queryFn: getOrders,
+export const revenueQuery = queryOptions({
+  queryKey: ['dashboard', 'revenue'] as const,
+  queryFn: getRevenue,
 })
 ```
 
 ```tsx
 // 소비
-const { data: orders } = useQuery(ordersQuery)
+const { data: revenue } = useQuery(revenueQuery)
 ```
 
-파라미터가 있으면 함수로 감싼다:
+파라미터가 있으면 함수로 감싸고, 파라미터 객체를 queryKey 마지막에 둔다 (04-state). 쿼리
+파라미터는 요청의 `params`로 넘긴다 (규칙 7):
 
 ```ts
-export const orderQuery = ({ orderId }: { orderId: string }) => {
+// features/dashboard/queries/ordersQuery.ts
+export const ordersQuery = (params: OrderListParams = {}) => {
   return queryOptions({
-    queryKey: ['dashboard', 'orders', orderId] as const,
+    queryKey: ['dashboard', 'orders', params] as const,
     queryFn: () => {
-      return getOrder({ orderId })
+      return getOrders(params)
     },
   })
 }
+
+// 소비 - useSuspenseQuery(ordersQuery()) / useQuery(ordersQuery({ page }))
 ```
 
 `queryOptions`(`xxxQuery.ts`)는 **여러 소비처가 같은 정의를 공유할 때** 쓴다 —
@@ -243,6 +247,31 @@ export const REFRESH_ENDPOINT = '/token-refresh'
 ```
 
 한 곳에서만 쓰는 경로는 인라인 문자열로 둔다. 상수화가 오히려 추적을 어렵게 한다.
+
+### 7. 쿼리 파라미터는 `params` 설정 객체로 보낸다
+
+**쿼리스트링을 손으로 이어붙이지 않는다.** `?page=1&status=OPEN`을 템플릿 리터럴로 만들면
+인코딩·배열·`undefined` 처리를 전부 직접 해야 하고 실수가 난다. axios의 `params`로 넘긴다.
+
+```ts
+// GOOD - 인자는 객체로 받고(07-javascript), 그대로 params에 넘긴다
+export const getOrders = async (params: OrderListParams = {}): Promise<Order[]> => {
+  const { data } = await api.get<Order[]>('/dashboard/orders', { params })
+  return data
+}
+
+// BAD - 손으로 쿼리스트링 조립
+const { data } = await api.get<Order[]>(`/dashboard/orders?page=${page}&status=${status}`)
+```
+
+- **직렬화는 인스턴스가 소유한다.** `apiClient.ts`의 `paramsSerializer`가 `qs`로 배열을
+  `?state=A&state=B`(repeat) 형태로 만든다. axios 기본값(`state[]=A`)은 백엔드가 못 받는
+  경우가 많다. 개별 요청에서 직렬화 방식을 다시 정하지 않는다.
+- **`undefined` 값은 axios가 알아서 뺀다.** `{ page, status }`에서 `status`가 `undefined`면
+  쿼리스트링에 안 붙는다. 그래서 옵셔널 파라미터를 조건부로 조립할 필요가 없다.
+- **파라미터 타입은 `types/`에 둔다** (`OrderListParams` — [05-types](./05-types.md)), 그리고
+  파라미터가 붙는 조회는 `queryOptions`를 함수로 감싸 **queryKey 마지막에 그 객체를 넣는다**
+  ([04-state](./04-state.md) Query Key 규칙).
 
 ## 인터셉터를 건드릴 때 (주의)
 
