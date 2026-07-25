@@ -4,3 +4,8 @@ export interface NativeWindow {
   /** Android: addJavascriptInterface로 주입된 객체 */
   AndroidBridge?: { postMessage: (body: string) => void }
 }
+
+export interface DeviceOs {
+  isIos: boolean
+  isAndroid: boolean
+}

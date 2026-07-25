@@ -275,7 +275,8 @@ shared/lib/
 ├── authChannel.ts  # 탭 간 로그아웃 브로드캐스트
 └── native/         # 웹뷰 ↔ 네이티브 앱 브릿지
     ├── bridge.ts   # send/subscribe. window를 만지는 유일한 곳.
-    └── common.ts   # 도메인별 네이티브 호출
+    ├── common.ts   # 도메인별 네이티브 호출
+    └── device.ts   # userAgent 기반 OS 감지 (getDeviceOs, isWebBrowser)
 ```
 
 `apiClient`(서버) · `authChannel`(다른 탭) · `native/`(네이티브 앱)은 전부 **바깥과
