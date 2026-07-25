@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    /* tsc -b는 composite 프로젝트만 tsbuildinfo로 최신 여부를 판단한다.
+       없으면 noEmit 탓에 "출력물이 없다"로 매번 풀 타입체크가 돈다.
+       noEmit이 있으므로 .d.ts는 실제로 생성되지 않는다. */
+    "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
