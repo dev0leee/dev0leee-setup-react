@@ -27,7 +27,7 @@ export const LoginPage = () => {
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) })
 
   // 토큰 저장·스토어 갱신은 useLogin이 한다. 여기서는 화면 전환과 폼 에러만 다룬다.
-  const { mutate: login, isPending } = useLogin()
+  const { loginMutation, isLoginPending } = useLogin()
 
   if (status === 'authenticated') return <Navigate to={ROUTE_PATH.HOME} replace />
 
@@ -46,7 +46,7 @@ export const LoginPage = () => {
             className="flex flex-col gap-4"
             onSubmit={(event) => {
               void handleSubmit((values) => {
-                login(values, {
+                loginMutation(values, {
                   onSuccess: () => {
                     const from =
                       (location.state as LocationState | null)?.from?.pathname ?? ROUTE_PATH.HOME
@@ -80,7 +80,7 @@ export const LoginPage = () => {
 
             {errors.root && <p className="text-xs text-destructive">{errors.root.message}</p>}
 
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isLoginPending}>
               로그인
             </Button>
           </form>

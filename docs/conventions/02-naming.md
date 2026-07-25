@@ -62,6 +62,27 @@ export const useFacilityCoupon = ...
 > 인자는 개수와 무관하게 객체로 받는다. `useCoupon({ facilityId })`처럼.
 > 규칙은 [07-javascript](./07-javascript.md) "함수" 절에 있다.
 
+## 쿼리·뮤테이션 훅의 반환 (SHOULD)
+
+**훅은 `data`·`mutate`·`isPending`·`isLoading`을 그대로 내보내지 않고 리네임한 객체로 반환한다.**
+`data`/`mutate`는 무엇인지 드러나게, 상태 플래그는 동작 이름을 접두로 붙인다.
+
+```ts
+// GOOD - 조회 (useGetOrder.ts)
+const { data: order, isLoading: isOrderLoading } = useQuery({ ... })
+return { order, isOrderLoading }
+
+// GOOD - 뮤테이션 (usePostOrder.ts)
+const { mutate: postOrderMutation, isPending: isPostOrderPending } = useMutation({ ... })
+return { postOrderMutation, isPostOrderPending }
+
+// BAD - 한 화면이 조회·뮤테이션 여럿을 쓰면 data·isLoading·isPending이 충돌한다
+return useQuery({ ... })
+```
+
+한 컴포넌트가 조회와 생성·수정·삭제를 함께 다룰 때 이름이 뭉개지지 않고, 호출부에서 무엇의
+상태인지 드러난다. 상세는 [03-api](./03-api.md) 규칙 4·5.
+
 ## 도메인 어휘 (SHOULD)
 
 같은 개념에 같은 단어를 쓴다. 이 레포의 어휘:

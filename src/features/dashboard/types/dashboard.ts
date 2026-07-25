@@ -15,3 +15,10 @@ export interface Order {
   amount: number
   createdAt: string
 }
+
+export interface CreateOrderPayload {
+  customer: string
+  amount: number
+}
+
+export type UpdateOrderPayload = Partial<CreateOrderPayload>

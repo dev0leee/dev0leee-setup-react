@@ -139,34 +139,96 @@ const { data: orders } = useQuery(ordersQuery)
 export const orderQuery = ({ orderId }: { orderId: string }) => {
   return queryOptions({
     queryKey: ['dashboard', 'orders', orderId] as const,
-    queryFn: async () => {
-      const { data } = await api.get<Order>(`/dashboard/orders/${orderId}`)
-      return data
+    queryFn: () => {
+      return getOrder({ orderId })
     },
   })
 }
 ```
 
-### 5. 변경(mutation)은 평범한 async 함수로 export한다
+`queryOptions`(`xxxQuery.ts`)는 **여러 소비처가 같은 정의를 공유할 때** 쓴다 —
+`useSuspenseQuery`로 위젯이 직접 소비하거나(`ordersQuery`·`revenueQuery`가 그 예),
+`prefetchQuery`·`invalidateQueries`가 같은 객체를 가리켜야 할 때다.
 
-`useMutation`에 그대로 넘길 수 있는 모양이어야 한다.
+#### 한 곳에서 쓰는 조회는 `useGetXxx` 훅으로
+
+**`queryOptions`를 공유할 필요가 없으면 훅 하나로 감싼다.** 뮤테이션 훅과 같은 모양이다 —
+파일 하나에 훅 하나, `data`·`isLoading`을 이름 붙여 반환한다.
 
 ```ts
+// features/dashboard/queries/useGetOrder.ts
+export const useGetOrder = ({ orderId }: { orderId: string | undefined }) => {
+  const { data: order, isLoading: isOrderLoading } = useQuery({
+    queryKey: ['dashboard', 'orders', orderId] as const,
+    queryFn: () => {
+      return getOrder({ orderId: orderId! })
+    },
+    // 라우트 파라미터처럼 아직 없을 수 있는 값은 요청을 막는다 (04-state).
+    enabled: Boolean(orderId),
+  })
+
+  return { order, isOrderLoading }
+}
+```
+
+- **파일 하나에 함수 하나.** `useGetXxx.ts`에 `queryOptions` export와 훅을 같이 두지 않는다.
+  공유가 필요하면 `xxxQuery.ts`(queryOptions만), 아니면 `useGetXxx.ts`(훅만). 한 파일이 둘을
+  겸하면 "이걸 어디서 가져다 쓰지"가 애매해진다.
+- **반환은 이름 붙인 객체.** `data`·`isLoading`을 그대로 내보내지 않는다 — 한 화면이 조회
+  여러 개를 쓰면 `isLoading`이 충돌한다 ([02-naming](./02-naming.md) 뮤테이션 반환과 같은 이유).
+- **조회에는 토스트를 달지 않는다.** 화면이 곧 결과다 ([11-overlay](./11-overlay.md)).
+
+### 5. 변경(mutation)은 `queries/`의 훅으로 감싼다
+
+api 함수는 `useMutation`에 그대로 넘길 수 있는 평범한 async 함수다.
+
+```ts
+// features/dashboard/api/dashboard.ts
 export const createOrder = async (payload: CreateOrderPayload): Promise<Order> => {
   const { data } = await api.post<Order>('/dashboard/orders', payload)
   return data
 }
 ```
 
-```tsx
-const mutation = useMutation({
-  mutationFn: createOrder,
-  onSuccess: () => {
-    // 접두 매칭 - dashboard 하위 쿼리가 전부 무효화된다
-    void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-  },
-})
+**컴포넌트 안에 `useMutation`을 인라인으로 쓰지 않는다.** 훅 하나당 파일 하나로 `queries/`에 둔다
+([01-folder-structure](./01-folder-structure.md)). 훅 이름은 `usePostXxx`·`usePatchXxx`·`useDeleteXxx`.
+
+```ts
+// features/dashboard/queries/usePostOrder.ts
+export const usePostOrder = () => {
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: postOrderMutation,
+    isSuccess: isPostOrderSuccess,
+    isPending: isPostOrderPending,
+  } = useMutation({
+    mutationFn: createOrder,
+    onSuccess: () => {
+      // 접두 매칭 - dashboard 하위 쿼리가 전부 무효화된다
+      void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      toast.success(ORDER_TOAST_MESSAGE.created)
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+  return { postOrderMutation, isPostOrderSuccess, isPostOrderPending }
+}
 ```
+
+**반환은 이름을 붙인 객체다.** `mutate`·`isPending`·`isSuccess`를 그대로 내보내지 말고
+`postOrderMutation`·`isPostOrderPending`·`isPostOrderSuccess`로 리네임한다. 한 화면이 여러
+뮤테이션을 쓸 때 `isPending`이 충돌하지 않고, 호출부에서 무엇의 상태인지 이름으로 드러난다
+([02-naming](./02-naming.md)).
+
+- **성공·실패 피드백은 훅이 소유한다.** 도메인 공통 결과(토스트)는 `onSuccess`/`onError`가
+  낸다. 화면 전환처럼 화면마다 다른 것만 호출부가 `mutate` 콜백으로 넘긴다.
+- **성공 토스트는 GET을 뺀 변경 계열(post·patch·delete)에 단다.** 조회는 화면이 곧 결과라
+  토스트가 없다. 문구는 `constants/`의 `_TOAST_MESSAGE` 매핑에서 가져온다 ([12-constants](./12-constants.md)).
+- **에러 표시가 폼이면 토스트 대신 호출부에서 처리한다.** 로그인처럼 필드 에러로 보여야 하는
+  뮤테이션은 훅에서 토스트를 달지 말고 `onError`를 호출부에 맡긴다 (`useLogin`이 그 예다).
 
 > **SHOULD — 수동 refetch 대신 invalidate.** 뮤테이션 후 `refetch()`를 직접 부르지 말고
 > `invalidateQueries`로 캐시를 무효화한다. 화면에 떠 있는 쿼리만 자동으로 다시 받는다.

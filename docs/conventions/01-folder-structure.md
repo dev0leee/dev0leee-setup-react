@@ -124,10 +124,12 @@ features/dashboard/
 
 - **`api/`는 도메인당 파일 하나.** `api/dashboard.ts`에 그 도메인 요청 함수를 전부 나열한다.
   도메인이 커지면 리소스별로 쪼갠다 (`api/office.ts`, `api/lobbyPhone.ts`).
-- **`queries/`는 쿼리/뮤테이션당 파일 하나.** 이름은 `useGetXxx.ts` · `usePatchXxx.ts`,
-  `queryOptions`만 있으면 `xxxQuery.ts`.
+- **`queries/`는 쿼리/뮤테이션당 파일 하나.** 이름은 `useGetXxx.ts` · `usePostXxx.ts` ·
+  `usePatchXxx.ts` · `useDeleteXxx.ts`, `queryOptions`만 있으면 `xxxQuery.ts`.
 - **뮤테이션도 `queries/`에 둔다.** 폴더 이름은 queries지만 TanStack Query 레이어 전체를 뜻한다.
 - **컴포넌트 안에 `useMutation`을 인라인으로 쓰지 않는다.** `queries/`로 뺀다.
+- **뮤테이션 훅은 이름 붙인 객체를 반환한다** — `{ xxxMutation, isXxxPending, isXxxSuccess }`.
+  성공·실패 피드백은 훅이 소유한다 ([03-api](./03-api.md) 규칙 5).
 
 도메인 부수효과(토큰 저장·스토어 갱신)는 훅이 갖고, 화면 전환·폼 에러는 호출부가 갖는다.
 
