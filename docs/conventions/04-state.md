@@ -200,17 +200,66 @@ const { status, user } = useAuthStore(
 **한 문장으로: store는 데이터, hook은 안무(choreography)다.** store는 값을 들고만 있고,
 그 값을 가지고 실제로 뭔가 하는 절차는 hook이 짠다.
 
-이 레포의 실제 짝이 정확히 그 경계다:
+이 레포의 실제 짝이 정확히 그 경계다.
 
 ```ts
-// shared/stores/authStore.ts - 상태와 전이만. 부수효과 없음.
-useAuthStore // status·user + setAuthenticated·setAnonymous
+// shared/stores/authStore.ts — store: 상태와 전이 액션만. 부수효과 없음.
+export const useAuthStore = create<AuthState>((set) => {
+  return {
+    status: 'booting',
+    user: null,
+    setAuthenticated: (user) => {
+      set({ status: 'authenticated', user })
+    },
+    setAnonymous: () => {
+      set({ status: 'anonymous', user: null })
+    },
+  }
+})
+```
 
-// features/auth/hooks/useLogout.ts - 안무. 여러 시스템을 순서대로 엮는다.
+```ts
+// features/auth/hooks/useLogout.ts — hook: 여러 시스템을 순서대로 엮는 "절차"
 export const useLogout = () => {
-  // 서버 폐기 → 다른 탭 전파 → 캐시 비우기 → store 액션 호출
-  // 이 "절차"가 hook의 일이다. store에 넣지 않는다.
+  const queryClient = useQueryClient()
+  const setAnonymous = useAuthStore((state) => {
+    return state.setAnonymous
+  })
+
+  return useCallback(async () => {
+    try {
+      await logout() // 1. 서버에서 토큰 폐기
+    } finally {
+      broadcastLogout() // 2. 다른 탭에 전파
+      setAccessToken({ token: null }) // 3. 메모리 토큰 제거
+      queryClient.clear() // 4. 쿼리 캐시 비우기
+      setAnonymous() // 5. store 상태 전이 ← 이 한 줄만 store 몫
+    }
+  }, [queryClient, setAnonymous])
 }
+```
+
+`setAnonymous`는 store가 하는 유일한 일(상태 전이)이고, 나머지 1~4의 **순서와 조합**이
+hook이 하는 일이다. 이 절차를 store 액션 안에 넣으면 store가 네트워크·캐시·다른 탭을 알게 돼
+경계가 무너진다.
+
+hook이 상태를 가져도 되지만, 그 상태는 **호출부마다 독립**이라는 점이 store와 다르다.
+
+```ts
+// shared/hooks/useDisclosure.ts — 상태를 갖지만 호출부마다 별개다
+export const useDisclosure = () => {
+  const [isOpen, setIsOpen] = useState(false)
+  const open = useCallback(() => {
+    setIsOpen(true)
+  }, [])
+  const close = useCallback(() => {
+    setIsOpen(false)
+  }, [])
+  return { isOpen, open, close }
+}
+
+// 모달 A와 모달 B가 각각 useDisclosure()를 부르면 isOpen이 서로 다르다.
+// 반대로 useAuthStore는 어디서 부르든 같은 status다 — 그게 store다.
 ```
 
 **판별 질문 세 개:**
