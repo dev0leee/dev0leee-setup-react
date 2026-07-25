@@ -185,6 +185,51 @@ const { status, user } = useAuthStore(
 )
 ```
 
+## store냐 hook이냐 (자주 헷갈리는 경계 · MUST)
+
+둘 다 `useXxx`라 헷갈린다. 하지만 소유하는 게 다르다.
+
+|             | `stores/` (Zustand)                      | `hooks/`                                       |
+| ----------- | ---------------------------------------- | ---------------------------------------------- |
+| 소유하는 것 | **상태** — 값이 사는 곳                  | **동작** — 무언가를 하는 로직                  |
+| 질문        | "이 값은 어디 사나?"                     | "이걸 어떻게 하나?"                            |
+| 정체성      | 싱글톤. 모든 호출부가 **같은** 값을 본다 | 호출부마다 **독립**. 각 호출이 자기 인스턴스다 |
+| 안에 든 것  | 상태 + 그 상태를 바꾸는 액션             | store·query·useState·effect를 **엮는** 로직    |
+| 부수효과    | 없다. 액션은 상태 전이만                 | 여기서 한다. 구독·네트워크·화면 전환           |
+
+**한 문장으로: store는 데이터, hook은 안무(choreography)다.** store는 값을 들고만 있고,
+그 값을 가지고 실제로 뭔가 하는 절차는 hook이 짠다.
+
+이 레포의 실제 짝이 정확히 그 경계다:
+
+```ts
+// shared/stores/authStore.ts - 상태와 전이만. 부수효과 없음.
+useAuthStore // status·user + setAuthenticated·setAnonymous
+
+// features/auth/hooks/useLogout.ts - 안무. 여러 시스템을 순서대로 엮는다.
+export const useLogout = () => {
+  // 서버 폐기 → 다른 탭 전파 → 캐시 비우기 → store 액션 호출
+  // 이 "절차"가 hook의 일이다. store에 넣지 않는다.
+}
+```
+
+**판별 질문 세 개:**
+
+1. **여러 컴포넌트가 같은 값을 읽고 서로의 변경을 봐야 하나?** → store.
+   아니면(호출부 지역 상태) → hook 안 `useState`.
+2. **구독·부수효과·여러 소스를 엮는 절차인가?** → hook.
+3. **훅이 상태를 갖더라도** 그게 그 호출부만의 것이면 hook, 앱 전역에서 공유되면 store다.
+
+> **MUST — hook 안에서 전역 상태를 흉내내지 않는다.** 모듈 스코프 변수 + `useState`로
+> "모든 호출부가 공유하는 값"을 만들면 그건 **숨은 store**다. 그럴 거면 Zustand store로 만든다.
+> 숨은 store는 devtools에도 안 잡히고 구독 규칙(셀렉터)도 못 태운다.
+>
+> **MUST — store 안에 부수효과를 넣지 않는다.** 액션에서 `navigate`·`api` 호출을 하지 않는다.
+> store 액션은 상태 전이만 하고, 그 전후의 절차는 hook이 소유한다 ([01-folder-structure](./01-folder-structure.md)).
+
+hook이 store를 읽고 액션을 부르는 건 정상이다 — 그게 hook이 store를 **쓰는** 방식이다.
+경계는 "hook이 store를 대체하거나, store가 hook 일을 하기 시작할 때" 무너진다.
+
 ## 로컬 상태 — useState / useReducer
 
 - 필드 2~3개까지는 `useState` 여러 개.

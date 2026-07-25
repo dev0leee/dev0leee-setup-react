@@ -122,6 +122,10 @@ features/dashboard/
 | `queries/` | `queryOptions` · `useQuery`/`useMutation` 훅 | 앎    |
 | `hooks/`   | 쿼리와 무관한 재사용 로직 (`useLogout`)      | 앎    |
 
+> **`stores/`와 `hooks/`가 헷갈리면** — `stores/`는 **상태**(값이 사는 곳), `hooks/`는
+> **동작**(그 값으로 뭔가 하는 로직)이다. 경계와 판별 질문은 [04-state](./04-state.md)
+> "store냐 hook이냐" 참고.
+
 - **`api/`는 도메인당 파일 하나.** `api/dashboard.ts`에 그 도메인 요청 함수를 전부 나열한다.
   도메인이 커지면 리소스별로 쪼갠다 (`api/office.ts`, `api/lobbyPhone.ts`).
 - **`queries/`는 쿼리/뮤테이션당 파일 하나.** 이름은 `useGetXxx.ts` · `usePostXxx.ts` ·
