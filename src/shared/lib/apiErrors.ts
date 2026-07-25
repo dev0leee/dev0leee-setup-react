@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import type { ServerErrorBody } from '@/shared/types/api'
+
 /**
  * 서버/네트워크 에러를 앱 공통 타입으로 정규화한다.
  * 화면 코드가 axios를 직접 알 필요가 없게 만드는 것이 목적.
@@ -22,11 +24,6 @@ export class ApiError extends Error {
   get isNetworkError(): boolean {
     return this.status === 0
   }
-}
-
-interface ServerErrorBody {
-  message?: string
-  code?: string
 }
 
 export const toApiError = ({ error }: { error: unknown }): ApiError => {

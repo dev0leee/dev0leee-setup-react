@@ -19,8 +19,11 @@ export const useNativeBackButton = ({
     handlerRef.current = handler
   }, [handler])
 
-  useEffect(
-    () => subscribeToBackButton({ handler: (canGoBack) => handlerRef.current(canGoBack) }),
-    [],
-  )
+  useEffect(() => {
+    return subscribeToBackButton({
+      handler: (canGoBack) => {
+        return handlerRef.current(canGoBack)
+      },
+    })
+  }, [])
 }

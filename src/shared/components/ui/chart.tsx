@@ -78,7 +78,9 @@ function ChartContainer({
 }
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(([, config]) => config.theme ?? config.color)
+  const colorConfig = Object.entries(config).filter(([, config]) => {
+    return config.theme ?? config.color
+  })
 
   if (!colorConfig.length) {
     return null
@@ -88,8 +90,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
+          .map(([theme, prefix]) => {
+            return `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
@@ -98,8 +100,8 @@ ${colorConfig
   })
   .join('\n')}
 }
-`,
-          )
+`
+          })
           .join('\n'),
       }}
     />
@@ -175,7 +177,9 @@ function ChartTooltipContent({
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
         {payload
-          .filter((item) => item.type !== 'none')
+          .filter((item) => {
+            return item.type !== 'none'
+          })
           .map((item, index) => {
             const key = `${nameKey ?? item.name ?? item.dataKey ?? 'value'}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
@@ -274,7 +278,9 @@ function ChartLegendContent({
       )}
     >
       {payload
-        .filter((item) => item.type !== 'none')
+        .filter((item) => {
+          return item.type !== 'none'
+        })
         .map((item, index) => {
           const key = `${nameKey ?? item.dataKey ?? 'value'}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)

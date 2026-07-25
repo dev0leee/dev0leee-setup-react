@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 
 import { ordersQuery } from '@/features/dashboard/queries/ordersQuery'
 import type { Order } from '@/features/dashboard/types/dashboard'
@@ -18,6 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table'
+import { DATE_FORMAT } from '@/shared/constants/format'
+import { formatPrice } from '@/shared/utils/formatNumber'
 
 const columnHelper = createColumnHelper<Order>()
 
@@ -26,11 +28,15 @@ const columns = [
   columnHelper.accessor('customer', { header: '고객' }),
   columnHelper.accessor('amount', {
     header: '금액',
-    cell: (info) => `${info.getValue().toLocaleString('ko-KR')}원`,
+    cell: (context) => {
+      return formatPrice({ price: context.getValue() })
+    },
   }),
   columnHelper.accessor('createdAt', {
     header: '주문일',
-    cell: (info) => format(new Date(info.getValue()), 'yyyy-MM-dd'),
+    cell: (context) => {
+      return format(parseISO(context.getValue()), DATE_FORMAT)
+    },
   }),
 ]
 
@@ -51,26 +57,34 @@ export const OrdersTable = () => {
       <CardContent>
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
+            {table.getHeaderGroups().map((headerGroup) => {
+              return (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              )
+            })}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
+            {table.getRowModel().rows.map((row) => {
+              return (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => {
+                    return (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </CardContent>

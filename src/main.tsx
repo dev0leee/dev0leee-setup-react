@@ -4,6 +4,10 @@ import { createRoot } from 'react-dom/client'
 
 import { App } from '@/app/App'
 import { env } from '@/config/env'
+import {
+  DEVELOPMENT_TRACES_SAMPLE_RATE,
+  PRODUCTION_TRACES_SAMPLE_RATE,
+} from '@/shared/constants/sentry'
 
 import '@/index.css'
 
@@ -11,7 +15,10 @@ if (env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: env.VITE_SENTRY_DSN,
     environment: env.VITE_ENV,
-    tracesSampleRate: env.VITE_ENV === 'production' ? 0.1 : 1.0,
+    tracesSampleRate:
+      env.VITE_ENV === 'production'
+        ? PRODUCTION_TRACES_SAMPLE_RATE
+        : DEVELOPMENT_TRACES_SAMPLE_RATE,
   })
 }
 

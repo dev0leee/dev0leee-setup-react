@@ -12,7 +12,9 @@ import { useAuthStore } from '@/shared/stores/authStore'
  */
 export const useLogout = () => {
   const queryClient = useQueryClient()
-  const setAnonymous = useAuthStore((s) => s.setAnonymous)
+  const setAnonymous = useAuthStore((state) => {
+    return state.setAnonymous
+  })
 
   return useCallback(async () => {
     try {

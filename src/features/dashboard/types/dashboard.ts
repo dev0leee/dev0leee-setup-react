@@ -1,3 +1,9 @@
+import type { ReactNode } from 'react'
+
+export interface WidgetProps {
+  children: ReactNode
+}
+
 export interface RevenuePoint {
   month: string
   revenue: number

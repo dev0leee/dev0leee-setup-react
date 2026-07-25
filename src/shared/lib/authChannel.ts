@@ -1,8 +1,6 @@
+import { CHANNEL_NAME } from '@/shared/constants/channel'
 import { setAccessToken } from '@/shared/lib/tokenStore'
-
-type AuthMessage = { type: 'token'; token: string } | { type: 'logout' }
-
-const CHANNEL_NAME = 'auth'
+import type { AuthMessage } from '@/shared/types/auth'
 
 let channel: BroadcastChannel | null = null
 
@@ -21,20 +19,24 @@ const getChannel = (): BroadcastChannel | null => {
  * 갱신된 토큰을 즉시 전파해서 그 상황을 막는다.
  */
 export const initAuthChannel = ({ onLogout }: { onLogout: () => void }): (() => void) => {
-  const ch = getChannel()
-  if (!ch) return () => {}
+  const activeChannel = getChannel()
+  if (!activeChannel) {
+    return () => {}
+  }
 
-  const handler = (e: MessageEvent<AuthMessage>) => {
-    if (e.data.type === 'token') {
-      setAccessToken({ token: e.data.token })
+  const handler = (event: MessageEvent<AuthMessage>) => {
+    if (event.data.type === 'token') {
+      setAccessToken({ token: event.data.token })
       return
     }
     setAccessToken({ token: null })
     onLogout()
   }
 
-  ch.addEventListener('message', handler)
-  return () => ch.removeEventListener('message', handler)
+  activeChannel.addEventListener('message', handler)
+  return () => {
+    activeChannel.removeEventListener('message', handler)
+  }
 }
 
 export const broadcastToken = ({ token }: { token: string }): void => {

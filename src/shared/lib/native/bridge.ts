@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+import { NATIVE_HANDLER } from '@/shared/constants/native'
+import type { NativeWindow } from '@/shared/types/native'
+
 /**
  * 웹뷰 ↔ 네이티브 앱 통신 창구.
  *
@@ -7,23 +10,16 @@ import { z } from 'zod'
  * window에 직접 손대는 곳은 여기 하나뿐이어야 한다.
  */
 
-interface NativeWindow {
-  /** iOS: WKWebView 메시지 핸들러 */
-  webkit?: { messageHandlers?: Record<string, { postMessage: (body: string) => void }> }
-  /** Android: addJavascriptInterface로 주입된 객체 */
-  AndroidBridge?: { postMessage: (body: string) => void }
-}
-
-const NATIVE_HANDLER = 'appBridge'
-
 const getNativeWindow = (): NativeWindow => {
   return window as unknown as NativeWindow
 }
 
 /** 네이티브 셸 안에서 실행 중인지. 브라우저에서 열었으면 false. */
 export const isNativeApp = (): boolean => {
-  const w = getNativeWindow()
-  return Boolean(w.AndroidBridge ?? w.webkit?.messageHandlers?.[NATIVE_HANDLER])
+  const nativeWindow = getNativeWindow()
+  return Boolean(
+    nativeWindow.AndroidBridge ?? nativeWindow.webkit?.messageHandlers?.[NATIVE_HANDLER],
+  )
 }
 
 /**
@@ -32,13 +28,21 @@ export const isNativeApp = (): boolean => {
  */
 export const sendToNative = ({ type, payload }: { type: string; payload?: unknown }): void => {
   const body = JSON.stringify({ type, payload })
-  const w = getNativeWindow()
+  const nativeWindow = getNativeWindow()
 
-  if (w.AndroidBridge) {
-    w.AndroidBridge.postMessage(body)
+  if (nativeWindow.AndroidBridge) {
+    nativeWindow.AndroidBridge.postMessage(body)
     return
   }
-  w.webkit?.messageHandlers?.[NATIVE_HANDLER]?.postMessage(body)
+  nativeWindow.webkit?.messageHandlers?.[NATIVE_HANDLER]?.postMessage(body)
+}
+
+const safeJsonParse = ({ raw }: { raw: string }): unknown => {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
 }
 
 /**
@@ -71,13 +75,7 @@ export const subscribeToNative = <T>({
   }
 
   window.addEventListener('message', onMessage)
-  return () => window.removeEventListener('message', onMessage)
-}
-
-const safeJsonParse = ({ raw }: { raw: string }): unknown => {
-  try {
-    return JSON.parse(raw)
-  } catch {
-    return null
+  return () => {
+    window.removeEventListener('message', onMessage)
   }
 }

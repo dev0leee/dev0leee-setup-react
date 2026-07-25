@@ -1,15 +1,11 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosError } from 'axios'
 
 import { env } from '@/config/env'
+import { API_TIMEOUT_MS, REFRESH_TIMEOUT_MS } from '@/shared/constants/http'
 import { toApiError } from '@/shared/lib/apiErrors'
 import { broadcastToken } from '@/shared/lib/authChannel'
 import { getAccessToken, setAccessToken } from '@/shared/lib/tokenStore'
-
-type RetriableConfig = InternalAxiosRequestConfig & { _retried?: boolean }
-
-interface RefreshResponse {
-  accessToken: string
-}
+import type { RefreshResponse, RetriableConfig } from '@/shared/types/api'
 
 export const REFRESH_ENDPOINT = '/token-refresh'
 
@@ -20,14 +16,37 @@ export const REFRESH_ENDPOINT = '/token-refresh'
 const refreshClient = axios.create({
   baseURL: env.VITE_API_URL,
   withCredentials: true, // Refresh Token 쿠키 전송
-  timeout: 10_000,
+  timeout: REFRESH_TIMEOUT_MS,
 })
 
+/** 인증이 필요한 요청. 토큰 주입 + 401 refresh + 에러 정규화가 붙는다. */
 export const api = axios.create({
   baseURL: env.VITE_API_URL,
   withCredentials: true,
-  timeout: 15_000,
+  timeout: API_TIMEOUT_MS,
 })
+
+/**
+ * 인증이 필요 없는 요청. 토큰을 붙이지 않고 401 refresh도 하지 않는다.
+ * 에러 정규화만 공유한다.
+ *
+ * 세션 복원처럼 refresh 엔드포인트를 직접 부르는 요청은 반드시 여기를 써야 한다.
+ * api로 보내면 401 시 인터셉터가 같은 엔드포인트로 또 refresh를 걸어 루프가 된다.
+ */
+export const publicApi = axios.create({
+  baseURL: env.VITE_API_URL,
+  withCredentials: true,
+  timeout: API_TIMEOUT_MS,
+})
+
+publicApi.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error: AxiosError) => {
+    return Promise.reject(toApiError({ error }))
+  },
+)
 
 /** Web Locks를 못 쓰는 환경(비 secure context)용 폴백 */
 let fallbackInflight: Promise<string> | null = null
@@ -47,7 +66,9 @@ const performRefresh = async ({ failedToken }: { failedToken: string | null }): 
 const refreshAccessToken = ({ failedToken }: { failedToken: string | null }): Promise<string> => {
   if ('locks' in navigator) {
     // Web Locks는 origin 단위라 탭을 가로질러 직렬화된다.
-    return navigator.locks.request('auth:refresh', () => performRefresh({ failedToken }))
+    return navigator.locks.request('auth:refresh', () => {
+      return performRefresh({ failedToken })
+    })
   }
 
   fallbackInflight ??= performRefresh({ failedToken }).finally(() => {
@@ -63,7 +84,9 @@ api.interceptors.request.use((config) => {
 })
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response
+  },
   async (error: AxiosError) => {
     const config = error.config as RetriableConfig | undefined
 

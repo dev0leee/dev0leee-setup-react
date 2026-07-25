@@ -1,16 +1,23 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { type ReactNode, useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { restoreSession } from '@/features/auth/api/auth'
+import type { AuthProviderProps } from '@/features/auth/types/auth'
 import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
 import { initAuthChannel } from '@/shared/lib/authChannel'
 import { setAccessToken } from '@/shared/lib/tokenStore'
 import { useAuthStore } from '@/shared/stores/authStore'
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const status = useAuthStore((s) => s.status)
-  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
-  const setAnonymous = useAuthStore((s) => s.setAnonymous)
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const status = useAuthStore((state) => {
+    return state.status
+  })
+  const setAuthenticated = useAuthStore((state) => {
+    return state.setAuthenticated
+  })
+  const setAnonymous = useAuthStore((state) => {
+    return state.setAnonymous
+  })
   const queryClient = useQueryClient()
 
   const clearSession = useCallback(() => {

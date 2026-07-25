@@ -9,7 +9,9 @@ import { useAuthStore } from '@/shared/stores/authStore'
  * 화면 전환·폼 에러 표시는 호출부가 `mutate`의 콜백으로 넘긴다.
  */
 export const useLogin = () => {
-  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
+  const setAuthenticated = useAuthStore((state) => {
+    return state.setAuthenticated
+  })
 
   return useMutation({
     mutationFn: login,

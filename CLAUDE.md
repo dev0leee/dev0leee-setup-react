@@ -35,7 +35,7 @@ React 19 + TypeScript + Vite SPA 템플릿.
 src/
 ├── app/          # 앱 조립: App, router, queryClient, layout, guard
 ├── features/     # 도메인 슬라이스 (auth, dashboard, ...)
-│   └── <name>/   # api · components · hooks · stores · types + index.ts(공개 API)
+│   └── <name>/   # api · queries · pages · components · constants · types + index.ts(공개 API)
 ├── shared/       # 도메인 무관 공용
 │   ├── components/
 │   │   ├── ui/       # shadcn 생성물 - 손대지 않음

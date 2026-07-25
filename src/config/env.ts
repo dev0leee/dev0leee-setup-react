@@ -11,7 +11,9 @@ const schema = z.object({
   VITE_ENABLE_MSW: z
     .enum(['true', 'false'])
     .default('false')
-    .transform((v) => v === 'true'),
+    .transform((value) => {
+      return value === 'true'
+    }),
 })
 
 const parsed = schema.safeParse(import.meta.env)

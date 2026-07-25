@@ -5,6 +5,7 @@ import { NotFoundPage } from '@/app/NotFoundPage'
 import { ProtectedRoute } from '@/app/ProtectedRoute'
 import { LoginPage } from '@/features/auth'
 import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
+import { ROUTE_PATH } from '@/shared/constants/routes'
 
 export const router = createBrowserRouter([
   {
@@ -12,7 +13,7 @@ export const router = createBrowserRouter([
     HydrateFallback: FullPageSpinner,
     children: [
       // 로그인은 비인증 사용자의 진입점이라 즉시 로드한다.
-      { path: '/login', element: <LoginPage /> },
+      { path: ROUTE_PATH.LOGIN, element: <LoginPage /> },
       {
         element: <ProtectedRoute />,
         children: [

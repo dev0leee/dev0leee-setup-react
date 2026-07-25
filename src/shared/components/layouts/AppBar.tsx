@@ -1,14 +1,8 @@
 import { ChevronLeft } from 'lucide-react'
 
 import { Button } from '@/shared/components/ui/button'
+import type { AppBarProps } from '@/shared/types/appBar'
 import { cn } from '@/shared/utils/cn'
-
-interface AppBarProps {
-  title: string
-  hasBackButton?: boolean
-  onBack?: () => void
-  className?: string
-}
 
 export const AppBar = ({ title, hasBackButton = false, onBack, className }: AppBarProps) => {
   return (

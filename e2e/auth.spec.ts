@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { mockApi } from './support/api'
 
 test('세션이 없으면 로그인 화면으로 보낸다', async ({ page }) => {
-  await mockApi(page, { session: 'none' })
+  await mockApi({ page, session: 'none' })
 
   await page.goto('/')
 
@@ -12,7 +12,7 @@ test('세션이 없으면 로그인 화면으로 보낸다', async ({ page }) =>
 })
 
 test('로그인하면 대시보드 위젯이 모두 보인다', async ({ page }) => {
-  await mockApi(page, { session: 'none' })
+  await mockApi({ page, session: 'none' })
   await page.goto('/login')
 
   await page.getByLabel('이메일').fill('dev@example.com')
@@ -25,7 +25,7 @@ test('로그인하면 대시보드 위젯이 모두 보인다', async ({ page })
 })
 
 test('세션이 살아있으면 새로고침해도 대시보드가 유지된다', async ({ page }) => {
-  await mockApi(page, { session: 'valid' })
+  await mockApi({ page, session: 'valid' })
 
   await page.goto('/')
 
