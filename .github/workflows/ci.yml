@@ -9,12 +9,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# CI는 리포를 읽기만 한다. GITHUB_TOKEN에 그 이상 주지 않는다.
+permissions:
+  contents: read
+
 # job의 `name:`을 지정하면 그 값이 status check 이름이 되고,
 # 브랜치 보호의 required check와 어긋나면 PR이 영원히 대기한다.
 # job id를 그대로 check 이름으로 쓰기 위해 `name:`을 두지 않는다.
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -23,14 +28,16 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm test
+      # build가 `tsc -b && vite build`라 타입체크를 겸한다.
+      # 따로 pnpm typecheck를 두면 같은 검사를 두 번 돌린다.
       - run: pnpm build
 
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

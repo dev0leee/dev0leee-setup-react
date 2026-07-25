@@ -119,7 +119,13 @@ ErrorBoundary는 **렌더링 중 에러만** 잡는다. 이벤트 핸들러와 �
 
 ## CI
 
-`.github/workflows/ci.yml` - `verify`(typecheck·lint·format·test·build)와 `e2e` 2개 job.
+`.github/workflows/ci.yml` - `verify`(lint·format·test·build)와 `e2e` 2개 job.
+
+`build`가 `tsc -b && vite build`라 타입체크를 겸한다. 그래서 CI에는 `pnpm typecheck` 단계를 따로
+두지 않는다. 로컬에서는 빌드 없이 타입만 빠르게 보려고 스크립트를 남겨둔다.
+
+`permissions: contents: read`로 `GITHUB_TOKEN` 권한을 최소화하고, job마다 `timeout-minutes`를
+둔다. 없으면 매달린 job이 기본값인 6시간을 채우고 죽는다.
 
 job에 `name:`을 붙이지 않는다. GitHub은 required status check를 job id가 아니라 `name:` 값으로
 식별하기 때문에, 이름을 붙였다가 나중에 다듬으면 보호 규칙이 조용히 깨져 PR이 무한 대기한다.
