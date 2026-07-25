@@ -20,7 +20,13 @@ react-hook-form + zod(`zodResolver`) + Base UI. 폼 값은 react-hook-form이 �
 </Field.Root>
 
 // BAD - div/button + svg로 흉내
-<button onClick={() => setChecked(!checked)}>{checked && <CheckIcon />}</button>
+<button
+  onClick={() => {
+    setChecked(!checked)
+  }}
+>
+  {checked && <CheckIcon />}
+</button>
 ```
 
 - **레이블을 연결한다.** `htmlFor`/`id`로 묶어 클릭 영역과 스크린리더 라벨을 확보한다.
@@ -54,11 +60,43 @@ zod 스키마로 다음을 전부 막는다. 경계값(빈값, 0, 최대 길이/
 
 ## 사용자 입력 안전성 (MUST)
 
-- **입력을 그대로 HTML로 렌더하지 않는다.** JSX는 기본 escape하지만 `dangerouslySetInnerHTML`,
-  `href`, 정규식에 넣을 때는 직접 escape/검증한다.
+- **입력을 그대로 HTML로 렌더하지 않는다.** JSX는 기본 escape하므로 `{content}`로 찍는 한 안전하다.
+  위험한 건 `dangerouslySetInnerHTML`, `href`, 정규식에 넣는 경우다.
 - **IME 한글 조합을 고려한다.** `onChange`는 **조합 중에도 발화**한다. 조합 중에 즉시 검증·검색·
   치환을 돌리면 깨진 글자(`ㅎ`, `한ㄱ`)가 들어간다. 실시간 처리는 `onCompositionEnd`를 기다리거나
   debounce한다. 폼 제출값은 조합이 끝난 값이라 안전하다.
+
+### HTML을 렌더해야 한다면 (MUST)
+
+에디터로 작성한 본문처럼 **HTML을 그대로 보여줘야 하는 경우에만** `dangerouslySetInnerHTML`을
+쓴다. 그리고 그때는 **손으로 escape하지 말고 반드시 sanitize를 거친다.**
+
+```tsx
+import DOMPurify from 'dompurify'
+import { decode } from 'he'
+
+const html = DOMPurify.sanitize(decode(content))
+
+return <div dangerouslySetInnerHTML={{ __html: html }} />
+```
+
+**순서가 중요하다.** `decode` → `sanitize`다.
+
+- **`he.decode`** — 서버가 `&lt;script&gt;`처럼 엔티티로 인코딩해 보낸 값을 원래 문자로 되돌린다.
+  이걸 건너뛰면 화면에 태그 문자가 그대로 보인다.
+- **`DOMPurify.sanitize`** — 되돌린 HTML에서 `<script>`·`onerror=` 같은 실행 가능한 것을 제거한다.
+
+**순서를 뒤집으면 뚫린다.** sanitize 후에 decode하면, sanitize가 무해하다고 판단해 남겨둔
+엔티티가 decode되면서 다시 실행 가능한 태그로 살아난다.
+
+- **손으로 만든 escape 함수를 쓰지 않는다.** `replace(/</g, '&lt;')` 류는 속성 컨텍스트·
+  URL 컨텍스트를 못 막아 대개 뚫린다. 검증된 라이브러리를 쓴다.
+- **`href`에 사용자 값을 넣을 때는 스킴을 확인한다.** `javascript:`로 시작하는 URL은 클릭 시
+  실행된다. `http`/`https`/`mailto`/`tel`만 허용한다.
+- **sanitize 결과를 캐싱하려면 렌더 중 계산한다.** `useEffect`로 state에 넣지 않는다
+  ([06-react](./06-react.md)).
+
+> `dompurify`와 `he`는 실제로 HTML을 렌더할 화면이 생길 때 설치한다. 지금은 의존성에 없다.
 
 ## 제출 처리 (MUST)
 

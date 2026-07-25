@@ -35,6 +35,35 @@
 > **MAY — 상수 파일이 커지면 페이지/기능 단위 섹션 주석으로 나눈다.** feature별로 이미 쪼개져
 > 있어 그럴 일은 드물다.
 
+## 정규식도 상수다 (MUST)
+
+**정규식 리터럴을 로직 안에 인라인으로 두지 않는다.** 다른 상수와 똑같이 `constants/`로 뺀다.
+범위 판단(도메인 하나면 `features/<f>/constants/`, 여러 곳이면 `shared/constants/`)도 같다.
+
+```ts
+// shared/constants/regex.ts
+export const PHONE_PATTERN = /^01[016789]\d{7,8}$/
+export const BUSINESS_NUMBER_PATTERN = /^\d{3}-\d{2}-\d{5}$/
+
+// 사용처
+import { PHONE_PATTERN } from '@/shared/constants/regex'
+
+export const phoneField = z.string().regex(PHONE_PATTERN, '올바른 전화번호를 입력하세요.')
+```
+
+```ts
+// BAD - 같은 정규식이 검증·치환·하이라이트에 각각 박힌다. 하나만 고치면 어긋난다.
+z.string().regex(/^01[016789]\d{7,8}$/)
+value.replace(/^01[016789]\d{7,8}$/, '')
+```
+
+- **이름은 `~_PATTERN`.** `~_REG`·`~Reg`처럼 줄이지 않는다 ([02-naming](./02-naming.md) 축약 금지).
+- **`g` 플래그를 붙인 정규식은 상수로 공유하지 않는다.** `lastIndex`가 호출 간에 남아
+  `test()`가 한 번씩 건너뛴다. 필요하면 상수는 패턴 문자열로 두고 쓰는 쪽에서 `new RegExp`를 만든다.
+
+정규식 대부분은 zod 필드로 흡수되므로([01-folder-structure](./01-folder-structure.md)),
+`constants/`에 남는 건 검증 밖에서 쓰는 것(문자열 치환·파싱 등)이다.
+
 ## 상태값 네이밍 (MUST)
 
 **도메인 상태값은 UI 스타일이 아니라 기능/도메인 기반으로 짓는다.** 키는 `SCREAMING_SNAKE`.

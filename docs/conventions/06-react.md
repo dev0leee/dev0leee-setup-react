@@ -40,13 +40,18 @@ const OrderDetailPage = () => {
     ...orderQuery({ orderId: orderId! }),
     enabled: Boolean(orderId),
   })
-  const status = useAuthStore((s) => s.status)
+  const status = useAuthStore((state) => {
+    return state.status
+  })
 
   // 4. 로컬 상태(useState / useRef)
   const [isEditing, setIsEditing] = useState(false)
 
   // 5. 파생값 — 렌더 중 계산 (파생 상태 금지 참고)
-  const total = order?.items.reduce((sum, item) => sum + item.amount, 0) ?? 0
+  const total =
+    order?.items.reduce((sum, item) => {
+      return sum + item.amount
+    }, 0) ?? 0
 
   // 6. 핸들러
   const handleSubmit = () => {}
@@ -87,7 +92,7 @@ useEffect(() => {
 > **MUST — 정리 함수를 반환한다.** 구독/타이머/리스너를 만들었으면 반드시 해제한다.
 > StrictMode에서 effect가 두 번 도는 이유가 이걸 검증하기 위해서다.
 
-> **MUST — `react/exhaustive-deps`가 `error`다.** 의존성 배열을 임의로 비우지 않는다.
+> **MUST — `react-hooks/exhaustive-deps`가 `error`다.** 의존성 배열을 임의로 비우지 않는다.
 > 배열을 채우기 싫어지면 effect가 필요 없다는 신호다.
 
 ## 파생 상태 금지
@@ -96,11 +101,17 @@ useEffect(() => {
 // BAD
 const [total, setTotal] = useState(0)
 useEffect(() => {
-  setTotal(orders.reduce((sum, o) => sum + o.amount, 0))
+  setTotal(
+    orders.reduce((sum, order) => {
+      return sum + order.amount
+    }, 0),
+  )
 }, [orders])
 
 // GOOD
-const total = orders.reduce((sum, o) => sum + o.amount, 0)
+const total = orders.reduce((sum, order) => {
+  return sum + order.amount
+}, 0)
 ```
 
 느려지면 그때 `useMemo`. **재보지 않고 감으로 `useMemo`를 붙이지 않는다.**
@@ -133,12 +144,19 @@ if (status === 'authenticated') return <Navigate to="/" replace />
 리스트 key는 **데이터의 안정적인 식별자**여야 한다.
 
 ```tsx
+// GOOD
 {
-  orders.map((order) => <Row key={order.id} order={order} />)
-} // GOOD
+  orders.map((order) => {
+    return <Row key={order.id} order={order} />
+  })
+}
+
+// BAD
 {
-  orders.map((order, i) => <Row key={i} order={order} />)
-} // BAD
+  orders.map((order, index) => {
+    return <Row key={index} order={order} />
+  })
+}
 ```
 
 정렬/필터/삽입이 일어나면 인덱스 key는 상태를 엉뚱한 행에 남긴다.

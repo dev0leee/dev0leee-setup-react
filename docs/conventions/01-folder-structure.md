@@ -67,7 +67,9 @@ app/
 { index: true, handle: { appBarTitle: '대시보드', showBottomNav: true }, lazy: ... }
 
 // app/layouts/AppLayout.tsx — 가장 깊은 라우트의 handle이 이긴다
-const config = useMatches().reduce((acc, m) => ({ ...acc, ...(m.handle ?? {}) }), {})
+const config = useMatches().reduce((merged, match) => {
+  return { ...merged, ...(match.handle ?? {}) }
+}, {})
 ```
 
 ### `src/features/<feature>/` — 도메인 슬라이스
@@ -132,7 +134,9 @@ features/dashboard/
 ```ts
 // features/auth/queries/useLogin.ts
 export const useLogin = () => {
-  const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
+  const setAuthenticated = useAuthStore((state) => {
+    return state.setAuthenticated
+  })
   return useMutation({
     mutationFn: login,
     onSuccess: ({ accessToken, user }) => {
@@ -146,8 +150,12 @@ export const useLogin = () => {
 ```tsx
 // 호출부가 화면 관심사를 넘긴다
 login(values, {
-  onSuccess: () => void navigate(from, { replace: true }),
-  onError: (error) => setError('root', { message: error.message }),
+  onSuccess: () => {
+    void navigate(from, { replace: true })
+  },
+  onError: (error) => {
+    setError('root', { message: error.message })
+  },
 })
 ```
 
@@ -189,8 +197,8 @@ feature A가 feature B를 import하고 싶어지면 셋 중 하나다.
 // BAD - dashboard가 auth를 안다
 import { useAuthStore } from '@/features/auth'
 
-// GOOD - 필요한 값을 props로 받는다
-const DashboardPage = ({ userName }: { userName: string }) => {}
+// GOOD - 필요한 값을 props로 받는다 (props 타입은 types/에 — 05-types)
+const DashboardPage = ({ userName }: DashboardPageProps) => {}
 ```
 
 > **예외:** `app/`이 `features/*`를 import하는 것은 `features` → `app` 방향이라 허용된다.
@@ -327,6 +335,47 @@ export const loginSchema = z.object({ email: ..., password: ... })
 feature 간 import와 같은 판단을 한다 — 합치거나, 상위에서 조립한다.
 
 > **예외: `config/env.ts`.** 환경변수 스키마는 그 모듈 자체가 검증기라 분리하지 않는다.
+
+#### 공유는 스키마 통째가 아니라 필드 단위로 (MUST)
+
+**`shared/schemas/`에 올리는 건 `z.object` 통째가 아니라 재사용되는 "필드"다.**
+도메인 스키마는 그 필드들을 **조합**해서 만든다.
+
+```ts
+// shared/schemas/common.ts - 필드 단위. 도메인을 모른다.
+export const phoneField = z.string().regex(/^01[016789]\d{7,8}$/, '올바른 전화번호를 입력하세요.')
+export const nicknameField = z.string().trim().min(2, '2자 이상 입력하세요.').max(10)
+
+// features/board/schemas/board.ts - 조합해서 도메인 스키마를 만든다
+export const boardFormSchema = z.object({
+  nickname: nicknameField,
+  phone: phoneField,
+  content: contentField,
+})
+```
+
+이렇게 하면 **에러 문구가 필드 한 곳에 모여 자동으로 통일된다.** 화면마다
+"올바른 전화번호를 입력하세요" / "전화번호 형식이 아닙니다"로 갈리지 않는다.
+
+**비슷한 스키마를 손으로 두 번 쓰지 않는다. `.extend()`로 파생시킨다.**
+
+```ts
+// GOOD - 원본에서 파생. 원본이 바뀌면 같이 따라온다.
+export const boardEditSchema = boardFormSchema.extend({ boardId: z.string() })
+
+// BAD - 복사해서 필드 하나 추가. 원본이 바뀌면 조용히 어긋난다.
+export const boardEditSchema = z.object({
+  nickname: nicknameField,
+  phone: phoneField,
+  content: contentField,
+  boardId: z.string(),
+})
+```
+
+일부만 필요하면 `.pick()` / `.omit()`, 전부 선택적으로 만들려면 `.partial()`을 쓴다.
+
+> 필드에 쓰는 정규식·길이 제한 같은 값은 상수다 — `constants/`에서 가져온다
+> ([12-constants](./12-constants.md)). `MIN_PASSWORD_LENGTH`가 이미 그렇게 쓰이고 있다.
 
 ### 상수는 어디에 두나
 

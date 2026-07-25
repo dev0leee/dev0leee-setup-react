@@ -63,11 +63,21 @@ if (first) {
 ```ts
 // GOOD - filter가 T | undefined를 T로 좁힌다
 const orders = ids
-  .map((id) => orderMap.get(id))
-  .filter((order): order is Order => order !== undefined)
+  .map((id) => {
+    return orderMap.get(id)
+  })
+  .filter((order): order is Order => {
+    return order !== undefined
+  })
 
 // BAD - 걸러도 타입은 여전히 (Order | undefined)[]
-const orders = ids.map((id) => orderMap.get(id)).filter((order) => order !== undefined)
+const orders = ids
+  .map((id) => {
+    return orderMap.get(id)
+  })
+  .filter((order) => {
+    return order !== undefined
+  })
 ```
 
 ## 타입을 어디에 두나 (MUST)

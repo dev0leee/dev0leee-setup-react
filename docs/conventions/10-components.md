@@ -54,12 +54,14 @@ const cancelInfo = {
   usagePeriod: `${formatDot(detail.startDate)} ~ ${formatDot(detail.endDate)}`,
 }
 
-return CANCEL_INFO_ROWS.map((row) => (
-  <div key={row.key} className="flex gap-2">
-    <span className="w-24 shrink-0 font-semibold">{row.label}</span>
-    <span>{cancelInfo[row.key]}</span>
-  </div>
-))
+return CANCEL_INFO_ROWS.map((row) => {
+  return (
+    <div key={row.key} className="flex gap-2">
+      <span className="w-24 shrink-0 font-semibold">{row.label}</span>
+      <span>{cancelInfo[row.key]}</span>
+    </div>
+  )
+})
 ```
 
 `satisfies`로 `key`가 실제 필드인지 컴파일 타임에 검사한다. 상수 위치는 [12-constants](./12-constants.md).
@@ -74,9 +76,11 @@ return CANCEL_INFO_ROWS.map((row) => (
 <table>
   <thead><tr><th>요일</th><th>운영 시간</th></tr></thead>
   <tbody>
-    {schedule.map((row) => (
-      <tr key={row.day}><td>{row.day}</td><td>{row.hours}</td></tr>
-    ))}
+    {schedule.map((row) => {
+      return (
+        <tr key={row.day}><td>{row.day}</td><td>{row.hours}</td></tr>
+      )
+    })}
   </tbody>
 </table>
 

@@ -6,7 +6,7 @@
 axios를 아는 곳은 `src/shared/lib/apiClient.ts`와 `src/shared/lib/apiErrors.ts` 둘뿐이다.
 
 ```
-컴포넌트  →  feature queries/  →  feature api/  →  @/shared/lib/apiClient의 api  →  서버
+컴포넌트  →  feature queries/  →  feature api/  →  @/shared/lib/apiClient의 인스턴스  →  서버
 ```
 
 ## 계층별 책임
@@ -21,13 +21,28 @@ axios를 아는 곳은 `src/shared/lib/apiClient.ts`와 `src/shared/lib/apiError
 
 ## MUST 규칙
 
-### 1. `api` 인스턴스만 쓴다
+### 1. 인증 여부에 맞는 인스턴스를 쓴다
+
+**`axios`를 직접 import하지 않는다.** 그리고 **그 요청이 인증을 요구하는지에 따라 인스턴스를
+나눠 쓴다.** 호출부만 봐도 인증이 필요한 요청인지 드러나야 한다.
+
+| 인스턴스    | 언제                      | 붙는 것                               |
+| ----------- | ------------------------- | ------------------------------------- |
+| `api`       | 인증이 필요한 요청 (기본) | 토큰 주입 + 401 refresh + 에러 정규화 |
+| `publicApi` | 인증이 필요 없는 요청     | 에러 정규화만                         |
 
 ```ts
-// GOOD
+// GOOD - 인증이 필요한 조회
 import { api } from '@/shared/lib/apiClient'
 
 const { data } = await api.get<Order[]>('/dashboard/orders')
+```
+
+```ts
+// GOOD - 로그인은 아직 토큰이 없다
+import { publicApi } from '@/shared/lib/apiClient'
+
+const { data } = await publicApi.post<SessionResponse>('/login', payload)
 ```
 
 ```ts
@@ -37,6 +52,16 @@ import axios from 'axios'
 const { data } = await axios.get('/dashboard/orders') // 토큰도, refresh도, 에러 정규화도 없다
 ```
 
+**비인증 요청을 `api`로 보내면 안 되는 이유는 편의가 아니라 정확성이다.**
+
+- 로그인·회원가입처럼 토큰이 없는 상태의 요청이 401을 받으면, `api`의 인터셉터가
+  "토큰이 만료됐구나" 하고 **불필요한 refresh를 시도**한다. 실패하면 세션까지 지운다.
+- 특히 **세션 복원처럼 refresh 엔드포인트를 직접 부르는 요청은 반드시 `publicApi`여야 한다.**
+  `api`로 보내면 401 시 인터셉터가 **같은 엔드포인트로 또 refresh를 걸어 루프**가 된다.
+
+> **판단 기준:** "이 요청이 성공하는 데 Access Token이 필요한가?"
+> 필요하면 `api`, 아니면 `publicApi`. 애매하면 `api`가 기본값이다.
+
 ### 2. 응답 타입을 제네릭으로 명시하고, 함수는 `data`만 반환한다
 
 컴포넌트가 `AxiosResponse`를 만지게 하지 않는다.
@@ -44,13 +69,13 @@ const { data } = await axios.get('/dashboard/orders') // 토큰도, refresh도, 
 ```ts
 // GOOD
 export const login = async (payload: LoginPayload): Promise<SessionResponse> => {
-  const { data } = await api.post<SessionResponse>('/login', payload)
+  const { data } = await publicApi.post<SessionResponse>('/login', payload)
   return data
 }
 
 // BAD
 export const login = (payload: LoginPayload) => {
-  return api.post('/login', payload) // 반환 타입 any, 호출부가 .data를 알아야 함
+  return publicApi.post('/login', payload) // 반환 타입 any, 호출부가 .data를 알아야 함
 }
 ```
 
@@ -62,7 +87,7 @@ export const login = (payload: LoginPayload) => {
 // BAD
 export const login = async (payload: LoginPayload) => {
   try {
-    const { data } = await api.post<SessionResponse>('/login', payload)
+    const { data } = await publicApi.post<SessionResponse>('/login', payload)
     return data
   } catch (e) {
     console.error(e) // 삼켜버림. Query가 실패를 모른다.

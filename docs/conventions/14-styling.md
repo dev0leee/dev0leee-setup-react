@@ -22,6 +22,44 @@ Tailwind CSS 4 (CSS-first `@theme`) + shadcn `base-nova` 토큰 + CVA. 폰트는
 하드코딩 hex를 뿌리면 **다크모드에서 전부 깨진다.** `next-themes`가 이미 테마를 토글하므로,
 색은 반드시 토큰을 거쳐야 라이트/다크가 같이 따라온다.
 
+### 토큰은 원시 → 시맨틱 2계층으로 (SHOULD)
+
+**팔레트가 늘어나면 색을 두 층으로 나눈다.** 1층은 원시 팔레트(색 그 자체), 2층은 시맨틱
+토큰(그 색의 용도). **컴포넌트는 2층만 쓴다.**
+
+```css
+/* 1층 - 원시 팔레트. 이름이 "무슨 색"이다. @theme 밖(:root)에 둔다. */
+:root {
+  --green-500: #12b669;
+  --green-50: #ecfdf3;
+}
+
+/* 2층 - 시맨틱. 이름이 "무슨 용도"다. @theme 안에 둔다. 컴포넌트는 이것만 쓴다. */
+@theme {
+  --color-primary: var(--green-500);
+  --color-primary-foreground: var(--green-50);
+}
+```
+
+```tsx
+// GOOD - 용도 이름
+<span className="bg-primary" />
+
+// BAD - 원시 팔레트를 컴포넌트가 직접 쓴다
+<span className="bg-green-500" />
+```
+
+이렇게 나누면 **리브랜딩은 1층만 갈아끼우면 끝나고, 다크 테마는 2층에서만 갈린다.**
+컴포넌트는 어느 쪽도 모른다. 한 층으로 두면 "브랜드 색을 바꿔주세요"가 전체 컴포넌트 수정이 된다.
+
+**1층을 `@theme` 밖에 두는 것이 규칙의 강제 장치다.** Tailwind 4는 `@theme` 안의 `--color-*`
+변수마다 유틸리티 클래스를 만든다. 원시 팔레트를 `@theme` 안에 넣으면 `bg-green-500` 클래스가
+생겨 컴포넌트가 쓸 수 있게 되지만, `:root`에 두면 그 클래스 자체가 생성되지 않아 위 BAD가
+물리적으로 불가능해진다. (Tailwind 기본 팔레트의 `bg-green-500`은 여전히 존재한다 — 그건
+맨 위의 "시맨틱 토큰 클래스만 쓴다" MUST가 막는다.)
+
+> 지금은 토큰이 몇 개뿐이라 1층을 따로 두는 게 과하다. **팔레트가 늘어나기 시작하면** 나눈다.
+
 ## 타이포 (SHOULD)
 
 **`text-[14px] font-semibold leading-[20px]` 같은 개별 유틸 조합을 쓰지 않는다.** 반복되는
@@ -102,3 +140,24 @@ URL은 얼마든지 길어진다.
   밖으로 삐져나가지 않게 한다.
 - **최하단 여백.** 하단 고정 바(`BottomNavigation`)·모바일 safe-area가 마지막 콘텐츠를 가리지
   않게 스크롤 영역에 `padding-bottom`(또는 `pb-[env(safe-area-inset-bottom)]`)을 준다.
+
+## 모션 (MUST)
+
+**애니메이션에는 `prefers-reduced-motion`을 존중한다.** 전정기관 장애가 있는 사용자에게
+큰 움직임·시차 효과는 실제로 어지럼증을 유발한다. OS 설정으로 "동작 줄이기"를 켠 사용자에게는
+움직임을 없애거나 페이드로 대체한다.
+
+Tailwind는 `motion-reduce:` variant를 기본 제공하므로 클래스 하나면 된다.
+
+```tsx
+// GOOD - 동작 줄이기를 켠 사용자에게는 트랜지션이 꺼진다
+<div className="transition-transform duration-300 motion-reduce:transition-none" />
+
+// GOOD - 움직임 대신 페이드만
+<div className="animate-slide-up motion-reduce:animate-none" />
+```
+
+- **없애도 되는 움직임만 없앤다.** 로딩 스피너처럼 상태를 전달하는 애니메이션까지 끄면
+  사용자가 진행 중인지 알 수 없다. 장식적 움직임(슬라이드·패럴랙스·바운스)이 대상이다.
+- **JS 애니메이션도 같다.** `window.matchMedia('(prefers-reduced-motion: reduce)')`로 확인하고
+  분기한다. CSS만 대응하고 JS 카운트업·스크롤 효과를 빼먹지 않는다.

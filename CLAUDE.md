@@ -20,7 +20,7 @@ React 19 + TypeScript + Vite SPA 템플릿.
 ## 절대 규칙
 
 1. **`import.meta.env`를 직접 읽지 않는다.** `@/config/env`의 `env` 객체만 쓴다. 부팅 시 zod로 검증된다.
-2. **`axios`를 직접 import하지 않는다.** `@/shared/lib/apiClient`의 `api` 인스턴스만 쓴다. 인터셉터가 토큰/refresh/에러 정규화를 담당한다.
+2. **`axios`를 직접 import하지 않는다.** `@/shared/lib/apiClient`의 `api`(인증 필요) · `publicApi`(인증 불필요) 인스턴스만 쓴다. 인터셉터가 토큰/refresh/에러 정규화를 담당한다.
 3. **서버 데이터를 Zustand에 넣지 않는다.** 서버에서 온 것은 전부 TanStack Query 캐시가 소유한다. 복사하는 순간 동기화 버그가 시작된다.
 4. **`any` 금지** (`@typescript-eslint/no-explicit-any: error`). 모르면 `unknown` 쓰고 좁힌다.
 5. **타입 import는 `import type`.** `verbatimModuleSyntax`가 켜져 있다.

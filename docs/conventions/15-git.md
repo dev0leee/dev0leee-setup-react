@@ -28,7 +28,12 @@ ci: 액션 최신 메이저로 올려 Node 20 deprecation 경고 제거
 ```
 
 - **type은 영어, 본문은 한국어.** 이 레포의 실제 히스토리가 그렇다.
-- 자주 쓰는 type: `feat` / `fix` / `refactor` / `chore` / `ci` / `docs` / `test`.
+- 자주 쓰는 type: `feat` / `fix` / `refactor` / `perf` / `chore` / `ci` / `docs` / `test`.
+- **`perf`는 동작이 같고 성능만 달라졌을 때** 쓴다. 메모이제이션, 번들 분할, 쿼리 수 감소 등.
+  구조를 바꿨으면 `refactor`, 동작이 바뀌었으면 `feat`/`fix`다.
+- **표준에 없는 type을 만들지 않는다.** `rename`·`remove`·`hotfix` 같은 건 쓰지 않는다 —
+  파일 이동·삭제는 `refactor`나 `chore`, 급한 수정도 그냥 `fix`다.
+  commitlint류 표준 도구가 인식하는 집합 안에 머문다.
 - `feat :`(콜론 앞 공백)처럼 쓰지 않는다. commitlint류 표준 도구가 인식하지 못한다.
 
 ## PR (MUST)

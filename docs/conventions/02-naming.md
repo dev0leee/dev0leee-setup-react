@@ -109,7 +109,8 @@ API 함수의 동사 관례:
 - **컴포넌트 내부 정의**: `handle` 접두 → `handleSubmit`, `handleRowClick`
 
 ```tsx
-const OrdersTable = ({ onRowClick }: { onRowClick: (id: string) => void }) => {
+// OrdersTableProps는 types/에 선언돼 있다 (05-types)
+const OrdersTable = ({ onRowClick }: OrdersTableProps) => {
   const handleRowClick = (order: Order) => {
     onRowClick(order.id)
   }
@@ -121,13 +122,10 @@ const OrdersTable = ({ onRowClick }: { onRowClick: (id: string) => void }) => {
 계층 구조를 배열로 표현한다. 넓은 것 → 좁은 것.
 
 ```ts
-;[
-  'dashboard',
-] // 이 도메인 전체
-[
-  ('dashboard', 'revenue')
-] // 특정 쿼리
-[('dashboard', 'orders', { page })] // 파라미터가 붙은 쿼리
+// 모양만 보여주는 예시다. 실제 정의는 queryOptions 안에 인라인으로 쓴다.
+const dashboardKey = ['dashboard'] as const // 이 도메인 전체
+const revenueKey = ['dashboard', 'revenue'] as const // 특정 쿼리
+const pagedOrdersKey = ['dashboard', 'orders', { page }] as const // 파라미터가 붙은 쿼리
 ```
 
 접두 매칭으로 한 번에 무효화할 수 있게 만드는 것이 목적이다.
@@ -139,12 +137,20 @@ const OrdersTable = ({ onRowClick }: { onRowClick: (id: string) => void }) => {
 
 ```ts
 // GOOD
-orders.filter((order) => order.id !== id)
-notices.find((notice) => notice.noticeUuid === id)
+orders.filter((order) => {
+  return order.id !== id
+})
+notices.find((notice) => {
+  return notice.noticeUuid === id
+})
 
 // BAD
-orders.filter((o) => o.id !== id)
-notices.find((n) => n.noticeUuid === id)
+orders.filter((o) => {
+  return o.id !== id
+})
+notices.find((n) => {
+  return n.noticeUuid === id
+})
 ```
 
 `reduce`의 누산기도 `acc` 대신 뜻이 있는 이름(`sum`, `total`, `result`)을 쓴다.

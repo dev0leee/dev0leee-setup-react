@@ -67,9 +67,7 @@ import {} from '@/shared/utils/cn'
 
 `import/no-amd`. ESM만 쓴다.
 
-## SHOULD 규칙
-
-### 6. named export를 기본으로 한다
+### 6. named export만 쓴다 — default export 금지
 
 `src/` 전체에 default export가 하나도 없다. 이름이 하나로 고정돼야 검색·자동 import·
 리네임이 정확해진다. `import/prefer-default-export`는 꺼져 있다.
@@ -112,6 +110,8 @@ export { login } from '@/features/auth/api/auth'
 
 feature `index.ts`의 `export { X } from '...'` 재export 자체는 정상이다
 ([01-folder-structure](./01-folder-structure.md)). 금지되는 건 `as`로 이름을 바꾸는 것뿐이다.
+
+## SHOULD 규칙
 
 ### 7. 사이드이펙트 import는 최소화하고 진입점에만 둔다
 

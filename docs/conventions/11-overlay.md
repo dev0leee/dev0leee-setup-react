@@ -23,7 +23,9 @@ Base UI `Dialog`를 감싼 공통 래퍼로만 띄운다. 딤 배경·포털·�
 // 부모
 <CancelReservationSheet
   open={overlayType === 'cancelReservation'}
-  onOpenChange={(next) => setOverlayType(next ? 'cancelReservation' : null)}
+  onOpenChange={(next) => {
+    setOverlayType(next ? 'cancelReservation' : null)
+  }}
   detail={detail}
   onSubmit={handleCancelSubmit}
 />
@@ -76,17 +78,50 @@ boolean 3개면 8가지 조합이 생기고 그중 4가지가 "모달 두 개가
 
 ### 구현 — Base UI `onOpenChange`
 
-Base UI는 `onOpenChange(open, event, reason)`에서 **닫힌 이유**(`outside-press` / `escape-key` /
-`close-press` …)를 준다. 래퍼에 정책 prop(예: `dismissOnBackdrop`)을 두고 `reason`으로 분기한다.
+Base UI는 `onOpenChange(open, eventDetails)`의 **`eventDetails.reason`**으로 닫힌 이유
+(`'outside-press'` / `'escape-key'` / `'close-press'` …)를 준다. 래퍼에 정책 prop
+(예: `dismissOnBackdrop`)을 두고 `reason`으로 분기한다.
 
 ```tsx
-onOpenChange={(open, _event, reason) => {
-  if (!open && reason === 'outside-press' && !dismissOnBackdrop) return // 배경 클릭 무시
+onOpenChange={(open, eventDetails) => {
+  if (!open && eventDetails.reason === 'outside-press' && !dismissOnBackdrop) return // 배경 클릭 무시
   onOpenChange(open)
 }}
 ```
 
+(3-인자 `(open, event, reason)`은 구버전 시그니처다. 설치된 `@base-ui/react` 1.6은
+2-인자 `eventDetails` 방식이라 3-인자로 쓰면 타입 에러가 난다.)
+
 **닫기 버튼은 어떤 경우든 항상 둔다.** 배경 클릭·`Esc`를 막아도 명시적 닫기 수단은 남긴다.
+
+## 토스트 (MUST)
+
+토스트도 오버레이다 — **컨테이너는 앱에 하나, 호출부는 함수 호출 하나.** 원리는 다른
+오버레이와 같다: 위치·트랜지션·타이머·중복 처리는 컨테이너가 소유하고, 쓰는 쪽은 그 존재를 모른다.
+
+- **`<Toaster />`는 `App.tsx`에 한 번만 마운트한다.** 전역 오버레이는 `App.tsx` 담당이다
+  ([01-folder-structure](./01-folder-structure.md)). 이미 그렇게 되어 있다 — 페이지·컴포넌트가
+  토스트 UI를 다시 만들지 않는다.
+- **호출부는 `toast()` 함수만 부른다.** sonner의 `toast`는 훅이 아니라서 컴포넌트 밖
+  (뮤테이션 `onSuccess` 등)에서도 부를 수 있다.
+- **토스트 상태를 스토어나 `useState`로 만들지 않는다.** 큐·타이머·자동 닫힘은 라이브러리가
+  소유한다. 직접 만들면 타이머 해제와 연속 호출 처리를 전부 손으로 관리하게 된다.
+- **문구는 [12-constants](./12-constants.md) "사용자에게 보여주는 메시지" 규칙을 따른다** —
+  개수·이름 같은 실제 값을 넣는다.
+- **HTML 문자열을 넣지 않는다.** 문자열·JSX만. HTML을 넣어야 할 것 같으면
+  [13-forms](./13-forms.md)의 sanitize 규칙부터 다시 읽는다.
+
+```tsx
+// app/App.tsx - 컨테이너는 여기 한 번뿐 (이미 마운트돼 있다)
+<Toaster />
+```
+
+```tsx
+// 호출부 - 함수 호출이 전부다
+import { toast } from 'sonner'
+
+toast.success(`${count}개 항목을 삭제했습니다.`)
+```
 
 ## 배치 (MAY)
 

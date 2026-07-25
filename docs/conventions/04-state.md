@@ -56,16 +56,11 @@ const DashboardPage = () => {
 ### Query Key 규칙 (MUST)
 
 ```ts
-;[
-  'dashboard',
-] // 도메인
-[
-  ('dashboard', 'orders')
-] // 리소스
-[
-  ('dashboard', 'orders', orderId)
-] // 개별
-[('dashboard', 'orders', { page, sort })] // 파라미터는 마지막에 객체로
+// 모양만 보여주는 예시다. 실제 정의는 queryOptions 안에 인라인으로 쓴다.
+const dashboardKey = ['dashboard'] as const // 도메인
+const ordersKey = ['dashboard', 'orders'] as const // 리소스
+const orderKey = ['dashboard', 'orders', orderId] as const // 개별
+const pagedOrdersKey = ['dashboard', 'orders', { page, sort }] as const // 파라미터는 마지막에 객체로
 ```
 
 - **넓은 것 → 좁은 것 순서.** 접두 매칭 무효화를 위해서다.
@@ -128,24 +123,33 @@ useQuery({ ...orderQuery({ orderId: orderId! }), enabled: Boolean(orderId) })
 ### 스토어 작성 규칙
 
 ```ts
-// shared/stores/authStore.ts
-import { create } from 'zustand'
-
-import type { AuthStatus, User } from '@/shared/types/auth'
-
-interface AuthState {
+// shared/types/auth.ts - 스토어 타입도 로직 파일이 아니라 types/에 선언한다 (05-types)
+export interface AuthState {
   status: AuthStatus
   user: User | null
   setAuthenticated: (user: User) => void
   setAnonymous: () => void
 }
+```
 
-export const useAuthStore = create<AuthState>((set) => ({
-  status: 'booting',
-  user: null,
-  setAuthenticated: (user) => set({ status: 'authenticated', user }),
-  setAnonymous: () => set({ status: 'anonymous', user: null }),
-}))
+```ts
+// shared/stores/authStore.ts - 선언하지 않고 import해서 쓴다
+import { create } from 'zustand'
+
+import type { AuthState } from '@/shared/types/auth'
+
+export const useAuthStore = create<AuthState>((set) => {
+  return {
+    status: 'booting',
+    user: null,
+    setAuthenticated: (user) => {
+      set({ status: 'authenticated', user })
+    },
+    setAnonymous: () => {
+      set({ status: 'anonymous', user: null })
+    },
+  }
+})
 ```
 
 - **MUST — 상태와 액션을 한 인터페이스에 둔다.** 분리된 액션 파일을 만들지 않는다.
@@ -158,8 +162,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 ```tsx
 // GOOD - status가 바뀔 때만 리렌더
-const status = useAuthStore((s) => s.status)
-const setAuthenticated = useAuthStore((s) => s.setAuthenticated)
+const status = useAuthStore((state) => {
+  return state.status
+})
+const setAuthenticated = useAuthStore((state) => {
+  return state.setAuthenticated
+})
 
 // BAD - 스토어의 무엇이든 바뀌면 리렌더
 const { status, setAuthenticated } = useAuthStore()
@@ -170,7 +178,11 @@ const { status, setAuthenticated } = useAuthStore()
 ```ts
 import { useShallow } from 'zustand/react/shallow'
 
-const { status, user } = useAuthStore(useShallow((s) => ({ status: s.status, user: s.user })))
+const { status, user } = useAuthStore(
+  useShallow((state) => {
+    return { status: state.status, user: state.user }
+  }),
+)
 ```
 
 ## 로컬 상태 — useState / useReducer
@@ -182,10 +194,18 @@ const { status, user } = useAuthStore(useShallow((s) => ({ status: s.status, use
 ```tsx
 // BAD
 const [total, setTotal] = useState(0)
-useEffect(() => setTotal(orders.reduce((a, o) => a + o.amount, 0)), [orders])
+useEffect(() => {
+  setTotal(
+    orders.reduce((sum, order) => {
+      return sum + order.amount
+    }, 0),
+  )
+}, [orders])
 
 // GOOD
-const total = orders.reduce((a, o) => a + o.amount, 0)
+const total = orders.reduce((sum, order) => {
+  return sum + order.amount
+}, 0)
 ```
 
 이건 커뮤니티가 가장 자주 후회하는 지점이다 (u/FearIsHere, 100 upvotes):

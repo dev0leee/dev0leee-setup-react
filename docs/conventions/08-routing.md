@@ -94,7 +94,7 @@ Query 캐시가 있어서 여러 컴포넌트가 같은 쿼리를 불러도 요�
 
 ```tsx
 // 탭 전환 - 같은 페이지의 뷰 변경이지 새 페이지 이동이 아니다
-function selectTab(next: string) {
+const selectTab = (next: string) => {
   setSearchParams({ tab: next }, { replace: true }) // 히스토리 쌓지 않는다
 }
 ```

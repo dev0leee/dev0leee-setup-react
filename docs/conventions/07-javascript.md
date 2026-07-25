@@ -75,9 +75,13 @@ getMileageList({ hours: queryString.hours ?? MAX_HOURS })
 ```ts
 // GOOD
 const next = [...orders, newOrder]
-const sorted = orders.toSorted((a, b) => a.amount - b.amount)
+const sorted = orders.toSorted((orderA, orderB) => {
+  return orderA.amount - orderB.amount
+})
 const updated = { ...order, amount: 100 }
-const without = orders.filter((o) => o.id !== id)
+const without = orders.filter((order) => {
+  return order.id !== id
+})
 const { [couponId]: _removed, ...rest } = selectedCoupons // 키 제거
 
 // BAD
@@ -191,6 +195,9 @@ throw new ApiError(message, status, code)
   컴포넌트·훅·유틸·API 함수 전부 통일한다. 화살표는 호이스팅되지 않으니 **정의가 사용보다 앞에**
   와야 한다 — 파일 안에서 헬퍼를 먼저, 그걸 쓰는 쪽을 뒤에 둔다. 유일한 예외는
   `src/shared/components/ui/**`(shadcn 생성물)다.
+- **MUST — 화살표 함수 본문은 항상 중괄호 + `return`.** 암묵적 반환(`() => value`)을 쓰지 않는다.
+  콜백도 예외가 아니다. (린트로 강제하려면 `arrow-body-style: ['error', 'always']` — 아직 켜지 않았다.
+  켜는 순간 기존 코드 43곳이 걸리고 `--fix`가 전부 고친다.)
 - **MUST — 인자는 개수와 무관하게 객체로 받는다.** 인자가 1개여도 객체로 감싼다.
   순서 의존 위치 인자를 만들지 않는다. 호출부에서 각 인자의 의미가 이름으로 드러나고,
   기본값 선언과 인자 추가가 자유롭다. (예외 없음 — 0개면 그냥 인자 없는 함수다.)
@@ -206,6 +213,23 @@ getMileageList({ hours })
 // BAD - 순서 의존 위치 인자
 formatDate(date, '.', false)
 ```
+
+```ts
+// GOOD - 본문은 항상 중괄호 + return
+export const getToday = () => {
+  return startOfDay(new Date())
+}
+orders.filter((order) => {
+  return order.id !== id
+})
+
+// BAD - 암묵적 반환
+export const getToday = () => startOfDay(new Date())
+orders.filter((order) => order.id !== id)
+```
+
+한 줄짜리를 여러 줄로 늘릴 때 diff가 본문에만 남고, 객체 리터럴을 반환할 때
+`() => ({ ... })`처럼 괄호로 감싸야 하는 함정도 사라진다.
 
 ## 모듈 부수효과
 
@@ -253,5 +277,7 @@ export const getToday = () => {
 import { formatPrice } from '@/shared/utils/formatNumber'
 
 // BAD - 컴포넌트 안에 로컬 정의 / 직접 toLocaleString
-const formatPrice = (price: number) => `${price.toLocaleString()}원`
+const formatPrice = (price: number) => {
+  return `${price.toLocaleString()}원`
+}
 ```
