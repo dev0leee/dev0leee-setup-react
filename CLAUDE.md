@@ -20,6 +20,11 @@ React 19 + TypeScript + Vite SPA 템플릿.
 ## 절대 규칙
 
 1. **`import.meta.env`를 직접 읽지 않는다.** `@/config/env`의 `env` 객체만 쓴다. 부팅 시 zod로 검증된다.
+   `eslint.config.js`의 `no-restricted-syntax`가 `src/**`에서 강제한다.
+   **공식 예외는 2곳뿐이다** — `src/config/env.ts`(검증기 자신)와 `src/main.tsx`(MSW 트리셰이킹 가드.
+   `import.meta.env.DEV`는 빌드 타임 리터럴이라 번들러가 죽은 가지를 잘라내지만,
+   zod transform을 거친 `env.VITE_ENABLE_MSW`는 정적 분석이 안 된다).
+   두 파일은 ESLint override에 명시돼 있다. 새 예외가 필요하면 override와 README를 같이 고친다.
 2. **`axios`를 직접 import하지 않는다.** `@/shared/lib/apiClient`의 `api`(인증 필요) · `publicApi`(인증 불필요) 인스턴스만 쓴다. 인터셉터가 토큰/refresh/에러 정규화를 담당한다.
 3. **서버 데이터를 Zustand에 넣지 않는다.** 서버에서 온 것은 전부 TanStack Query 캐시가 소유한다. 복사하는 순간 동기화 버그가 시작된다.
 4. **`any` 금지** (`@typescript-eslint/no-explicit-any: error`). 모르면 `unknown` 쓰고 좁힌다.

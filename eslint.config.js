@@ -143,7 +143,20 @@ export default tseslint.config(
     // 부정확해진다(09-imports 규칙 6). 도구가 default를 요구하는 루트 설정 파일은
     // src/ 밖이라 자연히 예외다.
     files: ['src/**/*.{ts,tsx}'],
-    rules: { 'import/no-default-export': 'error' },
+    rules: {
+      'import/no-default-export': 'error',
+      // `import.meta.env` 직접 접근 금지 (CLAUDE.md 절대 규칙 1).
+      // 검증되지 않은 원시 값이 앱 곳곳으로 새면 오타 하나가 런타임에서야 터진다.
+      // 공식 예외는 아래 두 파일뿐이고, 각각 override로 명시돼 있다.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "MemberExpression[object.type='MetaProperty'][property.name='env']",
+          message:
+            'import.meta.env를 직접 읽지 않는다. @/config/env의 env 객체를 쓴다. 예외는 src/config/env.ts와 src/main.tsx뿐이며 eslint.config.js에 명시돼 있다.',
+        },
+      ],
+    },
   },
 
   {
@@ -168,8 +181,22 @@ export default tseslint.config(
   },
 
   {
+    // 공식 예외 1. 이 파일이 import.meta.env를 zod로 검증해 env 객체를 만든다.
+    // 검증기 자신은 원본을 읽을 수밖에 없다.
     files: ['src/config/env.ts'],
-    rules: { 'no-console': 'off' },
+    rules: {
+      'no-console': 'off',
+      'no-restricted-syntax': 'off',
+    },
+  },
+
+  {
+    // 공식 예외 2. MSW 트리셰이킹 가드.
+    // `import.meta.env.DEV`는 빌드 타임에 리터럴로 치환돼 번들러가 죽은 가지를 잘라낸다.
+    // env.VITE_ENABLE_MSW는 zod transform을 거쳐 정적 분석이 안 되므로 대체할 수 없고,
+    // 그대로 두면 msw 400KB가 프로덕션 번들에 딸려간다.
+    files: ['src/main.tsx'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
 
   {

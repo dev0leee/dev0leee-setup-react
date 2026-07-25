@@ -4,7 +4,8 @@
 
 ## 요구 사항
 
-Node **24.18.0** (LTS Krypton). `.nvmrc`에 고정돼 있다.
+Node **24.18.0** (LTS Krypton). `.nvmrc`에 고정돼 있고, CI도 `node-version-file: .nvmrc`로 같은 값을 읽는다.
+`package.json`의 `engines.node`는 하한선(`>=24.18.0`)이다 — 둘 중 하나만 올리면 로컬과 CI가 갈린다.
 
 ```bash
 nvm use          # .nvmrc 읽음
@@ -34,7 +35,7 @@ pnpm dev
 | ----------------- | ------------------------------------------- |
 | UI Library        | React 19                                    |
 | Build             | Vite 8 (Rolldown + Oxc)                     |
-| Language          | TypeScript 7                                |
+| Language          | TypeScript 6                                |
 | Routing           | React Router v7 (library mode)              |
 | Server State      | TanStack Query v5                           |
 | HTTP              | axios + `src/shared/lib/apiClient.ts`       |
@@ -55,21 +56,33 @@ pnpm dev
 
 ```
 src/
-  api/          HTTP 레이어 (axios 인스턴스, 토큰, 에러 정규화)
-  app/          부트스트랩, 프로바이더, 라우터, 레이아웃
-  components/
-    ui/         shadcn 생성물. 직접 수정하지 말 것
-    common/     공용 컴포넌트
-    errors/     ErrorBoundary와 fallback 3종
+  app/          앱 조립 (App, router, queryClient, layouts, guard)
   config/       env (Zod 검증)
-  features/     기능 단위 (auth, dashboard)
-  lib/          유틸
-  mocks/        MSW 핸들러
-  test/         테스트 셋업 및 헬퍼
+  features/     도메인 슬라이스
+    auth/       api · queries · pages · components · hooks · schemas · constants · types + index.ts
+    dashboard/  api · queries · pages · components · constants · types + index.ts
+  shared/       도메인 무관 공용
+    components/
+      ui/       shadcn 생성물. 직접 수정하지 말 것
+      common/   우리가 만든 공용 컴포넌트
+      errors/   ErrorBoundary와 fallback 3종
+      layouts/  레이아웃 조각
+    lib/        HTTP 하부구조 (apiClient, apiErrors, tokenStore, authChannel, native/)
+    hooks/      여러 feature가 쓰는 훅
+    stores/     전역 클라이언트 상태
+    schemas/    공용 zod 스키마
+    constants/  공용 상수
+    types/      여러 곳이 쓰는 타입
+    utils/      순수 함수 (cn 등)
+  testing/      테스트 셋업 · renderWithProviders · MSW 핸들러(mocks/)
 e2e/            Playwright
 ```
 
-새 기능은 `src/features/<name>/` 아래에 api / 컴포넌트 / 훅을 모아 둔다.
+새 기능은 `src/features/<name>/` 아래에 api / queries / pages / components를 모으고 `index.ts`로
+공개 API를 내보낸다. **의존 방향은 `shared` → `features` → `app` 한 방향**이고,
+`eslint.config.js`의 `import/no-restricted-paths`가 강제한다.
+
+레이어와 폴더 규칙의 상세는 [`docs/conventions/01-folder-structure.md`](./docs/conventions/01-folder-structure.md)에 있다.
 
 ## 환경변수
 
@@ -84,6 +97,17 @@ e2e/            Playwright
 
 계약은 `src/config/env.ts`의 Zod 스키마다. 값이 빠지거나 형식이 틀리면 **앱 부팅 시점에** 죽는다.
 코드에서 `import.meta.env`를 직접 쓰지 말고 `env` 객체를 쓴다.
+`eslint.config.js`의 `no-restricted-syntax`가 `src/**`에서 이를 강제한다.
+
+### `import.meta.env` 직접 접근이 허용되는 곳 (공식 예외 2곳)
+
+| 파일                | 이유                                                                                                                                                                   |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/config/env.ts` | 검증기 자신. 원본을 읽어 Zod로 검사해 `env` 객체를 만든다                                                                                                              |
+| `src/main.tsx`      | MSW 트리셰이킹 가드. `import.meta.env.DEV`는 빌드 타임 리터럴로 치환돼 번들러가 죽은 가지를 잘라낸다. `env.VITE_ENABLE_MSW`는 Zod transform을 거쳐 정적 분석이 안 된다 |
+
+두 파일은 `eslint.config.js`에 override로 명시돼 있다. **여기에 없는 파일에서 쓰면 lint가 막는다.**
+새 예외가 필요하면 이 표와 ESLint override를 같이 고친다 — 한쪽만 고치면 규칙이 다시 문서와 어긋난다.
 
 ## 인증
 
