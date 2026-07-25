@@ -16,6 +16,8 @@ export const useLogin = () => {
 
   const { mutate: loginMutation, isPending: isLoginPending } = useMutation({
     mutationFn: login,
+    // 실패는 폼 필드 에러로 보여준다(호출부 onError). 전역 토스트는 건너뛴다.
+    meta: { skipGlobalErrorToast: true },
     onSuccess: ({ accessToken, user }) => {
       setAccessToken({ token: accessToken })
       setAuthenticated(user)

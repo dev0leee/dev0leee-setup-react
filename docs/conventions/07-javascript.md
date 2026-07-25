@@ -68,6 +68,37 @@ export const MAX_HOURS = 10_000
 getMileageList({ hours: queryString.hours ?? MAX_HOURS })
 ```
 
+## 복잡한 조건에는 이름을 붙인다 (MUST)
+
+**여러 항을 `&&`/`||`로 엮은 조건을 그 자리에 두지 않는다.** 의미를 담은 변수(또는 함수)로 빼서
+읽는 사람이 조건의 "뜻"을 보게 한다. 매직넘버에 이름을 주는 것과 같은 이유다.
+
+```ts
+// BAD - 이 괄호 뭉치가 참이면 무슨 상황인지 읽어야 안다
+if (user.age >= 19 && !user.isBlocked && user.emailVerified) {
+  allowCheckout()
+}
+
+// GOOD - 조건에 이름이 있다
+const canCheckout = user.age >= 19 && !user.isBlocked && user.emailVerified
+if (canCheckout) {
+  allowCheckout()
+}
+```
+
+- **불리언 이름은 `is`/`has`/`can`/`should` 접두** ([02-naming](./02-naming.md)).
+- **JSX 안의 조건도 마찬가지다.** `{a && b && c && <X />}`를 그대로 두지 말고 이름을 준 뒤
+  `{canShowX && <X />}`로 렌더한다 ([06-react](./06-react.md) 조건부 렌더링).
+- **재사용되거나 인자를 받으면 함수로.**
+
+```ts
+const isAdult = (user: User) => {
+  return user.age >= 19
+}
+```
+
+조건이 길수록 이름이 주는 이득이 크다. "이게 참이면 무슨 뜻인가"를 이름 한 번으로 끝낸다.
+
 ## 불변성 (MUST)
 
 원본을 바꾸지 않는다. 특히 React state와 Query 캐시 데이터는 절대.

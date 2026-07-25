@@ -307,6 +307,61 @@ if (error instanceof ApiError) {
 사용자에게 그대로 보여도 되는 문구인지는 백엔드와 합의한 것에 달렸다.
 합의가 없으면 화면에서 자체 문구로 치환한다.
 
+### 네트워크 단절·에러 토스트는 전역에서 (MUST)
+
+**뮤테이션 실패 토스트를 훅마다 `onError`에 넣지 않는다.** `queryClient`의 `MutationCache`에
+전역 `onError`를 한 번 걸어 모든 뮤테이션 실패를 처리한다. 오프라인(`isNetworkError`, status 0)은
+`NETWORK_ERROR_MESSAGE`로, 그 외는 `ApiError.message`로 — 이 분기는 `shared/lib/notifyError.ts`
+한 곳에만 있다.
+
+```ts
+// shared/lib/queryClient.ts - 전역 한 곳
+mutationCache: new MutationCache({
+  onError: (error, _variables, _context, mutation) => {
+    if (mutation.meta?.skipGlobalErrorToast) return
+    notifyError({ error })
+  },
+}),
+queryCache: new QueryCache({
+  onError: (error) => {
+    notifyNetworkError({ error }) // 조회 화면은 ErrorBoundary가 담당, 오프라인만 덧붙인다
+  },
+}),
+```
+
+```ts
+// 훅은 onError를 두지 않는다. 성공만 각자 처리한다.
+useMutation({
+  mutationFn: createOrder,
+  onSuccess: () => {
+    /* invalidate + 성공 토스트 */
+  },
+})
+```
+
+**폼처럼 토스트가 아니라 필드 에러로 보여야 하면 `meta`로 전역을 끄고 호출부에서 처리한다.**
+
+```ts
+// useLogin - 전역 토스트 건너뛰기
+useMutation({ mutationFn: login, meta: { skipGlobalErrorToast: true }, onSuccess })
+
+// LoginPage - 문구만 가져와 필드 에러로
+onError: (error) => {
+  setError('root', { message: getDisplayErrorMessage({ error }) })
+}
+```
+
+**요청 전에 미리 막고 싶으면 `useOnlineStatus`로 UI를 잠근다.** 오프라인일 때 제출 버튼을
+비활성화하거나 배너를 띄운다 — 타임아웃까지 기다리지 않고 즉시 피드백을 준다.
+`navigator.onLine`을 컴포넌트마다 직접 읽지 않는다 — 구독을 훅이 소유한다 ([04-state](./04-state.md)).
+
+```tsx
+const isOnline = useOnlineStatus()
+;<Button type="submit" disabled={isPending || !isOnline}>
+  저장
+</Button>
+```
+
 ## MSW 목킹
 
 새 엔드포인트를 만들면 `src/testing/mocks/handlers.ts`에 핸들러를 추가한다.

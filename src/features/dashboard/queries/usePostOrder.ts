@@ -21,9 +21,7 @@ export const usePostOrder = () => {
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success(ORDER_TOAST_MESSAGE.created)
     },
-    onError: (error) => {
-      toast.error(error.message)
-    },
+    // 실패 토스트는 전역 MutationCache가 처리한다 (03-api 네트워크 단절).
   })
 
   return { postOrderMutation, isPostOrderSuccess, isPostOrderPending }

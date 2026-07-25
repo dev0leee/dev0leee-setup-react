@@ -10,7 +10,8 @@
 └─ 아니오
    ├─ URL에 있어야 하나? (공유·새로고침·뒤로가기) → 라우터 (searchParams / path)
    ├─ 이 컴포넌트만 쓰나? → useState / useReducer
-   ├─ 부모-자식 몇 단계인가? → props로 내린다
+   ├─ 부모→자식 3단계까지? → props로 내린다
+   ├─ props로 4단계 이상 통과? → 합성 또는 Zustand (아래 "Props Drilling")
    └─ 앱 전역이고 자주 안 바뀌나? → Zustand
 ```
 
@@ -305,6 +306,37 @@ const total = orders.reduce((sum, order) => {
 이건 커뮤니티가 가장 자주 후회하는 지점이다 (u/FearIsHere, 100 upvotes):
 _"react.dev/learn/you-might-not-need-an-effect is one of the most useful reads I have done.
 Before that I used effects for pretty much anything, now barely at all."_
+
+## Props Drilling — 3단계까지 (MUST)
+
+props로 값을 내리는 건 정상이다. 하지만 **중간 컴포넌트가 쓰지도 않는 값을 3단계 넘게 그냥
+통과시키면** 그건 신호다.
+
+- **3단계까지: props.** 대부분 여기서 끝난다. 명시적이고 추적이 쉽다.
+- **4단계 이상: 둘 중 하나.**
+  1. **합성(composition)으로 없앤다.** 값을 쓰는 컴포넌트를 `children`으로 밀어넣어 통과
+     단계를 지운다. 중간 컴포넌트가 그 값을 몰라도 된다.
+  2. **전역 클라이언트 상태면 Zustand로.** 인증·테마처럼 여러 갈래로 깊이 내려가는 값은
+     store가 소유하고, 필요한 컴포넌트가 셀렉터로 직접 읽는다.
+
+```tsx
+// BAD - Layout·Section·Panel 다 안 쓰는데 user를 4단계 통과만 시킨다
+;<Layout user={user}>
+  <Section user={user}>
+    <Panel user={user}>
+      <Profile user={user} />
+    </Panel>
+  </Section>
+</Layout>
+
+// GOOD - 전역 사실이면 store에서 직접 읽는다 (중간 단계가 사라진다)
+const user = useAuthStore((state) => {
+  return state.user
+})
+```
+
+> **Context를 "전역 상태 도구"로 쓰지 않는다** ([06-react](./06-react.md)). 값이 바뀌면 구독자
+> 전체가 리렌더된다. 자주 바뀌는 값은 Zustand, 거의 안 바뀌는 주입(테마 등)만 Context다.
 
 ## URL 상태
 

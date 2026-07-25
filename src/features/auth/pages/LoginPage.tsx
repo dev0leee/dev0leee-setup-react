@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { ROUTE_PATH } from '@/shared/constants/routes'
+import { getDisplayErrorMessage } from '@/shared/lib/notifyError'
 import { useAuthStore } from '@/shared/stores/authStore'
 
 export const LoginPage = () => {
@@ -53,7 +54,7 @@ export const LoginPage = () => {
                     void navigate(from, { replace: true })
                   },
                   onError: (error) => {
-                    setError('root', { message: error.message })
+                    setError('root', { message: getDisplayErrorMessage({ error }) })
                   },
                 })
               })(event)

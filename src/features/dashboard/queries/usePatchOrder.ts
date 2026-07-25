@@ -18,9 +18,7 @@ export const usePatchOrder = () => {
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success(ORDER_TOAST_MESSAGE.updated)
     },
-    onError: (error) => {
-      toast.error(error.message)
-    },
+    // 실패 토스트는 전역 MutationCache가 처리한다.
   })
 
   return { patchOrderMutation, isPatchOrderSuccess, isPatchOrderPending }
