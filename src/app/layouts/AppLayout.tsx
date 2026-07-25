@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useLogout } from '@/features/auth'
 import { RouteErrorFallback } from '@/shared/components/errors/fallbacks'
 import { QueryErrorBoundary } from '@/shared/components/errors/QueryErrorBoundary'
+import { PageTransition } from '@/shared/components/layouts/PageTransition'
 import { Button } from '@/shared/components/ui/button'
 import { useAuthStore } from '@/shared/stores/authStore'
 
@@ -36,7 +37,9 @@ export const AppLayout = () => {
           resetKeys에 pathname을 넣어 라우트 이동 시 자동 복구되게 한다. */}
       <main>
         <QueryErrorBoundary FallbackComponent={RouteErrorFallback} resetKeys={[pathname]}>
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </QueryErrorBoundary>
       </main>
     </div>

@@ -153,6 +153,24 @@ lazy: async () => {
 }
 ```
 
+## 페이지 전환 애니메이션 (SHOULD)
+
+라우트가 바뀔 때 페이지에 fade-in을 준다. **라우트 레이아웃 한 곳**(`app/layouts/AppLayout`)에서
+`Outlet`을 `PageTransition`으로 감싼다. 페이지마다 각자 애니메이션을 붙이지 않는다.
+
+```tsx
+<PageTransition>
+  <Outlet />
+</PageTransition>
+```
+
+- **key로 재마운트해 enter 애니메이션을 돌린다.** `PageTransition`이 `location.pathname`을 key로
+  주면 라우트가 바뀔 때 안쪽이 다시 마운트되며 `animate-in fade-in`이 다시 돈다 — React판
+  `<Transition :key="route.fullPath">`다.
+- **enter만 준다.** leave(빠지는) 애니메이션은 이전 페이지를 남겨둬야 해서 별도 라이브러리가
+  필요하다. 지금은 넣지 않는다.
+- **`motion-reduce`로 끈다.** 동작 줄이기를 켠 사용자에겐 전환이 없다 ([14-styling](./14-styling.md)).
+
 ## 페이지 추가 체크리스트
 
 1. `src/features/<도메인>/pages/XxxPage.tsx` 생성 (named export)
