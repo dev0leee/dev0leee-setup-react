@@ -69,6 +69,12 @@
 | D-38 | `FIXED_MENUS`의 `'공지사항'`이 죽은 항목                   | `useGetResidentDetailInfo.js:25` — `MAIN_SWIPER_MENU_LIST`에 해당 `menuName`이 없어 필터에 안 잡힘                                         | 실제 고정 메뉴는 `관리사무소` 하나뿐                                                            |
 | D-41 | 콘텐츠 플래그 4개가 미사용                                 | `useGetResidentDetailInfo.js` — `hasAptCommunityContent`·`hasAptMovingHouseContent`·`hasAptVoteContent`·`hasAptShoppingContent` 사용처 0곳 | 해당 메뉴는 `MAIN_SWIPER_MENU_LIST.contentName`으로 게이팅. **이관 시 만들지 않아도 동작 동일** |
 | D-42 | 에테르노 단지 UUID가 상수와 리터럴로 중복 정의             | `MainAdvertisementBanner.vue:23` vs `:45-46`                                                                                               | 같은 값을 두 번 씀                                                                              |
+| D-43 | `MyPageMenuList.filterGroupList`가 `null`을 걸러내지 않음  | `MyPageView/MyPageMenuList.vue:79-92` — `.map()`이 `null` 반환 가능한데 `.filter(Boolean)` 없음                                            | 게시판 그룹 첫 항목이 무조건 통과해 실제로는 발생 안 함                                         |
+| D-44 | 앱 버전이 항상 `버전 없음`으로 표시                        | `MyPageView/MyPageVersion.vue:10` — `localStorage['version']`을 쓰는 곳이 코드 전체에 없고 `getApartmantVersion` API도 호출부가 없다       | `features/mypage.md` P-Q2. 네이티브가 직접 쓰지 않는 한 죽은 기능                               |
+| D-45 | `MyProfileView.userInfos`가 `computed`가 아님              | `MyProfile/MyProfileView.vue:11` — 마운트 시점 값으로 고정                                                                                 | React에서는 렌더 중 계산이라 자동 반응형이 됨                                                   |
+| D-46 | 알림 설정의 `isDisabled`가 무시됨                          | `useAlarmSetting.js:238`에 정의했으나 `AlarmSettingMenuGroupItem.vue:44`가 `isPending`만 전달                                              | 마케팅 미동의 상태에서도 광고성 토글이 활성화                                                   |
+| D-47 | `fontSizeLabel` 폴백에 TypeError                           | `storage/useFontSizeStorage.js:17-20` — `LABELS.ETC_FONT_SIZE_SCALES.MEDIUM`은 `undefined.MEDIUM`                                          | 정상 경로에선 실행 안 됨. **고쳐도 등가**                                                       |
+| D-48 | `MyPageFontSizeItem.vue` 미사용                            | import하는 곳 0곳. 슬라이더로 대체된 흔적                                                                                                  | **이관하지 않는다**                                                                             |
 
 ## 아키텍처 개선 (전환 후 검토)
 

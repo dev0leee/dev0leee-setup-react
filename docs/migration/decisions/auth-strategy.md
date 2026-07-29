@@ -58,17 +58,17 @@
 
 ## 이관 대상 — 레거시 인증 구현
 
-| 레거시       | 위치                                                                 | 이관 방식                                                                                                      |
-| ------------ | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| 토큰 저장    | `lib/composables/storage/useAuthStorage.js` (166 LOC)                | Zustand + `persist` 또는 동등 localStorage 래퍼                                                                |
-| 저장 키      | `accessToken`, `refreshToken`, `authUser`, `userAuthInfo`, `aptInfo` | **키 이름까지 동일하게** — 기존 앱 사용자의 저장값을 이어받아야 한다                                           |
-| 토큰 직렬화  | 레거시 JSON 따옴표를 읽을 때 벗기고 쓸 때는 raw                      | **그대로 재현** (기존 사용자 데이터 호환)                                                                      |
-| 로그인       | `lib/queries/auth/usePatchLogin.js` (111 LOC)                        | 응답 **헤더** `authorization`·`refresh-token`에서 토큰 추출                                                    |
-| 토큰 재발급  | `api/axios.js` 응답 인터셉터                                         | `errorCode`가 `EXPIRED_TOKEN`/`INVALID_TOKEN`일 때만 트리거 (**401 상태코드 아님**)                            |
-| 대기 요청 큐 | `stores/pendingRequests.js` + `watch`                                | ⚠️ 계획서 3-3에서 "삭제(apiClient가 대체)"로 판단했으나, **헤더 방식 유지 시 다시 필요하다.** Phase 5에서 설계 |
-| 자동 로그인  | `MainApp.vue`의 `watch` + `userAuthInfo`                             | 재발급 실패 시 저장된 아이디·비밀번호로 재로그인                                                               |
-| 로그아웃     | `lib/queries/auth/useDeleteLogout.js` + `useLogoutFlow.js`           | 로비폰 세대는 `putLobbyPhoneResidentLogout` 선행                                                               |
-| 라우터 가드  | `router/index.js` `beforeEach`                                       | `routes.md` §6의 5단계 로직                                                                                    |
+| 레거시       | 위치                                                                                                                         | 이관 방식                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 토큰 저장    | `lib/composables/storage/useAuthStorage.js` (166 LOC)                                                                        | Zustand + `persist` 또는 동등 localStorage 래퍼                                                                                    |
+| 저장 키      | **8종** — `accessToken`, `refreshToken`, `authUser`, `userAuthInfo`, `aptInfo`, `fontSize`, `surveyCertInfo`, `voteCertInfo` | **키 이름·직렬화까지 동일하게.** 기존 앱 사용자의 저장값을 이어받아야 한다 (R13). `features/mypage.md`에서 6종 → 8종으로 실측 정정 |
+| 토큰 직렬화  | 레거시 JSON 따옴표를 읽을 때 벗기고 쓸 때는 raw                                                                              | **그대로 재현** (기존 사용자 데이터 호환)                                                                                          |
+| 로그인       | `lib/queries/auth/usePatchLogin.js` (111 LOC)                                                                                | 응답 **헤더** `authorization`·`refresh-token`에서 토큰 추출                                                                        |
+| 토큰 재발급  | `api/axios.js` 응답 인터셉터                                                                                                 | `errorCode`가 `EXPIRED_TOKEN`/`INVALID_TOKEN`일 때만 트리거 (**401 상태코드 아님**)                                                |
+| 대기 요청 큐 | `stores/pendingRequests.js` + `watch`                                                                                        | ⚠️ 계획서 3-3에서 "삭제(apiClient가 대체)"로 판단했으나, **헤더 방식 유지 시 다시 필요하다.** Phase 5에서 설계                     |
+| 자동 로그인  | `MainApp.vue`의 `watch` + `userAuthInfo`                                                                                     | 재발급 실패 시 저장된 아이디·비밀번호로 재로그인                                                                                   |
+| 로그아웃     | `lib/queries/auth/useDeleteLogout.js` + `useLogoutFlow.js`                                                                   | 로비폰 세대는 `putLobbyPhoneResidentLogout` 선행                                                                                   |
+| 라우터 가드  | `router/index.js` `beforeEach`                                                                                               | `routes.md` §6의 5단계 로직                                                                                                        |
 
 ### 로그인 에러코드 매핑 (그대로 이관)
 
