@@ -100,7 +100,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | Intro             |      2 |  121 | **완료** | 미착수 |                  |
 | SignUp            |      8 |  703 | **완료** | 미착수 |                  |
 | Exception         |      4 |  149 | **완료** | 미착수 |                  |
-| Main              |     22 | 1708 | 미착수   | 미착수 |                  |
+| Main              |     22 | 1708 | **완료** | 미착수 |                  |
 | MyPage            |     19 | 1149 | 미착수   | 미착수 | ← Phase 5 파일럿 |
 | Board             |     48 | 3642 | 미착수   | 미착수 |                  |
 | ParkingManagement |     31 | 3278 | 미착수   | 미착수 |                  |
@@ -168,3 +168,4 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 | 2026-07-29 | `tech-mapping.md` 완료. **Phase 3 종료**                                                                                                       |
 | 2026-07-29 | `features/auth.md`(Intro+Login) · `features/exception.md` 완료. Phase 2 착수                                                                   |
 | 2026-07-29 | `features/signup.md` 완료 (SignUp 8 + TermsOfUse 3). 확인 항목 S-Q1 코드로 확정                                                                |
+| 2026-07-29 | `features/main.md` 완료 (22파일). 콘텐츠 플래그 4개 미사용 확인, M-Q3 확정                                                                     |
