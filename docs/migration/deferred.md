@@ -44,10 +44,20 @@
 
 ## 오타·표기
 
-| #    | 항목                        | 근거                                                             |
-| ---- | --------------------------- | ---------------------------------------------------------------- |
-| D-13 | opinion 라우트명에 공백 2칸 | `router/SurveyExternalIndex.js:65` — `설문  이름 휴대전화 인증`  |
-| D-14 | `LoginIndex`의 별칭 불일치  | `router/LoginIndex.js:5` — `@/views/...` (나머지는 `@views/...`) |
+| #    | 항목                                    | 근거                                                                                                 |
+| ---- | --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| D-13 | opinion 라우트명에 공백 2칸             | `router/SurveyExternalIndex.js:65` — `설문  이름 휴대전화 인증`                                      |
+| D-14 | `LoginIndex`의 별칭 불일치              | `router/LoginIndex.js:5` — `@/views/...` (나머지는 `@views/...`)                                     |
+| D-20 | 버전1 약관 화면의 죽은 `<style scoped>` | `LoginView/VersionOneTermsView.vue:22-26` — `.fixed-width`가 템플릿에서 안 쓰임. **이관하지 않는다** |
+
+## 동작 의심 (등가 이관으로 그대로 옮기되 확인 필요)
+
+| #    | 항목                                              | 근거                                                                                                            | 비고                                        |
+| ---- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| D-21 | 비밀번호 인증 "재요청" 버튼이 1회만 동작          | `LoginView/PasswordPhoneCertView.vue:128-136` — `resendCodeValue`가 `false`가 된 뒤 복원되지 않음               | `features/auth.md` A-Q1. 의도인지 확인      |
+| D-22 | 인증 성공 시 화면이 잠깐 빈 상태가 됨             | `LoginView/PasswordPhoneCertView.vue:159` — 루트 `v-if="!isSuccess"`                                            | `features/auth.md` A-Q2. 깜빡임 실기기 확인 |
+| D-23 | opinion 에러 화면에 `ERROR : undefined` 노출 가능 | `ExceptionView/OpinionExternalErrorView.vue:30` — `ref(undefined)` + 조건 렌더 없음. 메인 앱 E1은 `v-if`로 가림 | `features/exception.md` X-Q1                |
+| D-24 | `loginDataHandler` 실패를 조용히 삼킴             | `lib/composables/useLoginData.js:47-49` — `console.error`만. 부트스트랩 실패인데 로그인은 성공 처리             | `features/auth.md` A-Q3                     |
 
 ## 보안 (Phase 0-3과 함께 검토)
 

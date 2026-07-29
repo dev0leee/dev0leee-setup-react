@@ -88,27 +88,30 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ## Phase 2 / 6 — 도메인별 상태
 
-| 도메인            | `.vue` |  LOC | 명세   | 이관   | PR               |
-| ----------------- | -----: | ---: | ------ | ------ | ---------------- |
-| Login             |      5 |  463 | 미착수 | 미착수 |                  |
-| Intro             |      2 |  121 | 미착수 | 미착수 |                  |
-| SignUp            |      8 |  703 | 미착수 | 미착수 |                  |
-| Exception         |      4 |  149 | 미착수 | 미착수 |                  |
-| Main              |     22 | 1708 | 미착수 | 미착수 |                  |
-| MyPage            |     19 | 1149 | 미착수 | 미착수 | ← Phase 5 파일럿 |
-| Board             |     48 | 3642 | 미착수 | 미착수 |                  |
-| ParkingManagement |     31 | 3278 | 미착수 | 미착수 |                  |
-| Visit             |     23 | 2042 | 미착수 | 미착수 |                  |
-| Vote              |     23 | 1673 | 미착수 | 미착수 |                  |
-| Survey            |     19 | 1324 | 미착수 | 미착수 |                  |
-| AptMall           |     19 | 1472 | 미착수 | 미착수 |                  |
-| FireInspection    |     13 | 1231 | 미착수 | 미착수 |                  |
-| MovingHouse       |     10 | 1071 | 미착수 | 미착수 |                  |
-| Repair            |     11 |  964 | 미착수 | 미착수 |                  |
-| ManagementFee     |      3 |  906 | 미착수 | 미착수 |                  |
-| Apass             |      3 |  301 | 미착수 | 미착수 |                  |
-| TermsOfUse        |      3 |  158 | 미착수 | 미착수 |                  |
-| opinion 앱        |      — |    — | 미착수 | 미착수 |                  |
+> **명세 파일은 타깃 feature 슬라이스 기준으로 묶는다.** `IntroView` + `LoginView`는
+> 기능상 한 도메인이라 `features/auth.md` 하나로 작성했다.
+
+| 도메인            | `.vue` |  LOC | 명세     | 이관   | PR               |
+| ----------------- | -----: | ---: | -------- | ------ | ---------------- |
+| Login             |      5 |  463 | **완료** | 미착수 |                  |
+| Intro             |      2 |  121 | **완료** | 미착수 |                  |
+| SignUp            |      8 |  703 | 미착수   | 미착수 |                  |
+| Exception         |      4 |  149 | **완료** | 미착수 |                  |
+| Main              |     22 | 1708 | 미착수   | 미착수 |                  |
+| MyPage            |     19 | 1149 | 미착수   | 미착수 | ← Phase 5 파일럿 |
+| Board             |     48 | 3642 | 미착수   | 미착수 |                  |
+| ParkingManagement |     31 | 3278 | 미착수   | 미착수 |                  |
+| Visit             |     23 | 2042 | 미착수   | 미착수 |                  |
+| Vote              |     23 | 1673 | 미착수   | 미착수 |                  |
+| Survey            |     19 | 1324 | 미착수   | 미착수 |                  |
+| AptMall           |     19 | 1472 | 미착수   | 미착수 |                  |
+| FireInspection    |     13 | 1231 | 미착수   | 미착수 |                  |
+| MovingHouse       |     10 | 1071 | 미착수   | 미착수 |                  |
+| Repair            |     11 |  964 | 미착수   | 미착수 |                  |
+| ManagementFee     |      3 |  906 | 미착수   | 미착수 |                  |
+| Apass             |      3 |  301 | 미착수   | 미착수 |                  |
+| TermsOfUse        |      3 |  158 | 미착수   | 미착수 |                  |
+| opinion 앱        |      — |    — | 미착수   | 미착수 |                  |
 
 ---
 
@@ -160,3 +163,4 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 | 2026-07-29 | 기술 선택 4건 확정 (0-5·0-6·에러 모달·QueryClient 기본값). `decisions/tech-choices.md`                                                         |
 | 2026-07-29 | `zod-migration.md` 완료 (0-7). **Phase 0 종료**                                                                                                |
 | 2026-07-29 | `tech-mapping.md` 완료. **Phase 3 종료**                                                                                                       |
+| 2026-07-29 | `features/auth.md`(Intro+Login) · `features/exception.md` 완료. Phase 2 착수                                                                   |
