@@ -52,12 +52,27 @@
 
 ## 동작 의심 (등가 이관으로 그대로 옮기되 확인 필요)
 
-| #    | 항목                                              | 근거                                                                                                            | 비고                                        |
-| ---- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| D-21 | 비밀번호 인증 "재요청" 버튼이 1회만 동작          | `LoginView/PasswordPhoneCertView.vue:128-136` — `resendCodeValue`가 `false`가 된 뒤 복원되지 않음               | `features/auth.md` A-Q1. 의도인지 확인      |
-| D-22 | 인증 성공 시 화면이 잠깐 빈 상태가 됨             | `LoginView/PasswordPhoneCertView.vue:159` — 루트 `v-if="!isSuccess"`                                            | `features/auth.md` A-Q2. 깜빡임 실기기 확인 |
-| D-23 | opinion 에러 화면에 `ERROR : undefined` 노출 가능 | `ExceptionView/OpinionExternalErrorView.vue:30` — `ref(undefined)` + 조건 렌더 없음. 메인 앱 E1은 `v-if`로 가림 | `features/exception.md` X-Q1                |
-| D-24 | `loginDataHandler` 실패를 조용히 삼킴             | `lib/composables/useLoginData.js:47-49` — `console.error`만. 부트스트랩 실패인데 로그인은 성공 처리             | `features/auth.md` A-Q3                     |
+| #    | 항목                                                       | 근거                                                                                                            | 비고                                                              |
+| ---- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| D-21 | 비밀번호 인증 "재요청" 버튼이 1회만 동작                   | `LoginView/PasswordPhoneCertView.vue:128-136` — `resendCodeValue`가 `false`가 된 뒤 복원되지 않음               | `features/auth.md` A-Q1. 의도인지 확인                            |
+| D-22 | 인증 성공 시 화면이 잠깐 빈 상태가 됨                      | `LoginView/PasswordPhoneCertView.vue:159` — 루트 `v-if="!isSuccess"`                                            | `features/auth.md` A-Q2. 깜빡임 실기기 확인                       |
+| D-23 | opinion 에러 화면에 `ERROR : undefined` 노출 가능          | `ExceptionView/OpinionExternalErrorView.vue:30` — `ref(undefined)` + 조건 렌더 없음. 메인 앱 E1은 `v-if`로 가림 | `features/exception.md` X-Q1                                      |
+| D-24 | `loginDataHandler` 실패를 조용히 삼킴                      | `lib/composables/useLoginData.js:47-49` — `console.error`만. 부트스트랩 실패인데 로그인은 성공 처리             | `features/auth.md` A-Q3                                           |
+| D-25 | `setSignUpInfo({})`가 초기화되지 않음 (병합만 함)          | `stores/auth.js:6-12` — `{...prev, ...{}}`는 no-op. S1·A2 마운트의 "초기화" 의도가 동작하지 않는다              | `features/signup.md` S-Q2. 이전 가입 시도 데이터가 남는다         |
+| D-26 | `selectedAptUuid` 초기값이 `'aaaa'` 하드코딩               | `SignUpView/SignUpAptInfoView.vue:54`                                                                           | `aptName` 필수 검증이 막고 있어 실제 전송은 안 되지만 명백한 지뢰 |
+| D-27 | 회원가입 완료로 넘기는 `state.pageFrom`을 아무도 읽지 않음 | `usePostUserInfo.js:59` → `SignUpCompletedView.vue`                                                             | 죽은 state                                                        |
+| D-28 | 알 수 없는 `termsId`면 빈 화면                             | `TermsOfUseView/TermsOfUseDetailView.vue:19` — `v-if="termsItem"`, 폴백 없음                                    | 에러 처리 없음                                                    |
+| D-29 | 아파트 검색 모달이 열릴 때 빈 키워드로 API 1회 호출        | `lib/queries/auth/useGetAptList.js:10-14` — `enabled` 가드 없음                                                 | 불필요한 요청. `features/signup.md` S-Q6                          |
+| D-30 | `useGetAptList`의 `watch` 무효화가 불필요                  | `lib/queries/auth/useGetAptList.js:20-22` — 키에 `keyword`가 이미 있어 자동 refetch됨                           | **이관 시 옮기지 않아도 동작 동일**                               |
+
+## 고치면 안 되는 오타 (등가 이관 필수 보존)
+
+> 아래는 명백한 오타지만 **바로잡으면 화면이나 동작이 달라진다.** 절대 수정 금지.
+
+| #    | 항목                                                   | 근거                                                                                          | 고치면 생기는 일                       |
+| ---- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- | -------------------------------------- |
+| D-31 | `border-defaults-tertiary-border-tertiary0` (끝에 `0`) | `TermsOfUseAgreeView.vue:36`, `TermsCheckboxList.vue:32` — `tailwind.config.js`에 없는 클래스 | 테두리 색이 기본값 → 지정색으로 바뀐다 |
+| D-32 | `text-defaults-primary-text-primary0` (끝에 `0`)       | `TermsOfUseAgreeView.vue:45` — 〃                                                             | 글자 색이 기본값 → 지정색으로 바뀐다   |
 
 ## 보안 (Phase 0-3과 함께 검토)
 

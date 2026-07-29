@@ -88,6 +88,9 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ## Phase 2 / 6 — 도메인별 상태
 
+> **명세 밀도 방침 (2026-07-29 결정)**: 대칭·반복 구조도 **줄이지 않고 전수로 풀어쓴다.**
+> 도메인 명세 하나만 보고 이관할 수 있어야 한다. 예상 총량 약 24,000줄.
+>
 > **명세 파일은 타깃 feature 슬라이스 기준으로 묶는다.** `IntroView` + `LoginView`는
 > 기능상 한 도메인이라 `features/auth.md` 하나로 작성했다.
 
@@ -95,7 +98,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | ----------------- | -----: | ---: | -------- | ------ | ---------------- |
 | Login             |      5 |  463 | **완료** | 미착수 |                  |
 | Intro             |      2 |  121 | **완료** | 미착수 |                  |
-| SignUp            |      8 |  703 | 미착수   | 미착수 |                  |
+| SignUp            |      8 |  703 | **완료** | 미착수 |                  |
 | Exception         |      4 |  149 | **완료** | 미착수 |                  |
 | Main              |     22 | 1708 | 미착수   | 미착수 |                  |
 | MyPage            |     19 | 1149 | 미착수   | 미착수 | ← Phase 5 파일럿 |
@@ -110,7 +113,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | Repair            |     11 |  964 | 미착수   | 미착수 |                  |
 | ManagementFee     |      3 |  906 | 미착수   | 미착수 |                  |
 | Apass             |      3 |  301 | 미착수   | 미착수 |                  |
-| TermsOfUse        |      3 |  158 | 미착수   | 미착수 |                  |
+| TermsOfUse        |      3 |  158 | **부분** | 미착수 |                  |
 | opinion 앱        |      — |    — | 미착수   | 미착수 |                  |
 
 ---
@@ -164,3 +167,4 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 | 2026-07-29 | `zod-migration.md` 완료 (0-7). **Phase 0 종료**                                                                                                |
 | 2026-07-29 | `tech-mapping.md` 완료. **Phase 3 종료**                                                                                                       |
 | 2026-07-29 | `features/auth.md`(Intro+Login) · `features/exception.md` 완료. Phase 2 착수                                                                   |
+| 2026-07-29 | `features/signup.md` 완료 (SignUp 8 + TermsOfUse 3). 확인 항목 S-Q1 코드로 확정                                                                |
