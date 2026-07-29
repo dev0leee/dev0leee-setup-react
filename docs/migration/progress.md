@@ -55,7 +55,16 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | **에러 모달은 Base UI Dialog로 레거시 재현** (`sweetalert2` 추가 안 함)                                        | 〃                                 |
 | **QueryClient 기본값을 레거시에 맞춘다** — 전역 토스트 끄기, `throwOnError: false`, `retry: 0`, `staleTime: 0` | 〃                                 |
 
-**이관 제외 확정**: 미출차 내역 일체(라우트·컴포넌트 3·훅 2·API 2·상수), `postRejectCarRelease`,
+**이관 제외 확정 (2026-07-29 사용자 재확인 — "사용처 없으면 쓰지마")**:
+미출차 내역 **일체**(라우트·컴포넌트 3·훅 2·API 2·상수) · `postRejectCarRelease` ·
+항상허용 차량 **수정** 기능 · `MyPageFontSizeItem.vue` · `v-calendar` ·
+**콘텐츠 플래그 4개**(`hasAptCommunityContent`·`hasAptMovingHouseContent`·`hasAptVoteContent`·`hasAptShoppingContent`) ·
+`FIXED_MENUS`의 `'공지사항'` · 죽은 `<style scoped>` 2건 · `useGetAptList`의 `watch` 무효화
+
+**스타일 오타 수정 확정**: CSS 클래스 16개 중 12개를 이관 시 수정 → `broken-styles.md`
+(서버·앱 계약 오타 4건은 **그대로 유지**, 협의 후 처리 → `deferred.md`)
+
+**이관 필수로 정정**: 미출차 내역 일체(라우트·컴포넌트 3·훅 2·API 2·상수), `postRejectCarRelease`,
 항상허용 차량 **수정** 기능.
 **이관 필수로 정정**: `getNoticeTopThree` — `(미사용중)` 주석은 낡은 것이고 메인 화면에서 실제 렌더 중.
 
@@ -170,3 +179,4 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 | 2026-07-29 | `features/signup.md` 완료 (SignUp 8 + TermsOfUse 3). 확인 항목 S-Q1 코드로 확정                                                                |
 | 2026-07-29 | `features/main.md` 완료 (22파일). 콘텐츠 플래그 4개 미사용 확인, M-Q3 확정                                                                     |
 | 2026-07-29 | `features/mypage.md` 완료. **기반 도메인 6개 전부 완료.** P-Q3·P-Q4 코드로 확정                                                                |
+| 2026-07-29 | `broken-styles.md` 작성 — Tailwind 빌드로 미생성 클래스 16개 확정. 12개 수정, 4개는 디자인 확인 대기                                           |
