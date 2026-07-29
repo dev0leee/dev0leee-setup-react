@@ -863,7 +863,8 @@ handleMonthChange({ year, month }):
 > PK3·PK4·PK8·PK11의 카드도 같은 클래스를 쓴다(4곳).
 >
 > ⚠️ **`ChipBase`에 `variant`를 넘기지 않는다.** 다른 곳은 전부 `variant="fill"`인데 여기만 없다.
-> `ChipBase`의 기본 variant가 적용된다. → `[확인 필요]` PK-Q6
+> **`ChipBase`의 `variant` 기본값이 `'fill'`이므로 결과는 동일하다** (`visit.md` 작성 중 확인).
+> 이관 시 `variant="fill"`을 명시해도 렌더가 같다.
 
 **값 렌더** (`renderFieldValue`):
 
@@ -2255,19 +2256,19 @@ src/features/parking/
 
 # 확인 필요 항목
 
-| #      | 질문                                                                                                   | 성격       | 진행 차단 |
-| ------ | ------------------------------------------------------------------------------------------------------ | ---------- | --------- |
-| PK-Q1  | `useWallPadContent`가 서비스명을 `.trim()` 없이 `===` 비교한다. 서버 값에 공백이 섞이는가 (§3-2)       | 서버 확인  | 아니오    |
-| PK-Q2  | `history.state.forward` 기반 "상세 복귀 감지"를 react-router에서 어떻게 재현할지 (§3-4)                | **결정**   | 아니오    |
-| PK-Q3  | `useGetParkingRemainingMileage`의 `comparedDate` 연/월 혼합 비교가 의도한 동작인가 (§3-5)              | 확인       | 아니오    |
-| PK-Q4  | `findInParkingStatus`의 `new Date('YYYY-MM-DD HH:mm:ss')`가 실기기 웹뷰에서 파싱되는가 (§3-7)          | **실기기** | 아니오    |
-| PK-Q5  | 마일리지 한도 제한 단지에서 PK4(항상허용) 라우트를 살려둘지 (§PK1) — 현재 도달 경로 없음               | **결정**   | 아니오    |
-| PK-Q6  | PK2 `미출차` 칩에 `variant`가 없다. `ChipBase` 기본 variant가 무엇인가 (§PK2)                          | 확인       | 아니오    |
-| PK-Q7  | `inParkingTime`·`outParkingTime` 서버 응답 형식 — 가공 없이 그대로 출력한다 (§PK2)                     | 서버 확인  | 아니오    |
-| PK-Q8  | `VisitPurposeSelect`의 `inputValue.name`이 초기 렌더에서 터지지 않는 이유 (§PK5) — vee-validate 초기값 | 확인       | 아니오    |
-| PK-Q9  | 예약 기간 `.slice(5)` 결과에 시각이 남는가 (§PK11) — 서버 응답 형식 확인                               | 서버 확인  | 아니오    |
-| PK-Q10 | 삭제된 방문목적이 걸린 예약을 PK13에서 열면 TypeError로 깨진다. 에러 바운더리로 잡히는가 (§PK12)       | 확인       | 아니오    |
-| PK-Q11 | `case 'RESERVATION_DATE_INVALID('` 오타를 고칠지 (§PK14) — 고치면 사용자 메시지가 달라진다             | **결정**   | 아니오    |
+| #         | 질문                                                                                                   | 성격       | 진행 차단 |
+| --------- | ------------------------------------------------------------------------------------------------------ | ---------- | --------- |
+| PK-Q1     | `useWallPadContent`가 서비스명을 `.trim()` 없이 `===` 비교한다. 서버 값에 공백이 섞이는가 (§3-2)       | 서버 확인  | 아니오    |
+| PK-Q2     | `history.state.forward` 기반 "상세 복귀 감지"를 react-router에서 어떻게 재현할지 (§3-4)                | **결정**   | 아니오    |
+| PK-Q3     | `useGetParkingRemainingMileage`의 `comparedDate` 연/월 혼합 비교가 의도한 동작인가 (§3-5)              | 확인       | 아니오    |
+| PK-Q4     | `findInParkingStatus`의 `new Date('YYYY-MM-DD HH:mm:ss')`가 실기기 웹뷰에서 파싱되는가 (§3-7)          | **실기기** | 아니오    |
+| PK-Q5     | 마일리지 한도 제한 단지에서 PK4(항상허용) 라우트를 살려둘지 (§PK1) — 현재 도달 경로 없음               | **결정**   | 아니오    |
+| ~~PK-Q6~~ | ~~PK2 `미출차` 칩의 `variant` 기본값~~ → **해소.** `ChipBase` 기본값이 `'fill'`                        | —          | —         |
+| PK-Q7     | `inParkingTime`·`outParkingTime` 서버 응답 형식 — 가공 없이 그대로 출력한다 (§PK2)                     | 서버 확인  | 아니오    |
+| PK-Q8     | `VisitPurposeSelect`의 `inputValue.name`이 초기 렌더에서 터지지 않는 이유 (§PK5) — vee-validate 초기값 | 확인       | 아니오    |
+| PK-Q9     | 예약 기간 `.slice(5)` 결과에 시각이 남는가 (§PK11) — 서버 응답 형식 확인                               | 서버 확인  | 아니오    |
+| PK-Q10    | 삭제된 방문목적이 걸린 예약을 PK13에서 열면 TypeError로 깨진다. 에러 바운더리로 잡히는가 (§PK12)       | 확인       | 아니오    |
+| PK-Q11    | `case 'RESERVATION_DATE_INVALID('` 오타를 고칠지 (§PK14) — 고치면 사용자 메시지가 달라진다             | **결정**   | 아니오    |
 
 **진행을 막는 항목은 없다.**
 
