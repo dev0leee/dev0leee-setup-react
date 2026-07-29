@@ -116,7 +116,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | ParkingManagement |     31 | 3278 | **완료** | 미착수 |                  |
 | Visit             |     23 | 2042 | **완료** | 미착수 |                  |
 | Vote              |     23 | 1673 | **완료** | 미착수 |                  |
-| Survey            |     19 | 1324 | 미착수   | 미착수 |                  |
+| Survey            |     19 | 1324 | **완료** | 미착수 |                  |
 | AptMall           |     19 | 1472 | 미착수   | 미착수 |                  |
 | FireInspection    |     13 | 1231 | 미착수   | 미착수 |                  |
 | MovingHouse       |     10 | 1071 | 미착수   | 미착수 |                  |
@@ -148,11 +148,12 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 ### A. Phase 2 도메인 명세 — `features/<domain>.md`
 
 기반 도메인 6개 **완료** · 대형 Board **완료**.
-남은 것: **Survey(19/1324) · AptMall(19/1472) · FireInspection(13/1231) ·
-MovingHouse(10/1071) · Repair(11/964) · ManagementFee(3/906) → Apass(3/301) · opinion**
+남은 것: **AptMall(19/1472) · FireInspection(13/1231) · MovingHouse(10/1071) ·
+Repair(11/964) · ManagementFee(3/906) → Apass(3/301) · opinion**
 
-> **Survey는 Vote와 구조가 거의 같다** (비회원 딥링크 · KMC 인증 · 동적 폼 스키마).
-> `vote.md`를 참조 기준으로 쓰되, 밀도 방침대로 전수로 풀어쓴다.
+> **Vote·Survey는 이관 순서가 묶여 있다** — Survey가 opinion 엔트리와 KMC 인프라를
+> Vote에서 물려받는다 (`survey.md` 「이관 순서」).
+> **`VT-Q2`(Vote)와 `SV-Q3`(Survey)은 같은 오타이므로 한 번에 결정한다.**
 
 > ⚠️ **Visit 도메인은 Phase 4의 네이티브 브릿지 재작성이 선행 조건이다** (`visit.md` §2).
 
