@@ -111,7 +111,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | Exception         |      4 |  149 | **완료** | 미착수 |                  |
 | Main              |     22 | 1708 | **완료** | 미착수 |                  |
 | MyPage            |     19 | 1149 | **완료** | 미착수 | ← Phase 5 파일럿 |
-| Board             |     48 | 3642 | 미착수   | 미착수 |                  |
+| Board             |     48 | 3642 | **완료** | 미착수 |                  |
 | ParkingManagement |     31 | 3278 | 미착수   | 미착수 |                  |
 | Visit             |     23 | 2042 | 미착수   | 미착수 |                  |
 | Vote              |     23 | 1673 | 미착수   | 미착수 |                  |
@@ -146,8 +146,9 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ### A. Phase 2 도메인 명세 — `features/<domain>.md`
 
-기반 도메인부터: **Login · Intro · SignUp · Exception · Main · MyPage**
-→ 대형(Board · Parking · Visit · Vote) → 중형 → 소형 + opinion
+기반 도메인 6개 **완료** · 대형 Board **완료**.
+남은 것: **Parking(31/3278) → Visit(23/2042) → Vote(23/1673) → Survey · AptMall ·
+FireInspection · MovingHouse · Repair · ManagementFee → Apass · opinion**
 
 ### B. Phase 4 기반 구축
 
@@ -180,3 +181,4 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 | 2026-07-29 | `features/main.md` 완료 (22파일). 콘텐츠 플래그 4개 미사용 확인, M-Q3 확정                                                                     |
 | 2026-07-29 | `features/mypage.md` 완료. **기반 도메인 6개 전부 완료.** P-Q3·P-Q4 코드로 확정                                                                |
 | 2026-07-29 | `broken-styles.md` 작성 — Tailwind 빌드로 미생성 클래스 16개 확정. 12개 수정, 4개는 디자인 확인 대기                                           |
+| 2026-07-29 | `features/board.md` 완료 (48파일 · 화면 20 + 팝업 1 · 2,984줄). 결함 15건·소통↔민원 차이 17건 정리. 확인 항목 BD-Q1~Q15                        |
