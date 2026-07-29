@@ -666,18 +666,18 @@ if (boardType.value === 'community') { 소통공간 신고 } else { 민원공간
 
 ## 목록 아이템 — `NoticeBoardItem` (81줄)
 
-| 요소        | 클래스 / 값                                                                                                                |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `<li>`      | `flex flex-col items-start gap-3 self-stretch p-5 pb-6` + 부모가 `border-b border-defaults-tertiary-border-tertiary` 주입  |
-| 칩 줄       | `flex gap-3` > `flex gap-1`                                                                                                |
-| 필독 칩     | `noticeType === 'IMPORTANT'`일 때 `<ChipBase color="red" variant="fill">필독</ChipBase>`                                   |
-| 카테고리 칩 | `<ChipBase color="deepPurple" variant="fill">{categoryName}</ChipBase>`                                                    |
-| 날짜        | `leading-3.5 text-defaults-tertiary-text-tertiary pretendard-14Regular` — `formatIsoStringDate(createdDate).date()`        |
-| 제목        | `h-[150%] w-full overflow-hidden text-ellipsis whitespace-nowrap text-defaults-primary-text-primary pretendard-16SemiBold` |
-| 하이라이트  | 일치 조각에 `text-brand-default-text-brand`                                                                                |
-| 조회 영역   | `mt-2 flex items-center gap-1.5 self-stretch`                                                                              |
-| 조회 아이콘 | `/assets/icons/Eye.svg` alt `조회 아이콘` `h-[13px] w-[13px]`                                                              |
-| 조회수      | `flex items-center gap-[3px] text-defaults-tertiary-text-tertiary pretendard-12Regular`                                    |
+| 요소        | 클래스 / 값                                                                                                                                                                                               |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<li>`      | `flex flex-col items-start gap-3 self-stretch p-5 pb-6` + 부모가 `border-b border-defaults-tertiary-border-tertiary` 주입                                                                                 |
+| 칩 줄       | `flex gap-3` > `flex gap-1`                                                                                                                                                                               |
+| 필독 칩     | `noticeType === 'IMPORTANT'`일 때 `<ChipBase color="red" variant="fill">필독</ChipBase>`                                                                                                                  |
+| 카테고리 칩 | `<ChipBase color="deepPurple" variant="fill">{categoryName}</ChipBase>`                                                                                                                                   |
+| 날짜        | `leading-3.5 text-defaults-tertiary-text-tertiary pretendard-14Regular` — `formatIsoStringDate(createdDate).date()` ⚠️ **`leading-3.5`는 미생성** → `leading-[14px]`로 수정 (`broken-styles.md` §3, B-Q4) |
+| 제목        | `h-[150%] w-full overflow-hidden text-ellipsis whitespace-nowrap text-defaults-primary-text-primary pretendard-16SemiBold`                                                                                |
+| 하이라이트  | 일치 조각에 `text-brand-default-text-brand`                                                                                                                                                               |
+| 조회 영역   | `mt-2 flex items-center gap-1.5 self-stretch`                                                                                                                                                             |
+| 조회 아이콘 | `/assets/icons/Eye.svg` alt `조회 아이콘` `h-[13px] w-[13px]`                                                                                                                                             |
+| 조회수      | `flex items-center gap-[3px] text-defaults-tertiary-text-tertiary pretendard-12Regular`                                                                                                                   |
 
 **구분선 조건**: `noticeList?.pageable?.totalElements - 1 === index`면 선 없음.
 ⚠️ `index`는 **전체 평면 배열의 인덱스**이고 `totalElements`는 **첫 페이지 응답 기준 총 개수**다.
@@ -1212,8 +1212,9 @@ getCookie(name):
 
 **아이콘 크기 전부 `h-[13px] w-[13px]`**
 
-> ⚠️ **`bg-bg-deep-blue`** — `broken-styles.md`의 미생성 클래스 목록에 없다.
-> `tailwind.config.js`에 `bg.deep-blue`가 실제로 있는지 이관 시 확인. → `[확인 필요]` BD-Q8
+> ⚠️ **`bg-bg-deep-blue`는 CSS를 생성하지 않는다** (2차 스타일 조사에서 확정 —
+> `broken-styles.md` §4). `<img>`에 붙은 배경색이라 이미지가 로드되면 보이지도 않는다.
+> **이관 시 삭제한다.** 렌더 결과는 동일하다.
 >
 > ⚠️ **썸네일에 `object-cover`와 `items-center justify-center`가 함께 있다.** `<img>`에
 > flex 정렬은 의미 없다. 무해. 그대로.
@@ -3012,12 +3013,15 @@ Board는 단일 PR로 처리하기엔 너무 크다. **4개 PR로 쪼갠다.**
 
 ## 스타일 수정 (`broken-styles.md` 연동)
 
-게시판 영역에서 `broken-styles.md`의 16개 미생성 클래스에 **해당하는 것은 없다.**
-게시판은 전부 config 표기를 정상적으로 쓰고 있다.
+2차 전수 조사에서 **게시판 영역 2건**이 미생성 클래스로 확정됐다.
 
-단 §B5의 **`bg-bg-deep-blue`**는 `broken-styles.md` 후보에 오르지 않았으므로
-`tailwind.config.js`에 존재한다고 판단되나, 이관 시 `@theme`에 해당 토큰이 있는지 확인한다.
-→ BD-Q8
+| 클래스            | 위치                       | 조치                                            |
+| ----------------- | -------------------------- | ----------------------------------------------- |
+| `leading-3.5`     | `NoticeBoardItem` 날짜     | `leading-[14px]`로 수정 (`broken-styles.md` §3) |
+| `bg-bg-deep-blue` | `BoardPostListItem` 썸네일 | **삭제** (`<img>` 배경이라 효과 없음, §4)       |
+
+`leading-3.5` 수정은 **공지 목록 날짜의 행간이 좁아진다** — 화면이 바뀐다.
+`bg-bg-deep-blue` 삭제는 렌더 결과가 동일하다.
 
 ---
 
@@ -3025,23 +3029,23 @@ Board는 단일 PR로 처리하기엔 너무 크다. **4개 PR로 쪼갠다.**
 
 > `broken-styles.md`가 `B-Q1`~`B-Q3`을 쓰므로 게시판은 `BD-Q*`를 쓴다.
 
-| #      | 질문                                                                                                              | 성격        | 진행 차단 |
-| ------ | ----------------------------------------------------------------------------------------------------------------- | ----------- | --------- |
-| BD-Q1  | `useInfiniteScrollPosition`이 `scrollY`(Ref)를 `JSON.stringify`에 넣는데 실제 저장값이 숫자인지                   | 확인        | 아니오    |
-| BD-Q2  | 민원공간에서 `BOARD_BLACK_LIST` 시 서버가 내려주는 `message` 원문이 무엇인지 (§4 #10~#13)                         | 서버 확인   | 아니오    |
-| BD-Q3  | 제목 하이라이트의 **글자별 `<span>` DOM 구조**까지 재현할지, 시각적 동일성만 맞출지 (§5-5)                        | **결정**    | 아니오    |
-| BD-Q4  | `boardFormStore` 전역 잔존(이탈 후 값 유지)을 RHF로 옮길 때 재현할지 (§5-7)                                       | **결정**    | 아니오    |
-| BD-Q5  | `Object.values(additionalParams)` 순서 의존 캐시 키를 그대로 재현할지 (§B1, `useInfiniteList` 전역)               | **결정**    | 아니오    |
-| BD-Q6  | B4 본문에 `ql-snow` 래퍼가 없어 B2와 서식이 다른지 (`vue-quill.snow.css` 셀렉터 확인)                             | 확인        | 아니오    |
-| BD-Q7  | 실기기 웹뷰에서 `document.cookie`가 유지되는지 — 유지 안 되면 공지 팝업이 매번 뜬다 (§B21)                        | **실기기**  | 아니오    |
-| BD-Q8  | `bg-bg-deep-blue` 토큰이 `tailwind.config.js`에 실제로 있는지 (§B5)                                               | 확인        | 아니오    |
-| BD-Q9  | `authorText`의 실제 형식 — 쉼표 제거 시 `홍길동101동`처럼 붙어 보이는지 (§B6)                                     | 확인        | 아니오    |
-| BD-Q10 | 게시글 `fileList` 응답에 `title` 필드가 있는지 — 없으면 alt가 `undefined 이미지` (§B6)                            | 서버 확인   | 아니오    |
-| BD-Q11 | **B10·B17 초기값 주입이 `onMounted`라 상세 캐시가 없으면 폼이 빈다.** 쿼리 키를 레거시대로 둘지, `watch`로 바꿀지 | **결정 🔴** | 아니오    |
-| BD-Q12 | 비밀글 `button > label > input` 중첩 클릭 동작을 React에서 어떻게 재현할지 (§B16)                                 | **결정**    | 아니오    |
-| BD-Q13 | `처리중`/`처리완료` 민원의 수정 URL 직접 진입을 서버가 거부하는지 (§B17)                                          | 서버 확인   | 아니오    |
-| BD-Q14 | B19의 `residentBlockUuid`와 B6의 `authorAptResidentUuid`를 서버가 동일하게 취급하는지                             | 서버 확인   | 아니오    |
-| BD-Q15 | B20 제출 버튼 `absolute bottom-0 left-0`의 실제 렌더 위치 (§B20)                                                  | **실기기**  | 아니오    |
+| #         | 질문                                                                                                              | 성격        | 진행 차단 |
+| --------- | ----------------------------------------------------------------------------------------------------------------- | ----------- | --------- |
+| BD-Q1     | `useInfiniteScrollPosition`이 `scrollY`(Ref)를 `JSON.stringify`에 넣는데 실제 저장값이 숫자인지                   | 확인        | 아니오    |
+| BD-Q2     | 민원공간에서 `BOARD_BLACK_LIST` 시 서버가 내려주는 `message` 원문이 무엇인지 (§4 #10~#13)                         | 서버 확인   | 아니오    |
+| BD-Q3     | 제목 하이라이트의 **글자별 `<span>` DOM 구조**까지 재현할지, 시각적 동일성만 맞출지 (§5-5)                        | **결정**    | 아니오    |
+| BD-Q4     | `boardFormStore` 전역 잔존(이탈 후 값 유지)을 RHF로 옮길 때 재현할지 (§5-7)                                       | **결정**    | 아니오    |
+| BD-Q5     | `Object.values(additionalParams)` 순서 의존 캐시 키를 그대로 재현할지 (§B1, `useInfiniteList` 전역)               | **결정**    | 아니오    |
+| BD-Q6     | B4 본문에 `ql-snow` 래퍼가 없어 B2와 서식이 다른지 (`vue-quill.snow.css` 셀렉터 확인)                             | 확인        | 아니오    |
+| BD-Q7     | 실기기 웹뷰에서 `document.cookie`가 유지되는지 — 유지 안 되면 공지 팝업이 매번 뜬다 (§B21)                        | **실기기**  | 아니오    |
+| ~~BD-Q8~~ | ~~`bg-bg-deep-blue` 토큰 존재 여부~~ → **해소.** 미생성 확정, 효과 없어 삭제 (`broken-styles.md` §4)              | —           | —         |
+| BD-Q9     | `authorText`의 실제 형식 — 쉼표 제거 시 `홍길동101동`처럼 붙어 보이는지 (§B6)                                     | 확인        | 아니오    |
+| BD-Q10    | 게시글 `fileList` 응답에 `title` 필드가 있는지 — 없으면 alt가 `undefined 이미지` (§B6)                            | 서버 확인   | 아니오    |
+| BD-Q11    | **B10·B17 초기값 주입이 `onMounted`라 상세 캐시가 없으면 폼이 빈다.** 쿼리 키를 레거시대로 둘지, `watch`로 바꿀지 | **결정 🔴** | 아니오    |
+| BD-Q12    | 비밀글 `button > label > input` 중첩 클릭 동작을 React에서 어떻게 재현할지 (§B16)                                 | **결정**    | 아니오    |
+| BD-Q13    | `처리중`/`처리완료` 민원의 수정 URL 직접 진입을 서버가 거부하는지 (§B17)                                          | 서버 확인   | 아니오    |
+| BD-Q14    | B19의 `residentBlockUuid`와 B6의 `authorAptResidentUuid`를 서버가 동일하게 취급하는지                             | 서버 확인   | 아니오    |
+| BD-Q15    | B20 제출 버튼 `absolute bottom-0 left-0`의 실제 렌더 위치 (§B20)                                                  | **실기기**  | 아니오    |
 
 **진행을 막는 항목은 없다.** BD-Q11만 이관 착수 전에 결정하면 된다.
 

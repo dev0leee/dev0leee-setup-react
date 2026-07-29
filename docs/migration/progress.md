@@ -61,12 +61,13 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 **콘텐츠 플래그 4개**(`hasAptCommunityContent`·`hasAptMovingHouseContent`·`hasAptVoteContent`·`hasAptShoppingContent`) ·
 `FIXED_MENUS`의 `'공지사항'` · 죽은 `<style scoped>` 2건 · `useGetAptList`의 `watch` 무효화
 
-**스타일 오타 수정 확정**: CSS 클래스 16개 중 12개를 이관 시 수정 → `broken-styles.md`
+**스타일 오타 수정 확정**: CSS 클래스 **25개** 중 20개를 이관 시 수정/삭제 → `broken-styles.md`
 (서버·앱 계약 오타 4건은 **그대로 유지**, 협의 후 처리 → `deferred.md`)
+⚠️ 1차 조사의 "16개"는 후보 생성이 불완전해 틀렸다. 2차에서 토큰 821개 전수 빌드 검증으로 25개 확정.
 
-**이관 필수로 정정**: 미출차 내역 일체(라우트·컴포넌트 3·훅 2·API 2·상수), `postRejectCarRelease`,
-항상허용 차량 **수정** 기능.
 **이관 필수로 정정**: `getNoticeTopThree` — `(미사용중)` 주석은 낡은 것이고 메인 화면에서 실제 렌더 중.
+
+> 판단 근거는 `decisions/inventory-questions.md`가 정본이다 (R-1 · R-2 · E-Q5b).
 
 ---
 
@@ -112,7 +113,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | Main              |     22 | 1708 | **완료** | 미착수 |                  |
 | MyPage            |     19 | 1149 | **완료** | 미착수 | ← Phase 5 파일럿 |
 | Board             |     48 | 3642 | **완료** | 미착수 |                  |
-| ParkingManagement |     31 | 3278 | 미착수   | 미착수 |                  |
+| ParkingManagement |     31 | 3278 | **완료** | 미착수 |                  |
 | Visit             |     23 | 2042 | 미착수   | 미착수 |                  |
 | Vote              |     23 | 1673 | 미착수   | 미착수 |                  |
 | Survey            |     19 | 1324 | 미착수   | 미착수 |                  |
@@ -147,8 +148,9 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 ### A. Phase 2 도메인 명세 — `features/<domain>.md`
 
 기반 도메인 6개 **완료** · 대형 Board **완료**.
-남은 것: **Parking(31/3278) → Visit(23/2042) → Vote(23/1673) → Survey · AptMall ·
-FireInspection · MovingHouse · Repair · ManagementFee → Apass · opinion**
+남은 것: **Visit(23/2042) → Vote(23/1673) → Survey(19/1324) · AptMall(19/1472) ·
+FireInspection(13/1231) · MovingHouse(10/1071) · Repair(11/964) · ManagementFee(3/906) →
+Apass(3/301) · opinion**
 
 ### B. Phase 4 기반 구축
 
@@ -182,3 +184,5 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 | 2026-07-29 | `features/mypage.md` 완료. **기반 도메인 6개 전부 완료.** P-Q3·P-Q4 코드로 확정                                                                |
 | 2026-07-29 | `broken-styles.md` 작성 — Tailwind 빌드로 미생성 클래스 16개 확정. 12개 수정, 4개는 디자인 확인 대기                                           |
 | 2026-07-29 | `features/board.md` 완료 (48파일 · 화면 20 + 팝업 1 · 2,984줄). 결함 15건·소통↔민원 차이 17건 정리. 확인 항목 BD-Q1~Q15                        |
+| 2026-07-29 | **`broken-styles.md` 2차 조사 — 미생성 클래스 16 → 25로 정정.** 토큰 821개 전수 빌드 검증                                                      |
+| 2026-07-29 | `features/parking.md` 완료 (31파일 · 화면 15 · 2,221줄). 미출차 일체 제외 확정 반영. 확인 항목 PK-Q1~Q11                                       |
