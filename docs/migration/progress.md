@@ -33,17 +33,17 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ## Phase 0 — 선결 결정
 
-| #       | 항목                              | 상태            | 비고                                                                             |
-| ------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------- |
-| ~~0-1~~ | ~~인증 계약 백엔드 협의~~         | **해소**        | 레거시 방식 유지 결정 (`decisions/auth-strategy.md`)                             |
-| ~~0-2~~ | ~~네이티브 웹뷰 쿠키 검증~~       | **해소**        | 쿠키 안 씀                                                                       |
-| ~~0-3~~ | ~~자동 로그인 대체 설계~~         | **해소**        | 레거시 자동 로그인 그대로 이식                                                   |
-| ~~0-4~~ | ~~네이티브 브릿지 핸들러명 정합~~ | **해소**        | 앱이 이미 배포됨 → **웹이 레거시 프로토콜에 맞춘다** (`native-protocol.md` §0)   |
-| ~~0-5~~ | ~~캘린더·차트 대체재~~            | **해소**        | shadcn `calendar` / `recharts` / `v-calendar` 제거 (`decisions/tech-choices.md`) |
-| ~~0-6~~ | ~~opinion 빌드 형태~~             | **해소**        | **멀티 엔트리 유지** — 경로 충돌 11건 + 외부 딥링크 보존 + env 스키마 분리       |
-| 0-7     | zod 3 → 4 차이 확인               | **Claude 진행** | 결정 아님. `src/schemas/**` 대조                                                 |
+| #       | 항목                              | 상태     | 비고                                                                             |
+| ------- | --------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| ~~0-1~~ | ~~인증 계약 백엔드 협의~~         | **해소** | 레거시 방식 유지 결정 (`decisions/auth-strategy.md`)                             |
+| ~~0-2~~ | ~~네이티브 웹뷰 쿠키 검증~~       | **해소** | 쿠키 안 씀                                                                       |
+| ~~0-3~~ | ~~자동 로그인 대체 설계~~         | **해소** | 레거시 자동 로그인 그대로 이식                                                   |
+| ~~0-4~~ | ~~네이티브 브릿지 핸들러명 정합~~ | **해소** | 앱이 이미 배포됨 → **웹이 레거시 프로토콜에 맞춘다** (`native-protocol.md` §0)   |
+| ~~0-5~~ | ~~캘린더·차트 대체재~~            | **해소** | shadcn `calendar` / `recharts` / `v-calendar` 제거 (`decisions/tech-choices.md`) |
+| ~~0-6~~ | ~~opinion 빌드 형태~~             | **해소** | **멀티 엔트리 유지** — 경로 충돌 11건 + 외부 딥링크 보존 + env 스키마 분리       |
+| ~~0-7~~ | ~~zod 3 → 4 차이 확인~~           | **완료** | `zod-migration.md` — `required_error` 33 + `invalid_type_error` 5 변환 필요      |
 
-> 🎯 **Phase 0 결정 7건 중 6건 확정. 외부 블로커 0건.** 0-7만 남았고 이는 실무 조사다.
+> 🎯 **Phase 0 종료. 결정 7건 전부 확정, 외부 블로커 0건.**
 
 ### 확정된 주요 결정
 
@@ -127,21 +127,22 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ## 다음 작업
 
-**Phase 0·1 완료.** 착수를 막는 결정이 없다.
+**Phase 0 · 1 · 3 완료.** 남은 것은 Phase 2(명세)와 Phase 4(기반 구축)다.
 
-### A. 0-7 zod 3 → 4 (Claude 진행, 결정 아님)
+### A. Phase 2 도메인 명세 — `features/<domain>.md`
 
-`src/schemas/**`를 zod 4 기준으로 대조해 변환 규칙 작성. 짧은 작업.
+기반 도메인부터: **Login · Intro · SignUp · Exception · Main · MyPage**
+→ 대형(Board · Parking · Visit · Vote) → 중형 → 소형 + opinion
 
-### B. Phase 3 기술 매핑 (`tech-mapping.md`)
+### B. Phase 4 기반 구축
 
-**바로 착수 가능.** 인벤토리 6종 + 결정 4종이 전부 입력으로 준비됐다.
+착수 순서는 `tech-mapping.md` §14에 고정돼 있다.
+**1번(의존성 승인)에 사용자 확인이 필요하다** — `tech-mapping.md` §12 목록.
 
-### C. Phase 2 도메인 명세
+### 권장
 
-기반 도메인(Login·Intro·SignUp·Main·MyPage·Exception)부터. Phase 3과 병행 가능.
-
-**권장 순서**: 0-7 → Phase 3 → Phase 2 → Phase 4
+**Phase 2의 기반 도메인 6개를 먼저 쓰고 Phase 4에 들어간다.**
+Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세를 입력으로 쓰기 때문이다.
 
 ---
 
@@ -156,4 +157,6 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | 2026-07-29 | **인증 방침 변경** — 레거시 방식 유지로 확정. `decisions/auth-strategy.md` 작성. 계획서 반영(Phase 0 블로커 3→1, R3·R4·R11 소멸, R12·R13 추가) |
 | 2026-07-29 | `native-protocol.md` 완료 — 브릿지 24종 전수. **0-4 해소**(웹이 레거시 프로토콜에 맞춤). 외부 블로커 0건                                       |
 | 2026-07-29 | `query-keys.md`·`domain-codes.md`·`env-vars.md` 완료. **Phase 1 종료**                                                                         |
-| 2026-07-29 | 기술 선택 4건 확정 (0-5·0-6·에러 모달·QueryClient 기본값). `decisions/tech-choices.md`. **Phase 0 종료**                                       |
+| 2026-07-29 | 기술 선택 4건 확정 (0-5·0-6·에러 모달·QueryClient 기본값). `decisions/tech-choices.md`                                                         |
+| 2026-07-29 | `zod-migration.md` 완료 (0-7). **Phase 0 종료**                                                                                                |
+| 2026-07-29 | `tech-mapping.md` 완료. **Phase 3 종료**                                                                                                       |
