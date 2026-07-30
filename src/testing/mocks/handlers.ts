@@ -7,7 +7,7 @@ import type { CreateOrderPayload, UpdateOrderPayload } from '@/features/dashboar
  * axios의 baseURL 조합과 동일하게 단순 이어붙인다.
  * new URL('/login', 'http://host/api')는 '/api'를 버리고 'http://host/login'이 되므로 쓰면 안 된다.
  */
-const url = ({ path }: { path: string }) => {
+export const url = ({ path }: { path: string }) => {
   return `${env.VITE_API_URL.replace(/\/$/, '')}${path}`
 }
 

@@ -71,7 +71,7 @@ export default tseslint.config(
       // 한 줄을 여러 줄로 늘릴 때 diff가 본문에만 남고, 객체 리터럴 반환의
       // `() => ({...})` 괄호 함정이 사라진다. --fix가 전부 고쳐준다.
       'arrow-body-style': ['error', 'always'],
-      'no-underscore-dangle': ['warn', { allow: ['_retried'] }],
+      'no-underscore-dangle': 'warn',
       // 콜백 파라미터가 외부 스코프 변수를 가리는 것 금지 (docs/conventions/02-naming.md).
       // base 규칙은 TS 문법을 이해 못 해 오탐이 나므로 끄고 typescript-eslint 판을 쓴다.
       'no-shadow': 'off',

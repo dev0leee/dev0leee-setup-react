@@ -32,7 +32,8 @@ export const toApiError = ({ error }: { error: unknown }): ApiError => {
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 0
     const body = error.response?.data as ServerErrorBody | undefined
-    return new ApiError(body?.message ?? error.message, status, body?.code)
+    // 레거시 소비자가 읽던 `error.data.error.message` / `.errorCode`가 여기로 들어온다.
+    return new ApiError(body?.error?.message ?? error.message, status, body?.error?.errorCode)
   }
 
   if (error instanceof Error) return new ApiError(error.message, 0)

@@ -12,8 +12,8 @@ export const router = createBrowserRouter([
     // lazy 라우트를 쓰면 React Router가 루트에 HydrateFallback을 요구한다.
     HydrateFallback: FullPageSpinner,
     children: [
-      // 로그인은 비인증 사용자의 진입점이라 즉시 로드한다.
-      { path: ROUTE_PATH.LOGIN, element: <LoginPage /> },
+      // 인트로(로그인)는 비인증 사용자의 진입점이라 즉시 로드한다.
+      { path: ROUTE_PATH.INTRO, element: <LoginPage /> },
       {
         element: <ProtectedRoute />,
         children: [

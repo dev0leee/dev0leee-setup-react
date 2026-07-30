@@ -1,5 +1,9 @@
-/** 기본 fresh 유지 시간. 이 시간 안에는 화면 전환해도 재요청하지 않는다. */
-export const DEFAULT_STALE_TIME_MS = 60_000
+/**
+ * 기본 fresh 유지 시간.
+ * 레거시 QueryClient는 `staleTime`을 지정하지 않았다 → TanStack 기본값 0이다.
+ * 화면에 진입할 때마다 재요청한다.
+ */
+export const DEFAULT_STALE_TIME_MS = 0
 
-/** 5xx·네트워크 에러 재시도 상한 */
-export const MAX_QUERY_RETRIES = 2
+/** 재시도 횟수. 레거시 `main.js`가 조회·뮤테이션 모두 0으로 뒀다. */
+export const QUERY_RETRY_COUNT = 0

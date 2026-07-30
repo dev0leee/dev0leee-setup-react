@@ -1,50 +1,36 @@
-import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
+import { QueryCache, QueryClient } from '@tanstack/react-query'
 
-import { DEFAULT_STALE_TIME_MS, MAX_QUERY_RETRIES } from '@/shared/constants/query'
-import { ApiError } from '@/shared/lib/apiErrors'
-import { notifyError, notifyNetworkError } from '@/shared/lib/notifyError'
+import { DEFAULT_STALE_TIME_MS, QUERY_RETRY_COUNT } from '@/shared/constants/query'
+import { notifyNetworkError } from '@/shared/lib/notifyError'
 
-declare module '@tanstack/react-query' {
-  interface Register {
-    mutationMeta: {
-      /** true면 전역 에러 토스트를 건너뛴다. 폼 필드 에러로 보여줄 때 쓴다(useLogin). */
-      skipGlobalErrorToast?: boolean
-    }
-  }
-}
-
+/**
+ * 기본값을 **레거시 `main.js`의 QueryClient에 맞춘다**
+ * (`docs/migration/tech-mapping.md` §4-3).
+ *
+ * 템플릿 기본값(retry 2 · staleTime 60s · throwOnError · 전역 뮤테이션 토스트)을
+ * 그대로 두면 등가 이관이 깨진다:
+ *  - 전역 뮤테이션 토스트 + 레거시 에러 모달이 **둘 다** 떠서 알림이 이중으로 보인다
+ *  - `throwOnError: true`는 조회 실패를 ErrorBoundary 화면으로 승격시키는데,
+ *    레거시는 화면마다 자체 빈/에러 상태를 그린다
+ *  - `staleTime: 60s`는 화면 재진입 시 재요청 여부를 바꿔 데이터 신선도가 달라진다
+ */
 export const queryClient = new QueryClient({
-  // 조회 에러 화면은 ErrorBoundary가 담당한다. 여기서는 네트워크 단절만 전역 토스트로 덧붙인다.
+  // 레거시에 전역 뮤테이션 에러 토스트가 없으므로 MutationCache.onError를 두지 않는다.
+  // 조회 에러도 화면이 처리한다. 여기서는 오프라인만 알린다 —
+  // 레거시 라우터 가드의 오프라인 토스트와 같은 문구다.
   queryCache: new QueryCache({
     onError: (error) => {
       notifyNetworkError({ error })
     },
   }),
-  // 뮤테이션 실패 토스트는 전역 한 곳에서. 훅마다 onError를 반복하지 않는다.
-  mutationCache: new MutationCache({
-    onError: (error, _variables, _context, mutation) => {
-      if (mutation.meta?.skipGlobalErrorToast) return
-      notifyError({ error })
-    },
-  }),
   defaultOptions: {
     queries: {
       staleTime: DEFAULT_STALE_TIME_MS,
-      // 재시도는 Query가 담당한다. axios 인터셉터에도 재시도를 걸면 서버를 두 번 때린다.
-      retry: (failureCount, error) => {
-        if (error instanceof ApiError) {
-          // 4xx는 재시도해도 결과가 같다. 401은 인터셉터가 refresh로 이미 처리했다.
-          if (error.status >= 400 && error.status < 500) return false
-        }
-        return failureCount < MAX_QUERY_RETRIES
-      },
-      // 에러를 렌더 에러로 승격시켜 ErrorBoundary가 잡게 한다.
-      // 화면마다 `if (error) return <Error />`를 반복하지 않아도 된다.
-      throwOnError: true,
+      retry: QUERY_RETRY_COUNT,
+      throwOnError: false,
     },
     mutations: {
-      retry: false,
-      // 뮤테이션은 보통 폼 안에서 개별 처리하므로 바운더리로 던지지 않는다.
+      retry: QUERY_RETRY_COUNT,
       throwOnError: false,
     },
   },

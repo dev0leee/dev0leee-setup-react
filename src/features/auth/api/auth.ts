@@ -1,26 +1,34 @@
-import type { LoginPayload, SessionResponse } from '@/features/auth/types/auth'
-import { api, publicApi, REFRESH_ENDPOINT } from '@/shared/lib/apiClient'
+import type { LoginPayload, LoginResponseBody, LoginResult } from '@/features/auth/types/auth'
+import { API_PREFIX } from '@/shared/constants/api'
+import { api, publicApi } from '@/shared/lib/apiClient'
+import { readHeader } from '@/shared/lib/responseHeaders'
 
-/** Access Token은 body로, Refresh Token은 Set-Cookie로 내려온다. */
-export const login = async (payload: LoginPayload): Promise<SessionResponse> => {
-  // 아직 토큰이 없는 요청이라 publicApi를 쓴다 (03-api 규칙 1).
-  const { data } = await publicApi.post<SessionResponse>('/login', payload)
-  return data
+/**
+ * 로그인. 레거시 `api/auth.js`의 `postLogin`.
+ *
+ * ⚠️ **토큰이 body가 아니라 응답 헤더로 온다** (`authorization`, `refresh-token`).
+ * 헤더를 읽는 책임은 여기서 끝내고, 호출부에는 도메인 값만 넘긴다.
+ * 아직 토큰이 없는 요청이므로 `publicApi`를 쓴다.
+ */
+export const postLogin = async ({ id, password }: LoginPayload): Promise<LoginResult> => {
+  const response = await publicApi.post<LoginResponseBody>(`${API_PREFIX.APARTMANT}/login`, {
+    id,
+    password,
+  })
+
+  return {
+    accessToken: readHeader({ headers: response.headers, key: 'authorization' }),
+    refreshToken: readHeader({ headers: response.headers, key: 'refresh-token' }),
+    oldResidentFlag: response.data.success?.oldResidentFlag ?? false,
+  }
 }
 
 /**
- * 새로고침으로 사라진 메모리 Access Token을 RT 쿠키로 복원한다.
- * 서버는 RTR을 수행하고 새 RT를 Set-Cookie로 내려준다.
- *
- * refresh 엔드포인트를 직접 부르므로 반드시 publicApi를 쓴다.
- * api로 보내면 401 시 인터셉터가 같은 엔드포인트로 또 refresh를 걸어 루프가 된다.
+ * 로그아웃. 레거시 `deleteLogout`.
+ * refreshToken을 **헤더로** 보내 서버가 그 토큰을 폐기한다.
  */
-export const restoreSession = async (): Promise<SessionResponse> => {
-  const { data } = await publicApi.post<SessionResponse>(REFRESH_ENDPOINT)
-  return data
-}
-
-/** 서버에서 Refresh Token을 폐기하고 쿠키를 삭제한다. */
-export const logout = async (): Promise<void> => {
-  await api.post('/logout')
+export const deleteLogout = async ({ refreshToken }: { refreshToken: string }): Promise<void> => {
+  await api.delete(`${API_PREFIX.APARTMANT}/logout`, {
+    headers: { 'refresh-token': refreshToken },
+  })
 }

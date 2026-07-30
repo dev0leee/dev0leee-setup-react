@@ -9,8 +9,8 @@ import { Button } from '@/shared/components/ui/button'
 import { useAuthStore } from '@/shared/stores/authStore'
 
 export const AppLayout = () => {
-  const user = useAuthStore((state) => {
-    return state.user
+  const residentName = useAuthStore((state) => {
+    return state.aptInfo.residentName
   })
   const logout = useLogout()
   const { pathname } = useLocation()
@@ -20,7 +20,7 @@ export const AppLayout = () => {
       <header className="flex h-14 items-center justify-between border-b border-border px-6">
         <span className="font-semibold">dev0leee</span>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">{user?.name}</span>
+          <span className="text-sm text-muted-foreground">{residentName}</span>
           <Button
             size="sm"
             variant="ghost"
