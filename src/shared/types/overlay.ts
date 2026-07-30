@@ -27,6 +27,56 @@ export interface ModalButtonProps {
   onSecondClick?: () => void
 }
 
+export interface ModalPageProps {
+  open: boolean
+  onClose: () => void
+  title?: string
+  children: ReactNode
+}
+
+export interface ModalImageViewerProps {
+  open: boolean
+  onClose: () => void
+  /** 이미 S3 접두사가 붙은 완전한 URL이어야 한다 */
+  imageUrl: string
+}
+
+/** 바텀시트 목록 항목 */
+export interface DrawerListItem {
+  key: string
+  label: string
+  /** Tailwind 텍스트 색 클래스. 없으면 기본 본문색 */
+  color?: string
+  /** 명시적으로 false일 때만 숨는다 (레거시 `item.enabled ? item.enabled : true`) */
+  enabled?: boolean
+  onClick: () => void
+}
+
+export interface DrawerListProps {
+  open: boolean
+  onClose: () => void
+  title?: string
+  /** 기본값은 `center`다 */
+  textAlign?: 'left' | 'center' | 'right'
+  list: DrawerListItem[]
+}
+
+/** 첨부 이미지 한 건 */
+export interface AttachedImage {
+  fileUuid: string
+  /** S3 접두사를 붙이기 전의 상대 경로 */
+  fileUrl: string
+  fileName: string
+}
+
+export interface DrawerImagesProps {
+  open: boolean
+  onClose: () => void
+  /** 줄바꿈이 섞여 올 수 있어 `formatHtmlText`를 거친다 */
+  title: string
+  images: AttachedImage[]
+}
+
 export interface DrawerBaseProps {
   open: boolean
   onClose: () => void
