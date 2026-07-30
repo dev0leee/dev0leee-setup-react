@@ -6,11 +6,10 @@ import { cn } from '@/shared/utils/cn'
  *
  * 항목 라벨 앞에 `[필수]`/`[선택]`을 붙이고 오른쪽에 상세 보기 링크를 둔다.
  *
- * ⚠️ 체크박스 클래스에 **`border-defaults-tertiary-border-tertiary0`**라는
- * 존재하지 않는 클래스가 있었다(끝의 `0`이 오타). 테두리 색이 적용되지 않던
- * 상태이므로 **오타를 그대로 남기면 무의미하고, 고치면 화면이 달라진다.**
- * 오타를 제거해 브라우저 기본 테두리를 유지했다 — 레거시 렌더 결과와 같다
- * (`broken-styles.md`).
+ * ⚠️ 레거시 체크박스 클래스는 **`border-defaults-tertiary-border-tertiary0`**로
+ * 끝에 `0`이 붙은 오타였다. **대상 토큰이 config에 그대로 있으므로 오타만 고쳐 적용했다**
+ * (2026-07-30 결정 — `broken-styles.md` §0). 다만 네이티브 체크박스는 UA가 직접 그려서
+ * `border-*`가 보이지 않는다 — 눈에 보이는 변화는 없다.
  *
  * `보기` 버튼은 `label` 안에 있어 클릭이 체크박스로 전파된다.
  * 레거시가 `@click.prevent`로 막았고, 여기서는 `preventDefault()`로 같은 일을 한다.
@@ -33,7 +32,7 @@ export const TermsCheckboxList = ({
                 id={item.id}
                 checked={checkedMap[item.id] ?? false}
                 type="checkbox"
-                className="h-5 w-5 rounded"
+                className="h-5 w-5 rounded border-defaults-tertiary-border-tertiary"
                 onChange={(event) => {
                   onChange({ ...checkedMap, [item.id]: event.target.checked })
                 }}
