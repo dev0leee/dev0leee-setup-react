@@ -242,13 +242,15 @@ const envSchema = z.object({
 `.env.development` · `.env.production` · `.env.example` **3개 파일 공통**:
 
 ```dotenv
-VITE_BASE_URL=
-VITE_S3_BUCKET_URL_FILE=
-VITE_S3_BUCKET_URL_STATICS=
-VITE_VERSION_ONE_URL=
-VITE_TERMS_URL=
-VITE_COMMUNITY_URL=
-# 선택
+# 필수 — 값이 없으면 부팅 시 터진다. 전부 스킴(https://)까지 있는 URL이어야 한다
+VITE_BASE_URL=https://...
+VITE_S3_BUCKET_URL_FILE=https://...
+VITE_S3_BUCKET_URL_STATICS=https://...
+VITE_VERSION_ONE_URL=https://...
+VITE_TERMS_URL=https://...
+VITE_COMMUNITY_URL=https://...
+
+# 선택 — 키만 두고 비워둬도 된다(기본값으로 떨어진다)
 VITE_BUILD_ID=
 VITE_POSTHOG_PROJECT_TOKEN=
 VITE_POSTHOG_HOST=
@@ -258,6 +260,18 @@ VITE_POSTHOG_HOST=
 `VITE_SERVER_REQUEST_SERVICE_URL` → **`VITE_API_URL`**로 이름만 바뀐다(§4).
 
 `.env.test`는 손대지 않아도 된다 — `test.env`가 덮는다.
+
+> ### ⚠️ 빈 값 함정 (2026-07-30 실제로 밟았다)
+>
+> **`.env`에 키만 두고 값을 비우면 Vite는 `undefined`가 아니라 빈 문자열을 준다.**
+> 그러면 zod의 `.optional()`·`.default()`가 발동하지 않는다 — 값이 "있는" 것으로 보기 때문이다.
+> `VITE_POSTHOG_HOST=`가 `z.url()`에 걸려 **부팅이 막혔다.**
+>
+> `env.ts`에 `optionalEnv()` 래퍼를 넣어 **선택 변수의 빈 문자열을 미설정으로** 바꿨다.
+> 필수 변수에는 씌우지 않았다 — 비어 있으면 터지는 게 맞다.
+>
+> 검증 실패 로그도 `treeifyError`(객체 → DevTools가 접는다)에서
+> **`prettifyError`**(여러 줄 문자열)로 바꿨다. 어떤 키가 왜 틀렸는지 펼치지 않고 보인다.
 
 ---
 

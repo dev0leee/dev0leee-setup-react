@@ -6,6 +6,20 @@ import { z } from 'zod'
  */
 
 /**
+ * `.env`에 키만 두고 값을 비워두면 Vite는 `undefined`가 아니라 **빈 문자열**을 준다.
+ * 그러면 `.optional()`·`.default()`가 발동하지 않아 "설정 안 함"을 표현할 수 없다.
+ *
+ * 빈 플레이스홀더(`VITE_POSTHOG_HOST=`)는 `.env` 파일의 흔한 관행이므로
+ * 선택 변수에만 이 래퍼를 씌워 미설정으로 취급한다.
+ * **필수 변수에는 씌우지 않는다** — 값이 비었으면 부팅 시 터져야 한다.
+ */
+const optionalEnv = <T extends z.ZodType>(schema: T) => {
+  return z.preprocess((value) => {
+    return value === '' ? undefined : value
+  }, schema)
+}
+
+/**
  * 메인 앱과 opinion 앱이 **둘 다** 주입받는 변수.
  * 모듈 로드 시점에 검증하므로 하나라도 없으면 앱이 부팅하지 못한다.
  */
@@ -18,18 +32,20 @@ const sharedSchema = z.object({
   /** 첨부파일 S3 버킷 */
   VITE_S3_BUCKET_URL_FILE: z.url(),
 
-  VITE_SENTRY_DSN: z.string().optional(),
+  VITE_SENTRY_DSN: optionalEnv(z.string().optional()),
   /** 배포 커밋 SHA. `version.json`의 buildId와 비교해 새 배포를 감지한다. */
-  VITE_BUILD_ID: z.string().default('local'),
-  VITE_POSTHOG_PROJECT_TOKEN: z.string().optional(),
+  VITE_BUILD_ID: optionalEnv(z.string().default('local')),
+  VITE_POSTHOG_PROJECT_TOKEN: optionalEnv(z.string().optional()),
   /** 레거시 `lib/posthog/posthog.js`의 폴백 값을 그대로 기본값으로 둔다. */
-  VITE_POSTHOG_HOST: z.url().default('https://us.i.posthog.com'),
-  VITE_ENABLE_MSW: z
-    .enum(['true', 'false'])
-    .default('false')
-    .transform((value) => {
-      return value === 'true'
-    }),
+  VITE_POSTHOG_HOST: optionalEnv(z.url().default('https://us.i.posthog.com')),
+  VITE_ENABLE_MSW: optionalEnv(
+    z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => {
+        return value === 'true'
+      }),
+  ),
 })
 
 /**
@@ -56,7 +72,11 @@ const parse = <T extends z.ZodType>(schema: T, label: string): z.infer<T> => {
 
   if (!parsed.success) {
     // 잘못된 env로 배포되는 사고를 부팅 시점에 터뜨린다.
-    console.error(`[env] ${label} 환경변수 검증 실패:`, z.treeifyError(parsed.error))
+    //
+    // `treeifyError`는 객체를 돌려줘 DevTools가 접어버린다 — 어떤 키가 틀렸는지
+    // 보려면 손으로 펼쳐야 한다. `prettifyError`는 여러 줄 문자열이라 그대로 읽힌다.
+    // 부팅이 막힌 상황에서 원인을 한눈에 보는 것이 이 로그의 존재 이유다.
+    console.error(`[env] ${label} 환경변수 검증 실패\n${z.prettifyError(parsed.error)}`)
     throw new Error('환경변수 설정이 잘못됐습니다. .env 파일을 확인하세요.')
   }
 
