@@ -111,9 +111,29 @@ hasAptContent({ contentList, contentName: APT_CONTENT_NAME.LOBBY_PHONE })
 배럴(`index.ts`)이 **어딘가에서 정적 import되면 `lazy`는 아무 효과가 없다.** `pnpm build`의
 `INEFFECTIVE_DYNAMIC_IMPORT` 경고를 무시하지 않는다.
 
-- `features/auth`는 `AuthProvider`·`LoginPage`가 eager라 배럴이 초기 번들에 있다 →
-  같은 배럴의 `LogoutPage`도 `element`로 eager하게 둔다 (lazy로 감싸면 거짓 표시가 된다)
+- `features/auth`는 `AuthProvider`·`IntroPage`가 eager라 배럴이 초기 번들에 있다 →
+  같은 배럴의 `LogoutPage`·비밀번호 재설정 3화면도 `element`로 eager하게 둔다
+  (lazy로 감싸면 거짓 표시가 된다 — `deferred.md` D-207)
 - 나머지 도메인은 배럴을 **오직 lazy로만** 참조한다
+
+### 가드는 컴포넌트가 아니라 `loader`로 옮긴다 (MUST)
+
+레거시 `router.beforeEach`는 **이동 전에** 비동기 작업을 하고 목적지를 바꾼다.
+컴포넌트로 옮기면 화면이 한 번 그려진 뒤 사라지고, **그 사이 마운트 effect가 돈다.**
+
+Phase 6에서 실제로 문제가 됐다: 인트로는 마운트 시 `clearAuth()`를 부른다.
+"세션이 있으면 메인으로" 판정을 컴포넌트로 만들면 **정상 세션이 지워진 뒤에 이동**한다.
+
+| 레거시 가드 단계                        | 타깃                                             |
+| --------------------------------------- | ------------------------------------------------ |
+| `requiresAuth && 미인증`                | `ProtectedRoute` (동기 판정이라 컴포넌트로 충분) |
+| `requiresAuth === false && 인증됨`      | `publicRouteLoader` (**비동기** — loader)        |
+| `return false` (오프라인·뒤로가기 차단) | `useBlocker` + 즉시 `reset()`                    |
+
+- **`authOptional` 라우트에는 걸지 않는다.** 레거시가 그 플래그를 보면 나머지 검사를 건너뛴다
+- 차단 판정은 **순수 함수로 뽑는다**(`app/navigationBlocking.ts`). `useBlocker` 콜백에
+  인라인으로 넣으면 라우터를 띄우지 않고 검증할 수 없다
+- `reset()`을 부르지 않으면 blocker가 `blocked`에 머물러 **그 뒤 모든 이동이 막힌다**
 
 ---
 
@@ -402,6 +422,30 @@ jsdom이 계산하지 않는 것**만 본다. 같은 것을 두 번 검증하지
 - **로그인 흐름을 매번 다시 타지 않는다.** `useAuthStore.setState({ aptInfo })`로 컨텍스트를
   직접 넣는다. 로그인부터의 경로는 `app/router.test.tsx`가 한 번 덮는다
 - 스냅샷 테스트. 클래스 문자열이 바뀌었는지는 UI 대조로 본다
+
+### 화면 이동을 검증하려면 `<Routes>`를 직접 넣는다
+
+`renderWithProviders`에 `initialEntries`를 넘길 수 있다. 목적지 자리를 만들어두면
+"이동했는가"를 화면 내용으로 단정할 수 있다 — `useNavigate`를 모킹하지 않는다.
+
+```tsx
+renderWithProviders({
+  initialEntries: [{ pathname: '/password/reset', state: { verifiedToken: 't' } }],
+  ui: (
+    <Routes>
+      <Route path="/" element={<h1>인트로</h1>} />
+      <Route path="/password/reset" element={<PasswordResetPage />} />
+    </Routes>
+  ),
+})
+```
+
+라우터 state로 값을 받는 화면은 `initialEntries`에 객체를 넘겨 그 state까지 만든다.
+
+### 타이머는 `vi.useFakeTimers({ shouldAdvanceTime: true })`
+
+`userEvent`는 내부에서 타이머를 쓴다. 옵션 없이 가짜 타이머를 켜면 `userEvent`가 멈춘다.
+시간을 밀 때는 `act(() => vi.advanceTimersByTime(ms))`로 감싼다.
 
 ### 요령
 
