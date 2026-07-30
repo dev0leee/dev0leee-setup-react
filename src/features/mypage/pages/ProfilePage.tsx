@@ -33,17 +33,17 @@ export const ProfilePage = () => {
       title: PROFILE_TEXT.NICKNAME_LABEL,
       data: aptInfo.residentNickName || PROFILE_TEXT.NICKNAME_PLACEHOLDER,
       // 닉네임만 값이 없을 때 회색으로 흐려진다
-      className: aptInfo.residentNickName ? 'text-neutral-90' : 'text-neutral-40',
+      className: aptInfo.residentNickName ? 'text-neutral-b-gray-900' : 'text-neutral-b-gray-400',
     },
     {
       title: PROFILE_TEXT.NAME_LABEL,
       data: aptInfo.residentName || PROFILE_TEXT.EMPTY,
-      className: 'text-neutral-90',
+      className: 'text-neutral-b-gray-900',
     },
     {
       title: PROFILE_TEXT.APT_NAME_LABEL,
       data: aptInfo.aptName || PROFILE_TEXT.EMPTY,
-      className: 'text-neutral-90',
+      className: 'text-neutral-b-gray-900',
     },
   ]
 
@@ -61,7 +61,7 @@ export const ProfilePage = () => {
       </AppBar>
       <ul className="h-full w-full space-y-8 px-5 pt-16">
         <li className="flex items-center justify-center">
-          <div className="border-neutral-10 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border">
+          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-neutral-b-gray-100">
             <img className="h-20 w-20" src="/assets/images/Profile.svg" alt="프로필 이미지" />
           </div>
         </li>

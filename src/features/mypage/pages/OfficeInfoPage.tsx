@@ -23,7 +23,7 @@ export const OfficeInfoPage = () => {
 
   return (
     <div className="h-full space-y-2 overflow-auto bg-defaults-secondary-background-secondary">
-      <div className="border-b-neutral-20 flex w-full flex-col items-start gap-5 border-b bg-base-b-white px-5 py-6">
+      <div className="flex w-full flex-col items-start gap-5 border-b border-b-neutral-b-gray-200 bg-base-b-white px-5 py-6">
         <div className="flex items-center gap-[10px]">
           <div>
             {aptInfo.aptLogoFileUrl ? (
@@ -40,7 +40,7 @@ export const OfficeInfoPage = () => {
               />
             )}
           </div>
-          <div className="text-neutral-90 flex flex-col gap-2 pretendard-16Bold">
+          <div className="flex flex-col gap-2 pretendard-16Bold text-neutral-b-gray-900">
             {aptInfo.aptName}
           </div>
         </div>

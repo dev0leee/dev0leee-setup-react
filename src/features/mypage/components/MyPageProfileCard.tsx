@@ -35,7 +35,7 @@ export const MyPageProfileCard = () => {
         }}
       >
         <div className="flex items-center gap-2.5">
-          <div className="border-neutral-10 bg-neutral-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-neutral-b-gray-100 bg-neutral-b-gray-100">
             <img
               className="h-12 w-12 shrink-0"
               src="/assets/images/Profile.svg"
@@ -44,7 +44,7 @@ export const MyPageProfileCard = () => {
           </div>
           <div className="flex flex-1 flex-col items-start gap-[7px]">
             <span className="pretendard-16Bold">{residentName || PROFILE_TEXT.EMPTY}</span>
-            <div className="text-neutral-90 flex flex-col gap-1 pretendard-14SemiBold">
+            <div className="flex flex-col gap-1 pretendard-14SemiBold text-neutral-b-gray-900">
               <span>{residentDetailInfo?.aptName}</span>
               <div>
                 <span>{residentDetailInfo?.dong || 0}</span>동{' '}

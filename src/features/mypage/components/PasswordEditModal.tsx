@@ -103,9 +103,9 @@ export const PasswordEditModal = ({ open, onClose }: { open: boolean; onClose: (
               <div key={field.id} className={field.className}>
                 <label
                   htmlFor={field.id}
-                  className="text-neutral-70 mb-1 block pretendard-14Medium"
+                  className="mb-1 block pretendard-14Medium text-neutral-b-gray-700"
                 >
-                  {field.label} <span className="text-red-500">*</span>
+                  {field.label} <span className="text-[#ef4444]">*</span>
                 </label>
                 {/* `InputBase`는 값을 부모가 소유하는 제어 컴포넌트다. RHF의 `register`는
                     DOM ref와 이벤트 객체를 요구하므로 맞지 않는다 → `Controller`로 잇는다.

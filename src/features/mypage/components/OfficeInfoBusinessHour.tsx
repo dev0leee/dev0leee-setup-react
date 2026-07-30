@@ -13,7 +13,7 @@ export const OfficeInfoBusinessHour = () => {
 
   return (
     <div className="flex flex-col items-start gap-1 self-stretch bg-base-b-white px-5 py-4">
-      <h2 className="text-brand-primary-50 flex items-center justify-center gap-1 px-2.5 py-[7px] pretendard-13SemiBold">
+      <h2 className="flex items-center justify-center gap-1 px-2.5 py-[7px] pretendard-13SemiBold text-brand-default-text-brand">
         <img src="/assets/icons/Clock.svg" className="h-4 w-4" alt="시간 아이콘" />
         <span>운영시간</span>
       </h2>
@@ -23,10 +23,10 @@ export const OfficeInfoBusinessHour = () => {
           {officeBusinessHours.map((item) => {
             return (
               <li key={item.uuid} className="flex w-full items-center justify-between px-2.5 py-3">
-                <span className="text-neutral-90 pretendard-15SemiBold">
+                <span className="pretendard-15SemiBold text-neutral-b-gray-900">
                   {formatDay({ dayType: item.dayType })}
                 </span>
-                <div className="text-brand-primary-100 flex items-center justify-end gap-[2px] pretendard-15Regular">
+                <div className="flex items-center justify-end gap-[2px] pretendard-15Regular text-brand-default-text-brand">
                   {item.startTime?.slice(0, BUSINESS_HOUR_LENGTH)}~
                   {item.endTime?.slice(0, BUSINESS_HOUR_LENGTH)}
                 </div>
@@ -35,7 +35,7 @@ export const OfficeInfoBusinessHour = () => {
           })}
         </ul>
       ) : (
-        <p className="text-neutral-90 flex h-[100px] w-full items-center justify-center pretendard-15Regular">
+        <p className="flex h-[100px] w-full items-center justify-center pretendard-15Regular text-neutral-b-gray-900">
           {MYPAGE_EMPTY_TEXT.OFFICE_BUSINESS_HOUR}
         </p>
       )}

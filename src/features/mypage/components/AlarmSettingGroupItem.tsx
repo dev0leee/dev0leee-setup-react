@@ -24,7 +24,7 @@ export const AlarmSettingGroupItem = ({
   items: AlarmSettingItem[]
 }) => {
   return (
-    <div className="border-neutral-20 flex flex-col items-start gap-0.5 self-stretch border-b bg-base-b-white p-4">
+    <div className="flex flex-col items-start gap-0.5 self-stretch border-b border-neutral-b-gray-200 bg-base-b-white p-4">
       <div className="flex items-center justify-center gap-2.5 px-2.5 py-1.5">
         <h2 className="pretendard-14SemiBold text-defaults-secondary-text-secondary">{title}</h2>
       </div>
@@ -40,7 +40,7 @@ export const AlarmSettingGroupItem = ({
               )}
             >
               <div className="flex flex-col items-start gap-1.5">
-                <span className="text-neutral-90 pretendard-15SemiBold">{item.label}</span>
+                <span className="pretendard-15SemiBold text-neutral-b-gray-900">{item.label}</span>
                 <span className="w-full pretendard-12Regular text-defaults-secondary-text-secondary">
                   {item.info}
                 </span>

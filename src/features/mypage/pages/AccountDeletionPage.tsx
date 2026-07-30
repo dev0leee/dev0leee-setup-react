@@ -34,7 +34,7 @@ export const AccountDeletionPage = () => {
 
       <div className="fixed bottom-20 flex w-full gap-2.5 px-5 py-0">
         <InputCheckbox id="membershipDraw" checked={isAgreed} onChange={setIsAgreed} />
-        <label htmlFor="membershipDraw" className="text-neutral-90 pretendard-15Regular">
+        <label htmlFor="membershipDraw" className="pretendard-15Regular text-neutral-b-gray-900">
           {ACCOUNT_DELETION_TEXT.AGREEMENT}
         </label>
       </div>

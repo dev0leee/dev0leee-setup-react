@@ -75,13 +75,13 @@ export const ProfileEditPage = () => {
       </AppBar>
 
       <div className="h-full w-full px-5 pt-16">
-        <div className="border-neutral-10 mx-auto h-20 w-20 overflow-hidden rounded-full border">
+        <div className="mx-auto h-20 w-20 overflow-hidden rounded-full border border-neutral-b-gray-100">
           <img className="h-20 w-20" src="/assets/images/Profile.svg" alt="프로필 이미지" />
         </div>
 
         <div className="mt-8 space-y-6 pb-5">
           <div className="flex flex-col items-start gap-2 self-stretch">
-            <label htmlFor="name" className="text-neutral-90 pretendard-15SemiBold">
+            <label htmlFor="name" className="pretendard-15SemiBold text-neutral-b-gray-900">
               {PROFILE_TEXT.NAME_LABEL}
             </label>
             <div className="flex w-full flex-col items-start gap-1.5">
@@ -99,7 +99,7 @@ export const ProfileEditPage = () => {
 
           <form id="profileEditForm" className="w-full space-y-5" onSubmit={onSubmit}>
             <div className="flex flex-col items-start gap-2 self-stretch">
-              <label htmlFor="nickName" className="text-neutral-90 pretendard-15SemiBold">
+              <label htmlFor="nickName" className="pretendard-15SemiBold text-neutral-b-gray-900">
                 {PROFILE_TEXT.NICKNAME_LABEL}
               </label>
               <div className="flex w-full flex-col items-start gap-1.5">
