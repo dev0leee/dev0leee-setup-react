@@ -55,9 +55,22 @@ export const ROUTE_PATH = {
   /** 약관 본문. `:termsId`에 `TERMS_ITEMS`의 id가 들어간다 */
   TERMS_OF_USE_DETAIL: '/termsOfUse',
 
-  /**
-   * 소방 자가점검 완료. **화면은 FireInspection 이관 때 온다** —
-   * 지금은 뒤로가기 차단 목록(`app/navigationBlocking.ts`)이 이 경로를 참조한다.
-   */
+  // ── 아직 화면이 이관되지 않은 경로 ─────────────────────────────────────────
+  //
+  // ⚠️ **여기 있는 경로는 라우트 정의가 없다.** 이미 이관된 화면(메인 카드·메뉴 등)이
+  // 이동 대상으로 참조하기 때문에 먼저 상수로 둔다. 지금 누르면 404다.
+  // 해당 도메인을 이관할 때 라우트를 붙이고 이 구획에서 뺀다.
+
+  /** 소방 자가점검 완료. 뒤로가기 차단 목록(`app/navigationBlocking.ts`)이 참조한다 */
   FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
+  /** A-PASS (메인 A-PASS 카드) */
+  APASS: '/apass',
+  /** 방문자 출입관리 (메인 방문 출입관리 카드) */
+  VISIT: '/visit',
+  /** 주차 방문예약 (메인 주차 방문예약 카드) */
+  PARKING_RESERVATION: '/parking/reservation',
+  /** 주차 마일리지 내역 (메인 마일리지 카드) */
+  PARKING_MILEAGE_HISTORY: '/parking/mileage/history',
+  /** 관리비 상세 (메인 관리비 카드) */
+  MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
 } as const

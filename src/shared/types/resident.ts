@@ -29,6 +29,8 @@ export interface ResidentDetailInfo {
   apassUseFlag?: boolean
   /** 기기 A-PASS 활성화 여부 */
   apassOnOffFlag?: boolean
+  /** 단지 생성일. 주차 마일리지 조회 가능 시점을 판단한다 (`main.md` §7-3) */
+  aptCreatedDate?: string
 }
 
 /** 입주민 승인 상태. `APPROVED`만 진입할 수 있다 */

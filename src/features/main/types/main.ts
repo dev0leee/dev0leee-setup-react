@@ -15,3 +15,24 @@ export interface AptInfoHeaderDrawerProps {
   open: boolean
   onClose: () => void
 }
+
+/** `GET /bill/impose-yearmonths` 응답. `YYYY-MM` 문자열 배열이다 */
+export interface ImposeYearMonthsResponse {
+  imposeYearmonths?: string[]
+}
+
+/** 관리비 고지서. 카드는 `imposeAmount` 안의 두 값만 쓴다 */
+export interface ManagementFeeBill {
+  imposeAmount?: {
+    imposeAmount?: number
+    /** 음수면 전월보다 줄었다는 뜻이다 */
+    previousMonthComparedAmount?: number
+  }
+}
+
+/** 주차 마일리지(분 단위). `totalMileage`는 클라이언트가 더해 만든 값이다 */
+export interface ParkingMileage {
+  useMileage: number
+  remainingMileage: number
+  totalMileage: number
+}

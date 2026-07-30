@@ -988,3 +988,25 @@ input::-webkit-search-cancel-button {
 .font-size-range::-moz-range-thumb:active {
   scale: 1.05;
 }
+
+/**
+ * 주차 방문예약 카드 아이콘 흔들림. 레거시 `MainCardReservation.vue`의 `<style scoped>` 이식.
+ * 진입 시 2번 흔들린다(`ease-in-out 2`). 레거시에 `motion-reduce` 대응이 없어 넣지 않았다 —
+ * 추가하면 동작이 달라진다 (`main.md` §7-5).
+ */
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+.shake-animation {
+  animation: shake 0.6s ease-in-out 2;
+}

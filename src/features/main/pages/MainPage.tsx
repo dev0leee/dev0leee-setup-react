@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { env } from '@/config/env'
 import { AptInfoHeader } from '@/features/main/components/AptInfoHeader'
+import { MainCardMenus } from '@/features/main/components/MainCardMenus'
 import { BEACON_WORKAROUND_APT_ID } from '@/features/main/constants/main'
 import { APT_CONTENT_NAME } from '@/shared/constants/aptContent'
 import { useResidentDetailInfo } from '@/shared/hooks/useResidentDetailInfo'
@@ -60,8 +61,8 @@ const useBeaconWorkaround = ({
 /**
  * 메인 화면. 레거시 `MainView/MainView.vue` 이식 (`main.md` M1).
  *
- * ⚠️ **아직 헤더까지만 이관됐다.** 카드 그리드(5종)·A-PAY·메뉴 스와이퍼·광고 배너·
- * 공지 Top3·쇼핑 마케팅 동의는 이어지는 단계에서 붙인다 (`progress.md`).
+ * ⚠️ **아직 헤더·카드까지만 이관됐다.** 메뉴 스와이퍼·광고 배너·공지 Top3·쇼핑 마케팅
+ * 동의는 이어지는 단계에서 붙인다 (`progress.md`).
  * 공지 팝업(Board)·투표 대기 팝업(Vote)은 **그 도메인이 이관돼야** 붙일 수 있다.
  *
  * ⚠️ **마운트 시 앱에 권한 정보를 요청한다.** 응답(`CALLBACK_PERMISSION_INFO`)은
@@ -83,6 +84,7 @@ export const MainPage = () => {
     <div className="h-full w-full">
       <div className="h-full w-full space-y-5 overflow-auto bg-defaults-secondary-background-secondary px-5 py-6">
         <AptInfoHeader />
+        <MainCardMenus />
       </div>
     </div>
   )
