@@ -1,79 +1,68 @@
 import { http, HttpResponse } from 'msw'
 
 import { env } from '@/config/env'
-import type { CreateOrderPayload, UpdateOrderPayload } from '@/features/dashboard/types/dashboard'
+import { API_PREFIX } from '@/shared/constants/api'
 
 /**
  * axios의 baseURL 조합과 동일하게 단순 이어붙인다.
- * new URL('/login', 'http://host/api')는 '/api'를 버리고 'http://host/login'이 되므로 쓰면 안 된다.
+ * `new URL('/login', 'http://host/api')`는 `/api`를 버리고 `http://host/login`이 되므로 쓰면 안 된다.
  */
 export const url = ({ path }: { path: string }) => {
   return `${env.VITE_API_URL.replace(/\/$/, '')}${path}`
 }
 
-const user = { id: 'u_1', email: 'dev@example.com', name: '개발자' }
+/** 로그인 성공 시 서버가 헤더로 내려주는 토큰 */
+export const MOCK_TOKENS = {
+  ACCESS: 'mock-access-token',
+  REFRESH: 'mock-refresh-token',
+} as const
 
-// 단일 진실 공급원 - 목록·상세·수정 핸들러가 같은 fixture에서 파생한다 (03-api).
-const orders = [
-  { id: 'ORD-1001', customer: '김철수', amount: 128000, createdAt: '2026-07-18' },
-  { id: 'ORD-1002', customer: '이영희', amount: 89000, createdAt: '2026-07-19' },
-  { id: 'ORD-1003', customer: '박민수', amount: 245000, createdAt: '2026-07-20' },
-]
+export const MOCK_LOGIN_INFO = {
+  uuid: 'resident-uuid-1',
+  aptName: '아파트먼트 1단지',
+  aptId: 'APT-1',
+  name: '홍길동',
+  nickName: '길동',
+  oldApartmantToken: 'community-token',
+  aptLogoFileUrl: 'https://statics.test.local/logo.png',
+  contentList: [{ name: 'A-PASS' }, { name: ' 로비폰 ' }],
+  apassUseFlag: true,
+  apassOnOffFlag: false,
+}
 
+/**
+ * 기본 핸들러. 테스트마다 다른 응답이 필요하면 `server.use()`로 덮는다.
+ * 여기 있는 것은 **정상 경로**만이다 — 에러 경로를 기본값으로 두면 무엇을 검증하는지
+ * 읽기 어려워진다.
+ */
 export const handlers = [
-  http.post(url({ path: '/login' }), () => {
-    return HttpResponse.json({ accessToken: 'mock-access-token', user })
-  }),
-
-  http.post(url({ path: '/token-refresh' }), () => {
-    return HttpResponse.json({ accessToken: 'mock-access-token', user })
-  }),
-
-  http.post(url({ path: '/logout' }), () => {
-    return new HttpResponse(null, { status: 204 })
-  }),
-
-  http.get(url({ path: '/dashboard/revenue' }), () => {
-    return HttpResponse.json([
-      { month: '1월', revenue: 4200 },
-      { month: '2월', revenue: 3800 },
-      { month: '3월', revenue: 5100 },
-      { month: '4월', revenue: 4700 },
-      { month: '5월', revenue: 6200 },
-      { month: '6월', revenue: 5800 },
-    ])
-  }),
-
-  http.get(url({ path: '/dashboard/orders' }), () => {
-    return HttpResponse.json(orders)
-  }),
-
-  http.get(url({ path: '/dashboard/orders/:orderId' }), ({ params }) => {
-    const order = orders.find((candidate) => {
-      return candidate.id === params.orderId
-    })
-    return order ? HttpResponse.json(order) : new HttpResponse(null, { status: 404 })
-  }),
-
-  http.post(url({ path: '/dashboard/orders' }), async ({ request }) => {
-    const payload = (await request.json()) as CreateOrderPayload
+  http.post(url({ path: `${API_PREFIX.APARTMANT}/login` }), () => {
     return HttpResponse.json(
-      { id: 'ORD-9999', createdAt: '2026-07-25', ...payload },
-      { status: 201 },
+      { success: { oldResidentFlag: false } },
+      {
+        headers: {
+          authorization: MOCK_TOKENS.ACCESS,
+          'refresh-token': MOCK_TOKENS.REFRESH,
+        },
+      },
     )
   }),
 
-  http.patch(url({ path: '/dashboard/orders/:orderId' }), async ({ params, request }) => {
-    const order = orders.find((candidate) => {
-      return candidate.id === params.orderId
-    })
-    if (!order) return new HttpResponse(null, { status: 404 })
-
-    const payload = (await request.json()) as UpdateOrderPayload
-    return HttpResponse.json({ ...order, ...payload })
+  http.get(url({ path: `${API_PREFIX.APARTMANT}/login/info` }), () => {
+    return HttpResponse.json({ success: MOCK_LOGIN_INFO })
   }),
 
-  http.delete(url({ path: '/dashboard/orders/:orderId' }), () => {
+  http.get(url({ path: `${API_PREFIX.APARTMANT}/apt-resident/apt` }), () => {
+    return HttpResponse.json({
+      success: [{ aptResidentUuid: MOCK_LOGIN_INFO.uuid, aptUuid: 'apt-uuid-1' }],
+    })
+  }),
+
+  http.delete(url({ path: `${API_PREFIX.APARTMANT}/logout` }), () => {
     return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.post(url({ path: `${API_PREFIX.APARTMANT}/token-refresh` }), () => {
+    return HttpResponse.json({}, { headers: { authorization: 'refreshed-access-token' } })
   }),
 ]

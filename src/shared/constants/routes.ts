@@ -11,4 +11,8 @@ export const ROUTE_PATH = {
   /** 앱의 실질적 진입점이자 로그인 화면. 별도 `/login` 경로는 없다 */
   INTRO: '/intro',
   MAIN: '/main',
+  /** 로그인은 됐지만 세대 승인이 안 된 상태 */
+  LOGIN_PENDING: '/login/pending',
+  /** 버전1 사용자의 약관 재동의 */
+  VERSION_ONE_TERMS: '/versionOne/terms',
 } as const

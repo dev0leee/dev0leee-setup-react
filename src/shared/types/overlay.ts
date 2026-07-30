@@ -7,6 +7,26 @@ export interface ModalBaseProps {
   children: ReactNode
 }
 
+/** 레거시 ModalButton의 버튼 배치 3종 */
+export type ModalButtonType = 'single' | 'dual' | 'outline'
+
+export interface ModalData {
+  title?: string
+  /** 배열이면 줄마다 `<p>`로 그린다. 레거시가 문자열/배열 둘 다 받는다 */
+  description: string | string[]
+  firstButton?: string
+  secondButton?: string
+}
+
+export interface ModalButtonProps {
+  open: boolean
+  onClose: () => void
+  buttonType: ModalButtonType
+  modalData: ModalData
+  onFirstClick?: () => void
+  onSecondClick?: () => void
+}
+
 export interface DrawerBaseProps {
   open: boolean
   onClose: () => void

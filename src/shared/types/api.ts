@@ -20,3 +20,11 @@ export interface ServerErrorBody {
     message?: string
   }
 }
+
+/**
+ * 성공 응답 body. 에러와 대칭으로 **`success` 아래에 실린다.**
+ * 레거시 호출부들이 전부 `response.data.success`로 꺼낸다.
+ */
+export interface ServerSuccessBody<T> {
+  success?: T
+}

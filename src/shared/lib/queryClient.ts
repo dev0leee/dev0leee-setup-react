@@ -1,7 +1,21 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query'
 
 import { DEFAULT_STALE_TIME_MS, QUERY_RETRY_COUNT } from '@/shared/constants/query'
+import type { ApiError } from '@/shared/lib/apiErrors'
 import { notifyNetworkError } from '@/shared/lib/notifyError'
+
+declare module '@tanstack/react-query' {
+  interface Register {
+    /**
+     * 모든 쿼리·뮤테이션의 에러 타입.
+     *
+     * `apiClient`의 인터셉터가 예외 없이 `ApiError`로 정규화해서 reject하므로
+     * 여기서 한 번 선언해두면 훅마다 제네릭을 쓰지 않고 `error.code`로 분기할 수 있다.
+     * 레거시가 `error.data.error.errorCode`로 분기하던 69개 파일이 이 타입을 쓴다.
+     */
+    defaultError: ApiError
+  }
+}
 
 /**
  * 기본값을 **레거시 `main.js`의 QueryClient에 맞춘다**

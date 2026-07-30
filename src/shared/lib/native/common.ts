@@ -101,8 +101,17 @@ export const subscribeToAppVersion = ({
   return subscribeToNative<string>({ type: FROM_NATIVE.CALLBACK_APP_VERSION, handler })
 }
 
-/** 하드웨어 뒤로가기. 페이로드가 없다 */
-export const subscribeToGoBack = ({ handler }: { handler: () => void }): (() => void) => {
+/**
+ * 하드웨어 뒤로가기. 페이로드가 없다.
+ *
+ * 시그니처의 `payload?`는 `useNativeSubscription`과 맞추기 위한 것이다 —
+ * 인자를 안 받는 핸들러도 그대로 넘길 수 있다.
+ */
+export const subscribeToGoBack = ({
+  handler,
+}: {
+  handler: (payload?: unknown) => void
+}): (() => void) => {
   return subscribeToNative<unknown>({
     type: FROM_NATIVE.CALLBACK_GO_BACK,
     handler: () => {
