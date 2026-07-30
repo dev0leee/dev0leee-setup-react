@@ -139,71 +139,85 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 > 인벤토리 확인 항목 11건은 **전부 확정**됐다 → `decisions/inventory-questions.md`
 
+### 🔴 이관 착수 전 결정이 필요한 것 (등가 이관과 충돌하는 버그)
+
+**"고치면 화면/동작이 달라지는" 결함들이다.** 등가 이관 원칙만으로는 판단할 수 없다.
+
+| #                      | 결함                                                                          | 고치면                                           | 문서                    |
+| ---------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------- |
+| `RP-Q4`                | 하자보수 목록의 무한 스크롤 관측 타깃이 템플릿에 없다                         | **지금까지 안 보였던 11번째 이후 항목이 보인다** | `repair.md` §4          |
+| `RP-Q1`                | 등록 화면 제목이 `하자보수 수정`, 모달이 `수정 그만두기`                      | 제목·모달 문구가 바뀐다                          | `repair.md` §1          |
+| `RP-Q2`                | 등록 화면에 AppBar 2개 · `RP-Q3` 수정 화면 콘텐츠 48px 가림                   | 레이아웃이 바뀐다                                | `repair.md` §2·§3       |
+| `AP-Q3`                | A-PASS 7초 타임아웃이 전역 로딩 플래그를 못 내려 **뒤로가기 영구 차단**       | 뒤로가기가 동작하기 시작한다                     | `apass.md` AP1          |
+| `O-Q6`                 | opinion 레이아웃 2중 중첩 (`pt-6`×2=48px에 의존)                              | 중첩 제거 시 **`pt-12`로 함께 고쳐야** 한다      | `opinion.md` §4         |
+| `O-Q7`                 | opinion 앱에 `ToastContainer`가 없어 **모든 토스트 무음**                     | **레거시에 없던 토스트가 나타난다**              | `opinion.md` §4         |
+| `MF-Q1`                | 관리비 `/info` 524줄 목업 + 도달 불가                                         | 제외하면 ApexCharts 작업이 1건으로 줄어든다      | `management-fee.md` §1  |
+| `VT-Q2`·`SV-Q3`        | Vote·Survey의 `isCreateXxxFormPending` 오타 (같은 버그)                       | 중복 제출 잠금이 생긴다                          | `vote.md`·`survey.md`   |
+| `MH-Q10`               | 이사예약 안내문이 `<p>` 안의 `<div>` 때문에 배경·패딩 손실                    | 회색 카드 배경이 살아난다                        | `moving-house.md` MH2   |
+| `F-Q14`                | 소방 `홈으로 돌아가기`가 인트로 경유 → `getLoginInfo()` 실패 시 **로그아웃**  | 3홉 우회가 없어진다                              | `fire-inspection.md` F3 |
+| v4 `invalidateQueries` | **28곳이 v5에서 no-op.** 특히 `AP-Q`(A-PASS 토글)는 **UI 갱신 경로가 이것뿐** | 화면이 즉시 갱신되기 시작한다                    | `query-keys.md`         |
+
+> **v4 `invalidateQueries`는 "고쳐야 하는" 쪽이다** — 안 고치면 화면이 갱신되지 않는다.
+> 나머지는 **레거시가 이미 그렇게 동작하고 있으므로** 사용자 결정이 필요하다.
+
 ---
 
 ## 다음 작업
 
-**Phase 0 · 1 · 3 완료.** 남은 것은 Phase 2(명세)와 Phase 4(기반 구축)다.
+**Phase 0 · 1 · 2 · 3 완료.** 남은 것은 **Phase 4(기반 구축)** 다.
 
-### A. Phase 2 도메인 명세 — `features/<domain>.md`
+### A. 착수 전 사용자 결정 — 3건
 
-기반 도메인 6개 **완료** · 대형 4개(Board·Parking·Visit·Vote) **완료** ·
+| #     | 항목                                                                                                                                                                                | 왜 먼저인가                                                 |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **1** | **의존성 승인 9개** — `react-day-picker`(shadcn calendar) · `dompurify` · `swiper` · `qrcode` · `html2canvas` · `quill-delta-to-html` · `he` · `posthog-js` · `@sentry/vite-plugin` | `tech-mapping.md` §12. **Phase 4 1번 단계**                 |
+| **2** | **`MF-Q1`** — `/managementFee/info`(524줄, 목업, 도달 불가) 이관 제외 여부                                                                                                          | 제외하면 **ApexCharts→recharts 작업이 1건으로 줄어든다**    |
+| **3** | **`B-Q2`** — 미생성 클래스 4건의 색 결정 (`globalColor.scss` 근거 확보)                                                                                                             | `ButtonBase`·`InputRadioList` 공용이라 **전 화면에 걸린다** |
 
-### 🎯 **Phase 2 종료 — 도메인 19/19 완료**
+### B. Phase 4 기반 구축 — 착수 순서는 `tech-mapping.md` §14에 고정
 
-| 문서                 |       줄수 | 담당 범위                                           |
-| -------------------- | ---------: | --------------------------------------------------- |
-| `auth.md`            |        560 | Intro + Login                                       |
-| `signup.md`          |        696 | SignUp + **TermsOfUse**                             |
-| `exception.md`       |        231 | 에러·404 (메인 + opinion)                           |
-| `main.md`            |      1,000 | Main (카드 5종 포함)                                |
-| `mypage.md`          |        641 | MyPage                                              |
-| `board.md`           |      2,984 | 소통공간 + 민원공간 + 공지                          |
-| `parking.md`         |      2,221 | 주차관리 (미출차 제외)                              |
-| `visit.md`           |      1,463 | 방문·로비폰·안면인식                                |
-| `vote.md`            |      1,293 | 전자투표 (메인 + opinion)                           |
-| `survey.md`          |      1,053 | 설문조사 (메인 + opinion)                           |
-| `apt-mall.md`        |      1,584 | 아파트몰/주말조식                                   |
-| `fire-inspection.md` |      1,345 | 소방 자가점검                                       |
-| `moving-house.md`    |      1,265 | 이사예약                                            |
-| `repair.md`          |      1,080 | 하자보수                                            |
-| `management-fee.md`  |        765 | 관리비                                              |
-| `apass.md`           |        745 | A-PASS                                              |
-| `opinion.md`         |        765 | **opinion 앱 껍데기** (엔트리·빌드·레이아웃·라우터) |
-| **합계**             | **20,231** | 라우트 121개 전부 커버                              |
+**공용 인프라 확정이 도메인 이관의 선행 조건이다.** 명세에서 드러난 의존 관계:
 
-> **TermsOfUse 3파일 1라우트는 `signup.md`가 전부 다룬다** —
-> `TermsOfUseDetailView`(T1) · `TermsOfUseAgreeView`(S1·A5 공유) · `CertButton`(KMC).
-> 별도 문서를 만들지 않는다.
->
-> **`opinion.md`는 화면이 아니라 앱 껍데기를 다룬다.** 화면 18개는
-> `vote.md`(7) · `survey.md`(8) · `exception.md`(3)에 있다.
+| 공용물                                   | 소비 도메인                                                        | 결정 문서                                     |
+| ---------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------- |
+| **날짜 선택기 래퍼**                     | AptMall(AM9, `inline`) · 주차 · **이사예약**(휴무일 표시) · 로비폰 | `moving-house.md` MH-Q12 (달력 5개 전수 비교) |
+| **`ImageUploader` + 진행률**             | **Board**(10~11곳) → Repair                                        | `repair.md` 「이관 순서」                     |
+| **`SignaturePad`**                       | Vote(`CanvasSign` 모달) · **소방**(화면 단계)                      | `fire-inspection.md` F-Q13                    |
+| **`DrawerMonth`**                        | 관리비 상세 · **메인 카드**                                        | `management-fee.md` §4                        |
+| **`usePermissionInfo`**                  | A-PASS · **메인 배지**                                             | `apass.md` §1                                 |
+| **네이티브 브릿지 24종**                 | **Visit(7화면) · A-PASS** — 이 둘은 브릿지 없이 이관 불가          | `native-protocol.md` §4-4                     |
+| **`RadioList`** (vee-validate 결합 제거) | 소방 · 이사예약 · 하자보수                                         | `repair.md` §5                                |
+| **오버레이/에러 모달**                   | 69개 파일                                                          | `tech-choices.md`                             |
 
-> ⚠️ **Repair는 Board보다 먼저 이관하지 않는다** — `ImageUploader`·`useUploadProgress`·
-> `convertFormDataFile`·`validImage`를 Board(사용처 10~11곳)에서 확정한 뒤 물려받는다
-> (`repair.md` 「이관 순서」).
+### C. Phase 6 이관 순서 제약 (명세에서 확정된 것)
 
-> **Vote·Survey는 이관 순서가 묶여 있다** — Survey가 opinion 엔트리와 KMC 인프라를
-> Vote에서 물려받는다 (`survey.md` 「이관 순서」).
-> **`VT-Q2`(Vote)와 `SV-Q3`(Survey)은 같은 오타이므로 한 번에 결정한다.**
+```
+Phase 4 브릿지 완료 ─┬─→ Visit
+                     └─→ A-PASS (+ Main 배지와 같은 PR)
 
-> ⚠️ **Visit 도메인은 Phase 4의 네이티브 브릿지 재작성이 선행 조건이다** (`visit.md` §2).
->
-> ⚠️ **날짜 선택기 래퍼가 4개 도메인의 공통 선행 조건이다** — AptMall(AM9) · Parking(예약차량) ·
-> MovingHouse · Visit(로비폰 임시비밀번호). `VueDatePicker` → shadcn `calendar`(react-day-picker).
-> **AM9가 `inline` 모드로 prop을 가장 많이 쓰므로 이것을 기준으로 먼저 만든다** (`apt-mall.md` AM-Q14).
-> **달력 5개 인스턴스의 `week-start`·`no-today`가 서로 다르다** — 일:월 = 2:3, `no-today` 2:3.
-> 래퍼 기본값 결정이 5개 화면의 외형을 동시에 바꾼다 (`moving-house.md` MH-Q12 전수 표).
+Board ──→ Repair            (ImageUploader·useUploadProgress·convertFormDataFile·validImage)
+Vote ──→ Survey             (opinion 엔트리 + KMC 인프라)
+Main ──→ 관리비 상세         (DrawerMonth)
+AptMall ─→ 주차/이사예약/로비폰 (날짜 선택기 래퍼를 AM9 기준으로 먼저 만든다)
 
-### B. Phase 4 기반 구축
+브릿지 독립 (아무 때나): AptMall · 소방 · 이사예약 · 하자보수 · 관리비
+```
 
-착수 순서는 `tech-mapping.md` §14에 고정돼 있다.
-**1번(의존성 승인)에 사용자 확인이 필요하다** — `tech-mapping.md` §12 목록.
+**opinion 앱은 마지막에 몰지 않는다** — 골격을 Phase 4에 세우고 Vote·Survey 이관 때 각자 배선한다
+(계획서 리스크 R9 · `opinion.md` 「이관 순서」).
 
-### 권장
+### D. 확인 항목 현황
 
-**Phase 2의 기반 도메인 6개를 먼저 쓰고 Phase 4에 들어간다.**
-Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세를 입력으로 쓰기 때문이다.
+**도메인 명세 17개에 확인 항목 총 164건**(해소 9건 포함)이 쌓였다.
+전부 진행을 막지는 않지만, **이관 착수 전에 도메인별로 한 번 훑어야 한다.**
+
+| 성격                           | 예                                                                             | 처리 시점          |
+| ------------------------------ | ------------------------------------------------------------------------------ | ------------------ |
+| **버그 수정 여부** (등가 충돌) | `RP-Q4`(무한스크롤 미동작) · `AP-Q3`(뒤로가기 영구 차단) · `O-Q7`(토스트 무음) | **도메인 착수 전** |
+| **서버 응답 실물 확인**        | `AM-Q10`(단가/줄합계) · `F-Q7`(정렬 보장) · `RP-Q8`(필드명)                    | 백엔드 문의        |
+| **디자인 확인**                | `B-Q2` · `F-Q11` · `MH-Q11` · `RP-Q10` (미생성 클래스)                         | **위 A-3에 병합**  |
+| **스타일 오타 수정**           | `broken-styles.md` 26건 중 21건 수정 확정                                      | 도메인 이관 시     |
+| **개선 아이디어**              | `deferred.md` **D-1~D-183**                                                    | 전환 후            |
 
 ---
 
