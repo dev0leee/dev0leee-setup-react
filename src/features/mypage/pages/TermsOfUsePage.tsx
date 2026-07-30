@@ -21,7 +21,7 @@ export const TermsOfUsePage = () => {
           <li key={item.id} className="w-full">
             <button
               type="button"
-              className="flex w-full items-center justify-between self-stretch px-5 py-4 pretendard-15SemiBold text-base-b-black"
+              className="flex w-full items-center justify-between self-stretch px-5 py-4 text-left pretendard-15SemiBold text-base-b-black"
               onClick={() => {
                 void navigate(`${ROUTE_PATH.TERMS_OF_USE_DETAIL}/${item.id}`)
               }}

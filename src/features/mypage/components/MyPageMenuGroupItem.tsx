@@ -34,7 +34,7 @@ export const MyPageMenuGroupItem = ({
             <li key={item.url} className="w-full">
               <button
                 type="button"
-                className="flex w-full items-center justify-between self-stretch px-2.5 py-2 pretendard-15SemiBold text-base-b-black"
+                className="flex w-full items-center justify-between self-stretch px-2.5 py-2 text-left pretendard-15SemiBold text-base-b-black"
                 onClick={() => {
                   void navigate(item.url)
                 }}

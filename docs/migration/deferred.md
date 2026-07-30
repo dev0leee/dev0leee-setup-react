@@ -253,6 +253,8 @@
 | D-202 | 앱 버전 표시가 첫 렌더에 `최신 버전 0.0.0`을 잠깐 보여준다                | `MyPageVersion.vue` — 두 버전의 초기값이 같다               | 마운트 직후 `버전 없음`으로 바뀐다. 초기값을 `undefined`로 두면 깜빡임이 사라진다                                                |
 | D-203 | `cursor-pointer`인데 클릭 핸들러가 없다 (앱 버전 텍스트)                  | `MyPageVersion.vue`                                         | 클래스가 실제로 적용되므로 지우면 커서가 달라진다 → 유지. 원래 클릭 기능이 있었을 가능성                                         |
 
+| D-204 | 클릭 핸들러가 `div`·`li`에 달려 있어 키보드로 조작할 수 없다 | `MyPageProfile.vue` · `MyPageMenuGroupItem.vue` · `TermsOfUseView.vue` | **이관본은 `button`으로 바꿨다** — 렌더 결과는 `text-left`로 동일하게 맞췄지만 포커스 가능 여부가 달라진다. 웹뷰 앱이라 실사용 영향은 없다고 보고 접근성 쪽을 택했다. 되돌려야 하면 `div` + `onClick`으로 바꾼다 |
+
 > **D-44~D-48은 이 파일 앞쪽 「동작 의심」에 이미 있다** (앱 버전 죽은 기능 · `filterGroupList`의
 > `null` · `userInfos`가 `computed` 아님 · 광고성 `isDisabled` 무시 · `fontSizeLabel` 폴백 TypeError).
 > Phase 5에서 전부 **레거시 동작을 유지**하는 쪽으로 처리했고 근거는 각 파일 주석에 남겼다.

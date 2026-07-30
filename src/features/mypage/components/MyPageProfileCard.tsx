@@ -25,11 +25,13 @@ export const MyPageProfileCard = () => {
 
   return (
     <div className="flex w-full items-center justify-between gap-4 p-5">
-      {/* 레거시는 div에 클릭 핸들러를 달았다. 접근성을 위해 button으로 바꾸되
-          클래스는 그대로 둔다 — 레이아웃이 달라지지 않는다. */}
+      {/* 레거시는 div에 클릭 핸들러를 달았다. 키보드 접근성을 위해 button으로 바꿨다.
+          ⚠️ **`text-left`가 필수다** — `button`의 UA 기본값이 `text-align: center`이고
+          Tailwind preflight가 그것을 리셋하지 않는다. 없으면 단지명이 가운데로 밀려
+          들여쓰기처럼 보인다(대조에서 발견). div→button 변환에는 항상 붙인다. */}
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-5 rounded-xl bg-white px-6 py-5 shadow-md"
+        className="flex w-full items-center justify-between gap-5 rounded-xl bg-white px-6 py-5 text-left shadow-md"
         onClick={() => {
           void navigate(ROUTE_PATH.MYPAGE_PROFILE)
         }}

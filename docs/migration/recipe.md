@@ -335,6 +335,27 @@ Phase 5에서 MyPage 11곳을 그렇게 바꿨다가 되돌렸다 — `broken-st
 
 ---
 
+## 9-0. `div`/`li` → `button` 변환 (MUST) — 대조에서 발견
+
+레거시는 클릭 핸들러를 `div`·`li`에 직접 단 곳이 많다. 키보드 접근성 때문에 `button`으로
+바꾸는 것은 좋지만, **`button`은 UA 기본값이 `text-align: center`이고 Tailwind preflight가
+그것을 리셋하지 않는다.**
+
+```tsx
+// BAD — 레거시가 div였다면 텍스트가 가운데로 밀린다
+<button className="flex w-full items-center justify-between px-6 py-5">
+
+// GOOD
+<button className="flex w-full items-center justify-between px-6 py-5 text-left">
+```
+
+flex 자식이 전부 shrink-to-fit이면 눈에 안 띄지만, **`flex-col`로 늘어난 자식 안의 텍스트는
+가운데로 밀린다.** 마이페이지 프로필 카드의 단지명이 그래서 들여쓰기처럼 보였다.
+
+`e2e/layout.spec.ts`가 변환한 버튼들의 `text-align`을 확인한다.
+
+---
+
 ## 9-1. 레이아웃 높이 체인 (MUST) — Phase 5에서 실제로 깨진 자리
 
 레거시 화면은 대부분 `h-full` + `overflow-auto`로 **자기 스크롤 영역을 직접 만든다.**

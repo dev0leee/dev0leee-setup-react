@@ -112,3 +112,21 @@ test('관리사무소 화면도 스크롤 컨테이너 높이가 살아 있다',
   // AppBar 48px을 뺀 나머지를 다 쓴다
   expect(height).toBe(MOBILE_VIEWPORT.height - 48)
 })
+
+test('div→button으로 바꾼 자리의 텍스트가 왼쪽 정렬로 남아 있다', async ({ page }) => {
+  // `button`의 UA 기본값은 `text-align: center`이고 Tailwind preflight가 리셋하지 않는다.
+  // 레거시가 `div`/`li`에 클릭을 달았던 자리를 버튼으로 바꾸면 텍스트가 가운데로 밀린다 —
+  // 실제로 프로필 카드의 단지명이 들여쓰기처럼 보였다 (UI 대조에서 발견).
+  await page.goto('/mypage')
+  await expect(page.getByText('주차관리')).toBeVisible()
+
+  const cardAlign = await page.getByRole('button', { name: /홍길동/ }).evaluate((el) => {
+    return getComputedStyle(el).textAlign
+  })
+  expect(cardAlign).toBe('left')
+
+  const menuAlign = await page.getByRole('button', { name: '주차관리' }).evaluate((el) => {
+    return getComputedStyle(el).textAlign
+  })
+  expect(menuAlign).toBe('left')
+})
