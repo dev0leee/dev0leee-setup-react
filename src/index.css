@@ -908,3 +908,83 @@ input::-webkit-search-cancel-button {
     opacity 0.18s ease,
     transform 0.18s ease;
 }
+
+/* ── 글자 크기 슬라이더 의사요소 ──────────────────────────────────────────────
+   레거시 `MyPageFontSizeSlider.vue`의 `<style scoped>` 이식.
+
+   ⚠️ **의사요소는 Tailwind 유틸리티로 표현할 수 없다.** `14-styling.md`의
+   "Tailwind만 쓴다" 규칙의 문서화된 예외다. 레거시가 `@apply`와 원시 CSS를 섞어
+   썼는데 여기서는 전부 원시 CSS로 풀었다 — 값이 눈에 보여야 대조할 수 있다.
+
+   클래스명이 레거시(`progress-bar`·`range-input`)와 다르다. `<style scoped>`가
+   아니라 전역 CSS라 이름이 구체적이어야 한다. **스타일 값은 동일하다.**
+   `#0037be`는 브랜드 색의 hex 직값인데 레거시가 그렇게 썼다.
+   ─────────────────────────────────────────────────────────────────────────── */
+.font-size-progress::-webkit-progress-bar {
+  border-radius: 0.375rem;
+  background-color: var(--color-neutral-b-gray-200);
+}
+
+.font-size-progress::-webkit-progress-value {
+  border-radius: 0.375rem;
+  background-color: #0037be;
+  transition: width 0.3s ease-in-out;
+}
+
+.font-size-progress::-moz-progress-bar {
+  border-radius: 0.375rem;
+  background-color: #0037be;
+  transition: width 0.3s ease-in-out;
+}
+
+.font-size-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 0.375rem;
+  background-color: transparent;
+}
+
+.font-size-range::-moz-range-track {
+  height: 6px;
+  border-radius: 0.375rem;
+  background-color: transparent;
+}
+
+.font-size-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+  border: 3px solid var(--color-brand-default-border-brand);
+  border-radius: 9999px;
+  background-color: var(--color-base-b-white);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.font-size-range::-webkit-slider-thumb:hover {
+  scale: 1.1;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+}
+
+.font-size-range::-webkit-slider-thumb:active {
+  scale: 1.05;
+}
+
+.font-size-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--color-brand-default-border-brand);
+  border-radius: 9999px;
+  background-color: var(--color-base-b-white);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.font-size-range::-moz-range-thumb:hover {
+  scale: 1.1;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+}
+
+.font-size-range::-moz-range-thumb:active {
+  scale: 1.05;
+}

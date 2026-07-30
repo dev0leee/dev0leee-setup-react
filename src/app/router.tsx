@@ -4,8 +4,7 @@ import { AppRoot } from '@/app/AppRoot'
 import { AppLayout } from '@/app/layouts/AppLayout'
 import { RootLayout } from '@/app/layouts/RootLayout'
 import { ProtectedRoute } from '@/app/ProtectedRoute'
-import { LoginPage } from '@/features/auth'
-import { NotFoundPage } from '@/features/exception'
+import { LoginPage, LogoutPage } from '@/features/auth'
 import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
 import { ROUTE_PATH } from '@/shared/constants/routes'
 import type { RouteLayoutConfig } from '@/shared/types/layout'
@@ -83,10 +82,96 @@ export const routes = [
                       return { Component: ErrorPage }
                     },
                   },
+
+                  // ── 마이페이지 ─────────────────────────────────────────────
+                  {
+                    path: ROUTE_PATH.MYPAGE,
+                    // 하단 탭이 보이는 두 화면 중 하나다 (다른 하나는 /main)
+                    handle: layout({ showAppBar: false, showBottomNav: true }),
+                    lazy: async () => {
+                      const { MyPage } = await import('@/features/mypage')
+                      return { Component: MyPage }
+                    },
+                  },
+                  {
+                    // AppBar를 화면 안에서 렌더한다 — 우측 `수정` 버튼 때문이다
+                    path: ROUTE_PATH.MYPAGE_PROFILE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ProfilePage } = await import('@/features/mypage')
+                      return { Component: ProfilePage }
+                    },
+                  },
+                  {
+                    // 〃 우측이 `완료`(제출) 버튼이다
+                    path: ROUTE_PATH.MYPAGE_PROFILE_EDIT,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ProfileEditPage } = await import('@/features/mypage')
+                      return { Component: ProfileEditPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MYPAGE_ALARM_SETTING,
+                    handle: layout({ appBarTitle: '알림 설정' }),
+                    lazy: async () => {
+                      const { AlarmSettingPage } = await import('@/features/mypage')
+                      return { Component: AlarmSettingPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MYPAGE_APT_INFO,
+                    handle: layout({ appBarTitle: '관리사무소' }),
+                    lazy: async () => {
+                      const { OfficeInfoPage } = await import('@/features/mypage')
+                      return { Component: OfficeInfoPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MYPAGE_TERMS_OF_USE,
+                    handle: layout({ appBarTitle: '약관 및 정책' }),
+                    lazy: async () => {
+                      const { TermsOfUsePage } = await import('@/features/mypage')
+                      return { Component: TermsOfUsePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MYPAGE_FONT_SIZE_SETTING,
+                    handle: layout({ appBarTitle: '글자 크기 설정' }),
+                    lazy: async () => {
+                      const { FontSizePage } = await import('@/features/mypage')
+                      return { Component: FontSizePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MYPAGE_ACCOUNT_DELETION,
+                    handle: layout({ appBarTitle: '회원 탈퇴' }),
+                    lazy: async () => {
+                      const { AccountDeletionPage } = await import('@/features/mypage')
+                      return { Component: AccountDeletionPage }
+                    },
+                  },
+                  {
+                    // 화면이 아니라 확인 모달이다. 뒤에는 이전 화면이 남아 있다.
+                    // `features/auth` 배럴은 `AuthProvider`·`LoginPage` 때문에 이미 초기
+                    // 번들에 있으므로 lazy 로 감싸도 분리되지 않는다 — eager 로 둔다.
+                    path: ROUTE_PATH.LOGOUT,
+                    element: <LogoutPage />,
+                    handle: layout({ showAppBar: false }),
+                  },
                 ],
               },
 
-              { path: '*', element: <NotFoundPage />, handle: layout({ showAppBar: false }) },
+              {
+                // 레거시는 이 라우트가 `LayoutAuth` 하위지만 자기 meta로 `requiresAuth:false`를
+                // 덮어썼다. 타깃에서는 가드 밖에 둔다 (`routes.md` §3-1).
+                path: '*',
+                handle: layout({ showAppBar: false }),
+                lazy: async () => {
+                  const { NotFoundPage } = await import('@/features/exception')
+                  return { Component: NotFoundPage }
+                },
+              },
             ],
           },
         ],

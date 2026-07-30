@@ -5,8 +5,14 @@ export interface InputCheckboxProps {
   onChange: (checked: boolean) => void
 }
 
-/** 레거시 InputBase가 실제로 받던 type들 */
-export type InputBaseType = 'text' | 'tel' | 'number' | 'email' | 'date' | 'time'
+/**
+ * 레거시 InputBase가 실제로 받던 type들.
+ *
+ * `password`가 있는 이유: 비밀번호 변경 모달이 **`InputPassword`가 아니라
+ * `InputBase type="password"`를 쓴다** — 눈 아이콘이 없는 입력이다
+ * (`mypage.md` P3). 두 컴포넌트의 테두리·여백이 달라 바꿔 쓰면 화면이 어긋난다.
+ */
+export type InputBaseType = 'text' | 'tel' | 'number' | 'email' | 'date' | 'time' | 'password'
 
 export interface InputBaseProps {
   /** ⚠️ `'carNum'`이면 공백을 제거한다. id로 도메인을 판별하는 레거시 규칙이다 */

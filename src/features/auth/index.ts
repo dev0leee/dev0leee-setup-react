@@ -1,4 +1,5 @@
 export { AuthProvider } from '@/features/auth/components/AuthProvider'
 export { useLoginData } from '@/features/auth/hooks/useLoginData'
 export { LoginPage } from '@/features/auth/pages/LoginPage'
+export { LogoutPage } from '@/features/auth/pages/LogoutPage'
 export { useDeleteLogout } from '@/features/auth/queries/useDeleteLogout'

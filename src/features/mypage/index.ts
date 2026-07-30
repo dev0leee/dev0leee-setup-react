@@ -1,0 +1,8 @@
+export { AccountDeletionPage } from '@/features/mypage/pages/AccountDeletionPage'
+export { AlarmSettingPage } from '@/features/mypage/pages/AlarmSettingPage'
+export { FontSizePage } from '@/features/mypage/pages/FontSizePage'
+export { MyPage } from '@/features/mypage/pages/MyPage'
+export { OfficeInfoPage } from '@/features/mypage/pages/OfficeInfoPage'
+export { ProfileEditPage } from '@/features/mypage/pages/ProfileEditPage'
+export { ProfilePage } from '@/features/mypage/pages/ProfilePage'
+export { TermsOfUsePage } from '@/features/mypage/pages/TermsOfUsePage'

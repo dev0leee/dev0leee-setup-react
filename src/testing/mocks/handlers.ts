@@ -17,6 +17,20 @@ export const MOCK_TOKENS = {
   REFRESH: 'mock-refresh-token',
 } as const
 
+/** 입주민 상세정보. 구독 콘텐츠가 메뉴·알림 그룹 노출을 결정한다 */
+export const MOCK_RESIDENT_DETAIL_INFO = {
+  aptId: 'APT-1',
+  aptName: '아파트먼트 1단지',
+  aptLogoFileUrl: '/logo/apt-1.png',
+  residentId: 'resident-1',
+  dong: '101',
+  ho: '1001',
+  oldApartmantToken: 'community-token',
+  contentList: [{ name: '주차' }, { name: 'A-PASS' }, { name: '소통' }, { name: '민원' }],
+  apassUseFlag: true,
+  apassOnOffFlag: false,
+}
+
 export const MOCK_LOGIN_INFO = {
   uuid: 'resident-uuid-1',
   aptName: '아파트먼트 1단지',
@@ -56,6 +70,10 @@ export const handlers = [
     return HttpResponse.json({
       success: [{ aptResidentUuid: MOCK_LOGIN_INFO.uuid, aptUuid: 'apt-uuid-1' }],
     })
+  }),
+
+  http.get(url({ path: `${API_PREFIX.APARTMANT}/apt-resident/:uuid` }), () => {
+    return HttpResponse.json({ success: MOCK_RESIDENT_DETAIL_INFO })
   }),
 
   http.delete(url({ path: `${API_PREFIX.APARTMANT}/logout` }), () => {
