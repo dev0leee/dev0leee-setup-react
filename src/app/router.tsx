@@ -4,7 +4,14 @@ import { AppRoot } from '@/app/AppRoot'
 import { AppLayout } from '@/app/layouts/AppLayout'
 import { RootLayout } from '@/app/layouts/RootLayout'
 import { ProtectedRoute } from '@/app/ProtectedRoute'
-import { LoginPage, LogoutPage } from '@/features/auth'
+import { publicRouteLoader } from '@/app/publicRouteLoader'
+import {
+  IntroPage,
+  LoginPendingPage,
+  LogoutPage,
+  PasswordCertPage,
+  PasswordResetPage,
+} from '@/features/auth'
 import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
 import { ROUTE_PATH } from '@/shared/constants/routes'
 import type { RouteLayoutConfig } from '@/shared/types/layout'
@@ -47,8 +54,32 @@ export const routes = [
               },
               {
                 path: ROUTE_PATH.INTRO,
-                element: <LoginPage />,
+                element: <IntroPage />,
                 handle: layout({ showAppBar: false }),
+                loader: publicRouteLoader,
+              },
+              // 아래 세 화면은 `element`(eager)다. `features/auth` 배럴이 `AuthProvider`·
+              // `IntroPage` 때문에 이미 초기 번들에 들어가 있어 **`lazy`로 감싸도 청크가
+              // 분리되지 않는다** (Vite `INEFFECTIVE_DYNAMIC_IMPORT`). 분리하려면 배럴을
+              // 쪼개야 하는데 그건 컨벤션(공개 API는 index.ts) 쪽 결정이다 —
+              // `deferred.md` D-207.
+              {
+                // AppBar 제목이 **빈 문자열**이다. 뒤로가기 버튼만 보인다
+                path: ROUTE_PATH.PASSWORD_CERT,
+                element: <PasswordCertPage />,
+                loader: publicRouteLoader,
+              },
+              {
+                path: ROUTE_PATH.PASSWORD_RESET,
+                element: <PasswordResetPage />,
+                handle: layout({ appBarTitle: '새 비밀번호 설정' }),
+                loader: publicRouteLoader,
+              },
+              {
+                path: ROUTE_PATH.LOGIN_PENDING,
+                element: <LoginPendingPage />,
+                handle: layout({ showAppBar: false }),
+                loader: publicRouteLoader,
               },
               {
                 // 레거시 `authOptional` — 가드를 우회한다. 인증이 깨져서 오는 화면이라

@@ -8,6 +8,7 @@ import { routes } from '@/app/router'
 import { API_PREFIX } from '@/shared/constants/api'
 import { NATIVE_HANDLER, TO_NATIVE } from '@/shared/constants/native'
 import { STORAGE_KEY } from '@/shared/constants/storage'
+import { useAuthStore } from '@/shared/stores/authStore'
 import { useErrorModalStore } from '@/shared/stores/errorModalStore'
 import { url } from '@/testing/mocks/handlers'
 import { server } from '@/testing/mocks/server'
@@ -22,6 +23,9 @@ import { server } from '@/testing/mocks/server'
  * `routes`는 실제 앱이 쓰는 트리 그대로다. 테스트용 라우트를 따로 만들면
  * 배선이 어긋나도 알 수 없다.
  */
+
+/** 인트로 폼에는 `<label>`이 없다 — placeholder로 찾는다 (레거시 마크업 그대로) */
+const INTRO_ID_PLACEHOLDER = '휴대폰 번호(- 없이 숫자만 입력)'
 
 const ANDROID_UA =
   'Mozilla/5.0 (Linux; Android 14; SM-S911N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
@@ -51,7 +55,7 @@ describe('로그인 → 메인 진입', () => {
   it('세션이 없으면 루트에서 인트로로 보낸다', async () => {
     await renderApp()
 
-    expect(await screen.findByRole('heading', { name: '로그인' })).toBeInTheDocument()
+    expect(await screen.findByAltText('아파트먼트 로고')).toBeInTheDocument()
   })
 
   it('로그인하면 토큰·단지정보가 저장되고 메인 셸이 뜬다', async () => {
@@ -62,8 +66,8 @@ describe('로그인 → 메인 진입', () => {
 
     await renderApp()
 
-    await userEvent.type(await screen.findByLabelText('휴대폰 번호'), '010-1234-5678')
-    await userEvent.type(screen.getByLabelText('비밀번호'), 'abcd1234!')
+    await userEvent.type(await screen.findByPlaceholderText(INTRO_ID_PLACEHOLDER), '010-1234-5678')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'abcd1234!')
     await userEvent.click(screen.getByRole('button', { name: '로그인' }))
 
     // 단지 이름이 보이면 aptInfo 적재까지 끝난 것이다.
@@ -111,8 +115,8 @@ describe('로그인 → 메인 진입', () => {
 
     await renderApp()
 
-    await userEvent.type(await screen.findByLabelText('휴대폰 번호'), '010-1234-5678')
-    await userEvent.type(screen.getByLabelText('비밀번호'), 'abcd1234!')
+    await userEvent.type(await screen.findByPlaceholderText(INTRO_ID_PLACEHOLDER), '010-1234-5678')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'abcd1234!')
     await userEvent.click(screen.getByRole('button', { name: '로그인' }))
 
     // 서버 원문이 아니라 레거시 고정 문구를 쓴다. 어느 쪽이 틀렸는지 알려주지 않는다.
@@ -139,23 +143,29 @@ describe('로그인 → 메인 진입', () => {
 
     await renderApp()
 
-    await userEvent.type(await screen.findByLabelText('휴대폰 번호'), '010-1234-5678')
-    await userEvent.type(screen.getByLabelText('비밀번호'), 'abcd1234!')
+    await userEvent.type(await screen.findByPlaceholderText(INTRO_ID_PLACEHOLDER), '010-1234-5678')
+    await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'abcd1234!')
     await userEvent.click(screen.getByRole('button', { name: '로그인' }))
 
-    // `/login/pending` 화면은 Phase 6에서 만든다. 지금은 NotFound가 뜨는 것이
-    // "이동은 일어났다"는 증거다 — 라우트가 추가되면 이 기대값을 바꾼다.
-    expect(await screen.findByText('경로가 올바르지 않습니다')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '가입 승인 대기중' })).toBeInTheDocument()
   })
 
-  it('저장된 세션이 있으면 인트로에서 메인으로 넘긴다', async () => {
+  it('저장된 세션이 있으면 인트로를 그리기 전에 메인으로 넘긴다', async () => {
+    // 레거시 가드 4단계다. **화면을 렌더한 뒤 되돌리는 것이 아니라** loader가
+    // 렌더 전에 가로챈다 — 그래야 인트로의 `clearAuth()`가 세션을 지우지 않는다.
     localStorage.setItem(STORAGE_KEY.ACCESS_TOKEN, 'stored-token')
-    localStorage.setItem(STORAGE_KEY.APT_INFO, JSON.stringify({ aptResidentUuid: 'r-1' }))
+    useAuthStore.setState({
+      aptInfo: {
+        aptResidentUuid: 'resident-uuid-1',
+        aptName: '아파트먼트 1단지',
+        residentName: '홍길동',
+      },
+    })
 
     await renderApp({ initialPath: '/intro' })
 
-    await waitFor(() => {
-      expect(screen.queryByRole('heading', { name: '로그인' })).not.toBeInTheDocument()
-    })
+    expect(await screen.findByRole('heading', { name: '아파트먼트 1단지' })).toBeInTheDocument()
+    // 인트로가 한 번도 그려지지 않았으므로 토큰이 살아 있다
+    expect(localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN)).toBe('stored-token')
   })
 })

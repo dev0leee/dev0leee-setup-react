@@ -50,6 +50,16 @@ export interface LoginInfo {
   apassOnOffFlag?: boolean
 }
 
+/**
+ * A2(휴대폰 인증) → A3(비밀번호 재설정)로 넘기는 라우터 state.
+ *
+ * 레거시는 `pageTitle`도 함께 넘겼지만 A3가 그 값을 렌더하지 않아 옮기지 않았다.
+ */
+export interface PasswordResetLocationState {
+  /** 인증 성공 응답 헤더의 `authorization`. 없으면 A3가 `/`로 돌려보낸다 */
+  verifiedToken?: string | null
+}
+
 /** ProtectedRoute가 리다이렉트 시 남기는 원래 위치 */
 export interface LocationState {
   from?: { pathname: string }

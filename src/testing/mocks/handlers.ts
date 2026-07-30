@@ -15,6 +15,8 @@ export const url = ({ path }: { path: string }) => {
 export const MOCK_TOKENS = {
   ACCESS: 'mock-access-token',
   REFRESH: 'mock-refresh-token',
+  /** 휴대폰 인증 성공 시 내려오는 비밀번호 재설정 토큰 */
+  VERIFIED: 'mock-verified-token',
 } as const
 
 /** 입주민 상세정보. 구독 콘텐츠가 메뉴·알림 그룹 노출을 결정한다 */
@@ -82,5 +84,20 @@ export const handlers = [
 
   http.post(url({ path: `${API_PREFIX.APARTMANT}/token-refresh` }), () => {
     return HttpResponse.json({}, { headers: { authorization: 'refreshed-access-token' } })
+  }),
+
+  // ── 비밀번호 재설정 (`auth.md` A2·A3) ─────────────────────────────────────────
+  // ⚠️ 문자 발송은 `/apartmant/sms` 아래다 — 입주민 API 접두사가 아니다.
+  http.post(url({ path: '/apartmant/sms/password-reset/send-code' }), () => {
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.post(url({ path: '/apartmant/sms/password-reset/code-verify' }), () => {
+    // 재설정 토큰이 **헤더로** 온다. 화면은 이 값을 다음 화면에 state로 넘긴다.
+    return HttpResponse.json({}, { headers: { authorization: MOCK_TOKENS.VERIFIED } })
+  }),
+
+  http.patch(url({ path: `${API_PREFIX.APARTMANT}/re-set-password` }), () => {
+    return new HttpResponse(null, { status: 204 })
   }),
 ]

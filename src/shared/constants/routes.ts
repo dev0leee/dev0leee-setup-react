@@ -16,6 +16,13 @@ export const ROUTE_PATH = {
   /** 버전1 사용자의 약관 재동의 */
   VERSION_ONE_TERMS: '/versionOne/terms',
 
+  /** 비밀번호 재설정을 위한 휴대폰 인증 (`auth.md` A2) */
+  PASSWORD_CERT: '/password/cert',
+  /** 새 비밀번호 입력. 인증 토큰을 state로 받아야 열린다 (`auth.md` A3) */
+  PASSWORD_RESET: '/password/reset',
+  /** 가입 위저드 1단계. 인트로가 링크하지만 화면은 SignUp 이관에서 만든다 */
+  SIGNUP_TERMS: '/signup/terms',
+
   /** 일시적 오류 안내. 미인증 상태로도 열린다 */
   ERROR: '/error',
   /** 같은 화면이지만 인증 레이아웃 하위라 하단 탭이 보인다 (`exception.md` E2) */
@@ -36,4 +43,10 @@ export const ROUTE_PATH = {
 
   /** 약관 본문. `:termsId`에 `TERMS_ITEMS`의 id가 들어간다 */
   TERMS_OF_USE_DETAIL: '/termsOfUse',
+
+  /**
+   * 소방 자가점검 완료. **화면은 FireInspection 이관 때 온다** —
+   * 지금은 뒤로가기 차단 목록(`app/navigationBlocking.ts`)이 이 경로를 참조한다.
+   */
+  FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
 } as const
