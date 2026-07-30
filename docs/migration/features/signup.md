@@ -446,11 +446,17 @@ navigateTo('/signup/info/user')
 
 | 상태          | 클래스                                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------------------ |
-| 선택됨        | `bg-primary-400 text-white pretendard-16SemiBold`                                                            |
+| 선택됨        | `bg-primary-400 text-white pretendard-16SemiBold` → ⚠️ **`bg-primary-pc-indigo-400`으로 옮긴다**             |
 | 미선택        | `border-neutral-b-gray-300 bg-neutral-b-gray-100`                                                            |
 | 공통 (왼쪽)   | `flex h-11 w-full items-center justify-center gap-[7px] rounded-l-lg border ... px-3 py-[14px]`              |
 | 공통 (오른쪽) | 〃 `rounded-r-lg`                                                                                            |
 | 컨테이너      | `flex h-11 items-start self-stretch text-left font-normal leading-[14px] text-defaults-primary-text-primary` |
+
+> 🔴 **`bg-primary-400`은 config에 없어 아무 효과가 없다.** 그대로 옮기면 선택 시 배경이 사라지고
+> `text-white`만 남아 **흰 글자가 흰 배경에 묻힌다** — 선택 표시가 보이지 않는다.
+> ✅ **2026-07-30 확정: `bg-primary-pc-indigo-400`(`#7F98F9`)으로 복원한다** (사용자 결정).
+> 죽은 클래스 26건 중 **렌더값이 아니라 의도된 색으로 옮기는 유일한 자리**다
+> (`broken-styles.md` §0 예외).
 
 값: `householdHead` \| `householdMember`. 상수는 화면 안에 인라인 정의돼 있다
 (`SIGNUP_APT_INFO_IS_HOUSEHOLD_HEAD`) — 타깃에서는 `features/signup/constants/`로.

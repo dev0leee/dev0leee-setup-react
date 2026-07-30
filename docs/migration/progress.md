@@ -111,7 +111,7 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | ----------------- | -----: | ---: | -------- | -------- | ---------------------------------------------------------------- |
 | Login             |      5 |  463 | **완료** | 부분     | A1~A4 완료 (`40659c4`). A5·A6은 SignUp과 함께                    |
 | Intro             |      2 |  121 | **완료** | **완료** | ← `40659c4` (A1)                                                 |
-| SignUp            |      8 |  703 | **완료** | 미착수   | 🔴 `SignUpAptInfoRadio` 선택 표시 결정 필요                      |
+| SignUp            |      8 |  703 | **완료** | 미착수   | 착수 블로커 없음 (`SignUpAptInfoRadio` 결정 완료)                |
 | Exception         |      4 |  149 | **완료** | 부분     | E1·E2·E3 완료 (`aabe9dd`). opinion E4~E7은 opinion 엔트리와 함께 |
 | Main              |     22 | 1708 | **완료** | 미착수   |                                                                  |
 | MyPage            |     19 | 1149 | **완료** | **완료** | ← Phase 5 파일럿 (`10057cf`)                                     |
@@ -352,8 +352,9 @@ Sentry 통합 자체를 걷어내려면 `env` 스키마·`main.tsx`·`QueryError
 | `bg-neutral-10` · `bg-brand-...-brand-secondary`                       | 배경 없음        | 클래스 제거                 |
 
 > 디자이너 의도 복원(파랑 제목·회색 placeholder·연파랑 배경)은 **전환 후 별도 작업**이다.
-> 예외는 `SignUpAptInfoRadio`뿐이다 — 렌더값을 그대로 옮기면 선택 표시가 보이지 않아
-> SignUp 착수 시 결정이 필요하다 (`broken-styles.md` §0).
+> 예외는 `SignUpAptInfoRadio` 하나다 — ✅ **2026-07-30 확정: `bg-primary-pc-indigo-400`
+> (`#7F98F9`)으로 복원한다.** 렌더값을 그대로 옮기면 선택된 칩이 흰 글자만 남아 보이지 않는다.
+> **이 자리에 한정된 예외이며 나머지 25건은 렌더값 규칙 그대로다** (`broken-styles.md` §0).
 
 ### B. 공용 인프라 ↔ 소비 도메인 (Phase 4에서 대부분 해소)
 
