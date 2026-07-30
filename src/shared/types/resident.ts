@@ -36,12 +36,21 @@ export const RESIDENT_STATE = {
   APPROVED: 'APPROVED',
 } as const
 
-/** `GET /apt-resident/apt` 항목. 로그인 직후와 전출 처리에서 쓴다 */
+/**
+ * `GET /apt-resident/apt` 항목. 로그인 직후·전출 처리·단지 전환 드로어가 쓴다.
+ *
+ * `dong`·`ho`·`aptAddress`는 **드로어 목록 표시용**이다 (`main.md` §4).
+ * 로그인 직후 경로는 `aptResidentUuid`·`aptUuid`만 본다.
+ */
 export interface ResidentApt {
   aptResidentUuid?: string
   aptUuid?: string
   aptName?: string
+  /** `APPROVED`가 아니면 전환할 수 없다 */
   residentState?: string
+  dong?: string
+  ho?: string
+  aptAddress?: string
 }
 
 /**

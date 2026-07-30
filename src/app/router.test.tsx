@@ -70,9 +70,12 @@ describe('로그인 → 메인 진입', () => {
     await userEvent.type(screen.getByPlaceholderText('비밀번호'), 'abcd1234!')
     await userEvent.click(screen.getByRole('button', { name: '로그인' }))
 
-    // 단지 이름이 보이면 aptInfo 적재까지 끝난 것이다.
-    expect(await screen.findByRole('heading', { name: '아파트먼트 1단지' })).toBeInTheDocument()
-    expect(screen.getByText('홍길동님')).toBeInTheDocument()
+    // 단지 헤더가 보이면 aptInfo 적재 → 단지 상세 조회까지 끝난 것이다.
+    // ⚠️ 아파트명은 어절마다 `<span>`으로 쪼개지고 사이에 `&nbsp;`가 들어간다.
+    // `getByRole(name)`은 nbsp를 일반 공백으로 정규화하지 않아 매칭되지 않는다 →
+    // `toHaveTextContent`로 본다 (`recipe.md` §10).
+    expect(await screen.findByAltText('토글 아이콘')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('아파트먼트 1단지')
 
     // 헤더로 온 토큰이 레거시 키에 raw로 저장됐는지
     expect(localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN)).toBe('mock-access-token')
@@ -164,7 +167,7 @@ describe('로그인 → 메인 진입', () => {
 
     await renderApp({ initialPath: '/intro' })
 
-    expect(await screen.findByRole('heading', { name: '아파트먼트 1단지' })).toBeInTheDocument()
+    expect(await screen.findByAltText('토글 아이콘')).toBeInTheDocument()
     // 인트로가 한 번도 그려지지 않았으므로 토큰이 살아 있다
     expect(localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN)).toBe('stored-token')
   })

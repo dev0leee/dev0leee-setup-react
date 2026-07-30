@@ -474,6 +474,21 @@ renderWithProviders({
 
 라우터 state로 값을 받는 화면은 `initialEntries`에 객체를 넘겨 그 state까지 만든다.
 
+### `&nbsp;`가 있으면 `getByRole(name)`이 안 맞는다
+
+접근성 이름 계산은 `&nbsp;`(U+00A0)를 일반 공백으로 정규화하지 **않는다.** 화면에는
+`아파트먼트 1단지`로 보여도 `getByRole('heading', { name: '아파트먼트 1단지' })`는 실패한다.
+
+```ts
+// BAD — nbsp 때문에 매칭 실패
+screen.getByRole('heading', { name: '아파트먼트 1단지' })
+
+// GOOD — toHaveTextContent 는 공백을 정규화한다
+expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('아파트먼트 1단지')
+```
+
+어절 단위 줄바꿈처럼 **`&nbsp;`를 의도적으로 쓰는 마크업**(메인 단지 헤더)에서 걸린다.
+
 ### 타이머는 `vi.useFakeTimers({ shouldAdvanceTime: true })`
 
 `userEvent`는 내부에서 타이머를 쓴다. 옵션 없이 가짜 타이머를 켜면 `userEvent`가 멈춘다.
