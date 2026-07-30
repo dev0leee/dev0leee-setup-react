@@ -15,11 +15,9 @@ import '@/index.css'
 if (env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: env.VITE_SENTRY_DSN,
-    environment: env.VITE_ENV,
+    environment: env.APP_ENV,
     tracesSampleRate:
-      env.VITE_ENV === 'production'
-        ? PRODUCTION_TRACES_SAMPLE_RATE
-        : DEVELOPMENT_TRACES_SAMPLE_RATE,
+      env.APP_ENV === 'production' ? PRODUCTION_TRACES_SAMPLE_RATE : DEVELOPMENT_TRACES_SAMPLE_RATE,
   })
 }
 

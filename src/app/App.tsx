@@ -36,7 +36,7 @@ export const App = () => {
       />
       {/* 전역 오버레이는 App이 소유한다. 띄우는 쪽은 showErrorModal()만 부른다. */}
       <ErrorModal />
-      {env.VITE_ENV !== 'production' && <ReactQueryDevtools initialIsOpen={false} />}
+      {env.APP_ENV !== 'production' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )
 }

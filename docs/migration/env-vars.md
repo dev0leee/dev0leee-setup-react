@@ -104,7 +104,7 @@ if (import.meta.env.MODE === 'development') {
 | 용도               | 이관                                                                                                                                                             |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | opinion 분기 (2-1) | **`env`로 옮기지 않는다.** 빌드 구성 문제이므로 Phase 0-6 결정에 종속. 멀티 엔트리를 유지하면 `vite.config.ts`에서만 `mode`를 읽는다(설정 파일은 ESLint 대상 밖) |
-| 개발 게이트 (2-2)  | `env.VITE_ENV === 'development'`로 대체. 동작 등가 (개발 편의 기능이라 프로덕션 영향 없음)                                                                       |
+| 개발 게이트 (2-2)  | **`env.APP_ENV === 'development'`로 대체.** `APP_ENV`는 `.env` 변수가 아니라 `MODE`에서 파생된다(§7) — 레거시와 판단 근거가 같다                                 |
 
 > 23곳 중 대부분이 2-2 유형으로 보이나 **Phase 3에서 전수 분류가 필요하다.**
 > 새 예외가 필요하면 ESLint override와 README를 함께 고친다(타깃 CLAUDE.md 규칙 1).
@@ -115,12 +115,12 @@ if (import.meta.env.MODE === 'development') {
 
 `src/config/env.ts`가 zod로 부팅 시 검증한다. 실패하면 throw.
 
-| 변수              | 스키마                                                               | 비고                      |
-| ----------------- | -------------------------------------------------------------------- | ------------------------- |
-| `VITE_API_URL`    | `z.url()` — 필수                                                     |                           |
-| `VITE_ENV`        | `z.enum(['development','staging','production'])` — 필수              | 레거시엔 `staging`이 없다 |
-| `VITE_SENTRY_DSN` | `z.string().optional()`                                              |                           |
-| `VITE_ENABLE_MSW` | `z.enum(['true','false']).default('false').transform(...)` → boolean | 레거시에 없음 (신규)      |
+| 변수              | 스키마                                                               | 비고                                        |
+| ----------------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| `VITE_API_URL`    | `z.url()` — 필수                                                     |                                             |
+| `VITE_ENV`        | `z.enum(['development','staging','production'])` — 필수              | ⚠️ **폐기됨** — §7에서 `MODE` 파생으로 대체 |
+| `VITE_SENTRY_DSN` | `z.string().optional()`                                              |                                             |
+| `VITE_ENABLE_MSW` | `z.enum(['true','false']).default('false').transform(...)` → boolean | 레거시에 없음 (신규)                        |
 
 `.env` 파일: `.env.example` · `.env.development` · `.env.test` · `.env.production`
 
@@ -128,23 +128,23 @@ if (import.meta.env.MODE === 'development') {
 
 ## 4. 매핑표 — 이관 후 `config/env.ts`
 
-| 레거시                            | 타깃                         | 조치                                                                |
-| --------------------------------- | ---------------------------- | ------------------------------------------------------------------- |
-| `VITE_SERVER_REQUEST_SERVICE_URL` | **`VITE_API_URL`**           | **이름 변경.** 타깃 `apiClient.ts`가 이미 `env.VITE_API_URL`을 쓴다 |
-| `VITE_BASE_URL`                   | `VITE_BASE_URL`              | 추가                                                                |
-| `VITE_S3_BUCKET_URL_FILE`         | `VITE_S3_BUCKET_URL_FILE`    | 추가                                                                |
-| `VITE_S3_BUCKET_URL_STATICS`      | `VITE_S3_BUCKET_URL_STATICS` | 추가                                                                |
-| `VITE_VERSION_ONE_URL`            | `VITE_VERSION_ONE_URL`       | 추가                                                                |
-| `VITE_TERMS_URL`                  | `VITE_TERMS_URL`             | 추가                                                                |
-| `VITE_COMMUNITY_URL`              | `VITE_COMMUNITY_URL`         | 추가                                                                |
-| `VITE_POSTHOG_PROJECT_TOKEN`      | `VITE_POSTHOG_PROJECT_TOKEN` | 추가 (optional)                                                     |
-| `VITE_POSTHOG_HOST`               | `VITE_POSTHOG_HOST`          | 추가 (optional)                                                     |
-| `VITE_BUILD_ID`                   | `VITE_BUILD_ID`              | 추가 (optional — 로컬은 `'local'` 폴백)                             |
-| `VITE_SENTRY_DSN`                 | `VITE_SENTRY_DSN`            | **이미 있음**                                                       |
-| `SENTRY_AUTH_TOKEN`               | 동일                         | Node 측. `env.ts` 대상 아님                                         |
-| `import.meta.env.MODE`            | `VITE_ENV` + 빌드 모드       | §2                                                                  |
-| —                                 | `VITE_ENV`                   | 타깃 필수. 레거시 `MODE`를 대체                                     |
-| —                                 | `VITE_ENABLE_MSW`            | 타깃 전용 (개발/테스트)                                             |
+| 레거시                            | 타깃                          | 조치                                                                |
+| --------------------------------- | ----------------------------- | ------------------------------------------------------------------- |
+| `VITE_SERVER_REQUEST_SERVICE_URL` | **`VITE_API_URL`**            | **이름 변경.** 타깃 `apiClient.ts`가 이미 `env.VITE_API_URL`을 쓴다 |
+| `VITE_BASE_URL`                   | `VITE_BASE_URL`               | 추가                                                                |
+| `VITE_S3_BUCKET_URL_FILE`         | `VITE_S3_BUCKET_URL_FILE`     | 추가                                                                |
+| `VITE_S3_BUCKET_URL_STATICS`      | `VITE_S3_BUCKET_URL_STATICS`  | 추가                                                                |
+| `VITE_VERSION_ONE_URL`            | `VITE_VERSION_ONE_URL`        | 추가                                                                |
+| `VITE_TERMS_URL`                  | `VITE_TERMS_URL`              | 추가                                                                |
+| `VITE_COMMUNITY_URL`              | `VITE_COMMUNITY_URL`          | 추가                                                                |
+| `VITE_POSTHOG_PROJECT_TOKEN`      | `VITE_POSTHOG_PROJECT_TOKEN`  | 추가 (optional)                                                     |
+| `VITE_POSTHOG_HOST`               | `VITE_POSTHOG_HOST`           | 추가 (optional)                                                     |
+| `VITE_BUILD_ID`                   | `VITE_BUILD_ID`               | 추가 (optional — 로컬은 `'local'` 폴백)                             |
+| `VITE_SENTRY_DSN`                 | `VITE_SENTRY_DSN`             | **이미 있음**                                                       |
+| `SENTRY_AUTH_TOKEN`               | 동일                          | Node 측. `env.ts` 대상 아님                                         |
+| `import.meta.env.MODE`            | **`env.APP_ENV`** (MODE 파생) | §2 · §7                                                             |
+| —                                 | ~~`VITE_ENV`~~                | **변수로 두지 않는다.** `MODE`에서 파생 (§7)                        |
+| —                                 | `VITE_ENABLE_MSW`             | 타깃 전용 (개발/테스트)                                             |
 
 ### 확장 후 `env.ts` 스키마 (초안)
 
@@ -152,7 +152,7 @@ if (import.meta.env.MODE === 'development') {
 const envSchema = z.object({
   // 필수
   VITE_API_URL: z.url(), // ← SERVER_REQUEST_SERVICE_URL
-  VITE_ENV: z.enum(['development', 'staging', 'production']),
+  // VITE_ENV는 폐기됐다 — env.APP_ENV가 MODE에서 파생한다 (§7)
   VITE_BASE_URL: z.url(),
   VITE_S3_BUCKET_URL_FILE: z.url(),
   VITE_S3_BUCKET_URL_STATICS: z.url(),
@@ -200,13 +200,41 @@ const envSchema = z.object({
 | -------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ~~V-Q1~~ | ~~`VITE_POSTHOG_TOKEN` vs `VITE_POSTHOG_PROJECT_TOKEN`~~                    | **확정** — 코드는 `VITE_POSTHOG_PROJECT_TOKEN`만 읽는다(`lib/posthog/posthog.js:8`). `VITE_POSTHOG_TOKEN`은 CI에만 있는 미사용 시크릿이라 이관 대상이 아니다. `VITE_POSTHOG_HOST`에는 `'https://us.i.posthog.com'` 폴백이 있다 |
 | ~~V-Q2~~ | ~~opinion 빌드에 메인 앱 변수(약관·커뮤니티·버전1 URL)를 주입해도 되는가?~~ | **해소 — 주입 불필요하게 설계했다** (§7). 스키마를 둘로 갈라 opinion이 메인 전용 변수를 모르게 만들었다. 배포 쪽 변경도 없다                                                                                                   |
-| V-Q3     | `VITE_ENV`에 `staging`이 실제로 필요한가?                                   | 레거시는 dev/prod 2단계뿐. 타깃 스키마엔 staging이 있다. **코드가 이 값으로 분기하는 곳은 없어** 남겨둬도 무해하다 — 실제 staging 환경이 생길 때 정리                                                                          |
+| ~~V-Q3~~ | ~~`VITE_ENV`에 `staging`이 실제로 필요한가?~~                               | **소멸** — `VITE_ENV` 자체를 없앴다(§7). `--mode staging`으로 빌드하면 `APP_ENV`가 `staging`이 되므로 변수도 CI 설정도 필요 없다                                                                                               |
 
 ---
 
 ## 7. Phase 4 1단계 적용 결과 (2026-07-30)
 
 `src/config/env.ts`를 확장했다. §4 초안과 **한 곳이 다르다** — 스키마를 하나로 합치지 않았다.
+
+### `VITE_ENV`를 없앴다 — `MODE`에서 파생한다
+
+§4 초안은 `VITE_ENV`를 필수 변수로 뒀지만 **변수로 두지 않는 것이 맞다.**
+
+`--mode`가 이미 환경을 결정하는데 변수로 또 받으면 둘이 어긋날 수 있다.
+`--mode production`으로 빌드하면서 `.env`에 `VITE_ENV=development`가 남아 있으면
+**프로덕션에서 스택트레이스가 노출되고 Sentry가 dev로 태깅된다.** 조용히 잘못되는 실패다.
+레거시도 `import.meta.env.MODE`로 판단했으므로 파생이 등가이기도 하다.
+
+`env.APP_ENV`가 `resolveAppEnv()`로 파생된다 (`VITE_` 접두사가 없는 이유):
+
+| 빌드 모드             | `APP_ENV`                        |
+| --------------------- | -------------------------------- |
+| `production`          | `'production'`                   |
+| `production.opinion`  | `'production'`                   |
+| `development`         | `'development'`                  |
+| `development.opinion` | `'development'`                  |
+| `staging`             | `'staging'`                      |
+| `test` (vitest)       | `'development'`                  |
+| 그 외                 | `'development'` + `console.warn` |
+
+**게이트하는 것 5곳**: Sentry `environment`·트레이스 샘플링(`main.tsx`),
+React Query Devtools(`App.tsx`), 에러 화면의 스택트레이스 노출(`fallbacks.tsx`),
+네이티브 메시지 콘솔 로그(`native/bridge.ts`).
+
+→ `.env`·CI에서 한 줄이 줄고, **V-Q3(staging 필요 여부)도 소멸한다** —
+`--mode staging`으로 빌드하면 그만이다.
 
 ### 스키마를 둘로 나눈 이유
 
@@ -215,7 +243,7 @@ const envSchema = z.object({
 
 | 스키마           | 변수                                                                                            | 검증 시점                                    |
 | ---------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `sharedSchema`   | `VITE_API_URL` · `VITE_ENV` · `VITE_BASE_URL` · `VITE_S3_BUCKET_URL_FILE` + 선택 5종            | **모듈 로드 시** — 두 빌드 공통              |
+| `sharedSchema`   | `VITE_API_URL` · `VITE_BASE_URL` · `VITE_S3_BUCKET_URL_FILE` + 선택 5종                         | **모듈 로드 시** — 두 빌드 공통              |
 | `mainOnlySchema` | `VITE_S3_BUCKET_URL_STATICS` · `VITE_VERSION_ONE_URL` · `VITE_TERMS_URL` · `VITE_COMMUNITY_URL` | `getMainEnv()` 최초 호출 시 (`src/main.tsx`) |
 
 - 메인 앱: `main.tsx`가 부팅 때 `getMainEnv()`를 부르므로 **fail-fast가 유지된다**
@@ -243,6 +271,8 @@ const envSchema = z.object({
 
 ```dotenv
 # 필수 — 값이 없으면 부팅 시 터진다. 전부 스킴(https://)까지 있는 URL이어야 한다
+# ⚠️ VITE_SERVER_REQUEST_SERVICE_URL을 이 이름으로 바꿔야 한다
+VITE_API_URL=https://...
 VITE_BASE_URL=https://...
 VITE_S3_BUCKET_URL_FILE=https://...
 VITE_S3_BUCKET_URL_STATICS=https://...

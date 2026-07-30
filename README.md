@@ -107,7 +107,6 @@ e2e/            Playwright
 | 변수                                                                                            | 필수                      | 비고                                       |
 | ----------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
 | `VITE_API_URL`                                                                                  | ✅                        | API 서버 baseURL                           |
-| `VITE_ENV`                                                                                      | ✅                        | `development` \| `staging` \| `production` |
 | `VITE_BASE_URL`                                                                                 | ✅                        | 앱 자신의 배포 URL                         |
 | `VITE_S3_BUCKET_URL_FILE`                                                                       | ✅                        | 첨부파일 버킷                              |
 | `VITE_S3_BUCKET_URL_STATICS` · `VITE_VERSION_ONE_URL` · `VITE_TERMS_URL` · `VITE_COMMUNITY_URL` | ✅ (메인 앱만)            | `getMainEnv()`가 검증. opinion 빌드는 제외 |
@@ -117,9 +116,32 @@ e2e/            Playwright
 | `VITE_POSTHOG_HOST`                                                                             | — (기본 us.i.posthog.com) |                                            |
 | `VITE_ENABLE_MSW`                                                                               | — (기본 `false`)          | 개발 중 목 서버                            |
 
+**필수 변수는 값을 비워두면 부팅 시 터진다. 선택 변수는 키만 두고 비워둬도 된다** —
+`.env`에 `KEY=`만 있으면 Vite가 빈 문자열을 주는데, 선택 변수는 그것을 미설정으로 바꿔
+기본값으로 떨어뜨린다(`optionalEnv`).
+
 **메인 앱 전용 변수 4개는 `env`가 아니라 `getMainEnv()`로 읽는다.** opinion 빌드에는 이 변수가
 주입되지 않으므로(`docs/migration/env-vars.md` §1-2) `env`에 합치면 opinion 앱이 부팅하지 못한다.
 `src/main.tsx`가 부팅 시 `getMainEnv()`를 한 번 불러 메인 앱의 fail-fast를 유지한다.
+
+### `env.APP_ENV` — 변수가 아니다
+
+배포 환경은 **`.env`로 받지 않고 Vite `MODE`에서 파생한다.** 이름에 `VITE_` 접두사가 없는 이유다.
+
+```
+--mode production         → 'production'
+--mode production.opinion → 'production'   (opinion 접미사는 떼고 본다)
+--mode development        → 'development'
+vitest (MODE=test)        → 'development'
+```
+
+`--mode`가 이미 환경을 결정하는데 변수로 또 받으면 둘이 어긋날 수 있다. `--mode production`으로
+빌드하면서 `VITE_ENV=development`가 남아 있으면 **프로덕션에서 스택트레이스가 노출되고
+Sentry가 dev로 태깅된다.** 파생시키면 그 실패가 불가능해진다.
+
+새 배포 모드를 만들면 `src/config/env.ts`의 `resolveAppEnv()`에 한 줄 추가한다.
+`APP_ENV`가 게이트하는 것: Sentry `environment`·트레이스 샘플링, React Query Devtools,
+에러 화면의 스택트레이스 노출, 네이티브 메시지 콘솔 로그.
 
 ### `import.meta.env` 직접 접근이 허용되는 곳 (공식 예외 2곳)
 

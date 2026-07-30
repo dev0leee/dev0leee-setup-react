@@ -6,7 +6,7 @@ import { Button } from '@/shared/components/ui/button'
 import type { DevDetailProps } from '@/shared/types/fallbacks'
 
 const DevDetail = ({ error }: DevDetailProps) => {
-  if (env.VITE_ENV === 'production') return null
+  if (env.APP_ENV === 'production') return null
   const message = error instanceof Error ? error.message : String(error)
   return <pre className="mt-2 text-xs break-all text-muted-foreground">{message}</pre>
 }

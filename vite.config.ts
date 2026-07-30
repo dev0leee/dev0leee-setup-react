@@ -20,7 +20,6 @@ export default defineConfig({
        로컬·CI가 같은 값으로 돌게 만든다. config/env.ts의 zod 스키마와 함께 유지할 것. */
     env: {
       VITE_API_URL: 'https://api.test.local',
-      VITE_ENV: 'development',
       VITE_BASE_URL: 'https://app.test.local',
       VITE_S3_BUCKET_URL_FILE: 'https://file.test.local',
       VITE_S3_BUCKET_URL_STATICS: 'https://statics.test.local',

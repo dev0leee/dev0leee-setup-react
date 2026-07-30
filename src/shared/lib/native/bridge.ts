@@ -46,7 +46,7 @@ export const sendToNative = ({ type, data }: { type: string; data?: unknown }): 
 
   // 레거시는 `import.meta.env.MODE === 'development'`로 게이트했다.
   // 개발 편의 기능이라 동작 등가성에 영향이 없다.
-  if (env.VITE_ENV === 'development') console.warn('[native] →', message)
+  if (env.APP_ENV === 'development') console.warn('[native] →', message)
 
   try {
     if (isIOS) {

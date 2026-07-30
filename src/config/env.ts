@@ -5,6 +5,32 @@ import { z } from 'zod'
  * 시크릿은 절대 넣지 말 것.
  */
 
+/** 배포 환경. `.env` 변수가 아니라 Vite `MODE`에서 파생된다 */
+export type AppEnv = 'development' | 'staging' | 'production'
+
+/**
+ * 배포 환경을 Vite `MODE`에서 뽑는다.
+ *
+ * **`.env`에 따로 적지 않는다.** `--mode`가 이미 환경을 결정하는데 변수로 또 받으면
+ * 둘이 어긋날 수 있다 — `--mode production`으로 빌드하면서 `VITE_ENV=development`가
+ * 남아 있으면 프로덕션에서 스택트레이스가 노출되고 Sentry가 dev로 태깅된다.
+ * 레거시도 `import.meta.env.MODE`로 판단했다.
+ *
+ * opinion 빌드는 `production.opinion`처럼 접미사가 붙으므로 첫 조각만 본다.
+ * vitest는 `test`인데, 프로덕션이 아니면 전부 개발로 취급하면 되므로 따로 다루지 않는다.
+ */
+const resolveAppEnv = (): AppEnv => {
+  const [baseMode] = import.meta.env.MODE.split('.')
+
+  if (baseMode === 'production') return 'production'
+  if (baseMode === 'staging') return 'staging'
+  if (baseMode === 'development' || baseMode === 'test') return 'development'
+
+  // 새 배포 모드를 만들었으면 위에 한 줄 추가한다. 조용히 개발로 떨어지지 않게 알린다.
+  console.warn(`[env] 알 수 없는 모드 '${import.meta.env.MODE}' — development로 취급합니다.`)
+  return 'development'
+}
+
 /**
  * `.env`에 키만 두고 값을 비워두면 Vite는 `undefined`가 아니라 **빈 문자열**을 준다.
  * 그러면 `.optional()`·`.default()`가 발동하지 않아 "설정 안 함"을 표현할 수 없다.
@@ -26,7 +52,6 @@ const optionalEnv = <T extends z.ZodType>(schema: T) => {
 const sharedSchema = z.object({
   /** API 서버 baseURL. 레거시 `VITE_SERVER_REQUEST_SERVICE_URL`의 새 이름. */
   VITE_API_URL: z.url(),
-  VITE_ENV: z.enum(['development', 'staging', 'production']),
   /** 앱 자신의 배포 URL. 외부 인증 콜백의 returnUrl 등에 쓴다. */
   VITE_BASE_URL: z.url(),
   /** 첨부파일 S3 버킷 */
@@ -83,8 +108,16 @@ const parse = <T extends z.ZodType>(schema: T, label: string): z.infer<T> => {
   return parsed.data
 }
 
-/** 앱 어디서도 import.meta.env를 직접 쓰지 말고 이 객체만 사용한다. */
-export const env = parse(sharedSchema, '공통')
+/**
+ * 앱 어디서도 import.meta.env를 직접 쓰지 말고 이 객체만 사용한다.
+ *
+ * `VITE_*` 키는 `.env`에서 온 것이고, `APP_ENV`는 빌드 모드에서 파생된 것이다 —
+ * 이름에 `VITE_` 접두사가 없는 이유다. `.env`에 `VITE_APP_ENV`를 적어도 읽지 않는다.
+ */
+export const env = {
+  ...parse(sharedSchema, '공통'),
+  APP_ENV: resolveAppEnv(),
+}
 
 let mainOnlyEnv: MainOnlyEnv | null = null
 
