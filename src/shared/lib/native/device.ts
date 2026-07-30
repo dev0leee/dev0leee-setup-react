@@ -1,21 +1,21 @@
 import { ANDROID_UA_PATTERN, IOS_UA_PATTERN } from '@/shared/constants/regex'
-import { isNativeApp } from '@/shared/lib/native/bridge'
-import type { DeviceOs } from '@/shared/types/native'
+import type { DeviceOs, NativeWindow } from '@/shared/types/native'
 
 /**
- * userAgent로 OS를 감지한다. 네이티브 셸 안/밖 모두에서 동작한다.
- * "어느 네이티브 브릿지로 보낼까"는 bridge.ts가 window 객체 존재로 판단하므로,
- * 이 함수는 스타일·레이아웃을 OS로 분기하는 용도다(safe-area, 스토어 링크 등).
+ * userAgent로 OS를 감지한다. 레거시 `checkDeviceOs()` 이식.
+ *
+ * ⚠️ **브릿지 전송 분기가 이 함수 결과로 갈린다** (`native-protocol.md` P11).
+ * 템플릿은 `window.AndroidBridge` 객체 존재로 분기했는데 레거시는 UA로 분기한다.
+ * 판정 기준이 다르면 전송 형식(객체/문자열)이 뒤바뀐다.
+ *
+ * `MSStream` 체크는 레거시 원본 그대로다 — 구형 IE가 iPad UA를 흉내내던 시절의 방어다.
  */
-export const getDeviceOs = (): DeviceOs => {
+export const checkDeviceOs = (): DeviceOs => {
   const { userAgent } = navigator
+  const nativeWindow = window as unknown as NativeWindow
+
   return {
-    isIos: IOS_UA_PATTERN.test(userAgent),
+    isIOS: IOS_UA_PATTERN.test(userAgent) && !nativeWindow.MSStream,
     isAndroid: ANDROID_UA_PATTERN.test(userAgent),
   }
-}
-
-/** 네이티브 셸이 아닌 순수 웹 브라우저인지. 개발 중에는 항상 true다. */
-export const isWebBrowser = (): boolean => {
-  return !isNativeApp()
 }

@@ -8,6 +8,7 @@ import {
   DEVELOPMENT_TRACES_SAMPLE_RATE,
   PRODUCTION_TRACES_SAMPLE_RATE,
 } from '@/shared/constants/sentry'
+import { registerNativeCallbacks } from '@/shared/lib/native/register'
 
 import '@/index.css'
 
@@ -42,6 +43,10 @@ const bootstrap = async (): Promise<void> => {
   // 메인 앱 전용 환경변수를 부팅 시점에 검증한다(config/env.ts 참고).
   // opinion 엔트리는 이 호출을 하지 않는다 — 해당 변수를 주입받지 않기 때문이다.
   getMainEnv()
+
+  // window.CALLBACK_* 7종을 렌더보다 먼저 설치한다.
+  // 앱이 종료 상태에서 푸시로 열리면 React가 뜨기 전에 콜백이 날아온다.
+  registerNativeCallbacks()
 
   const rootElement = document.getElementById('root')
   if (!rootElement) throw new Error('#root 엘리먼트를 찾을 수 없습니다.')
