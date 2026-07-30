@@ -47,16 +47,16 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ### 확정된 주요 결정
 
-| 결정                                                                                                           | 문서                               |
-| -------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| **인증은 레거시 방식 그대로 유지** (헤더 토큰 + localStorage + 자동 로그인). 쿠키 전환은 전환 후 별도 작업     | `decisions/auth-strategy.md`       |
-| 인벤토리 확인 항목 11건 전부 확정                                                                              | `decisions/inventory-questions.md` |
-| **opinion 멀티 엔트리 유지** · 날짜선택기 shadcn `calendar` · 차트 `recharts` · `v-calendar` 제거              | `decisions/tech-choices.md`        |
-| **에러 모달은 Base UI Dialog로 레거시 재현** (`sweetalert2` 추가 안 함)                                        | 〃                                 |
-| **의존성 8개 승인 · `@sentry/vite-plugin` 제외 · `lodash-es` 불필요** (2026-07-30)                             | `tech-mapping.md` §12              |
-| **관리비 목업 화면(`/managementFee/info`)도 이관** — ApexCharts 2개를 recharts로 (2026-07-30)                  | `features/management-fee.md` §1    |
-| **미생성 클래스 6건을 현 Tailwind 토큰으로 매핑** — `globalColor.scss` 팔레트를 되살리지 않는다 (2026-07-30)   | `broken-styles.md` §5              |
-| **QueryClient 기본값을 레거시에 맞춘다** — 전역 토스트 끄기, `throwOnError: false`, `retry: 0`, `staleTime: 0` | 〃                                 |
+| 결정                                                                                                                                              | 문서                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| **인증은 레거시 방식 그대로 유지** (헤더 토큰 + localStorage + 자동 로그인). 쿠키 전환은 전환 후 별도 작업                                        | `decisions/auth-strategy.md`       |
+| 인벤토리 확인 항목 11건 전부 확정                                                                                                                 | `decisions/inventory-questions.md` |
+| **opinion 멀티 엔트리 유지** · 날짜선택기 shadcn `calendar` · 차트 `recharts` · `v-calendar` 제거                                                 | `decisions/tech-choices.md`        |
+| **에러 모달은 Base UI Dialog로 레거시 재현** (`sweetalert2` 추가 안 함)                                                                           | 〃                                 |
+| **의존성 8개 승인 · `@sentry/vite-plugin` 제외 · `lodash-es` 불필요** (2026-07-30)                                                                | `tech-mapping.md` §12              |
+| **관리비 목업 화면(`/managementFee/info`)도 이관** — ApexCharts 2개를 recharts로 (2026-07-30)                                                     | `features/management-fee.md` §1    |
+| **미생성 클래스를 현 Tailwind 토큰으로 표현** — `globalColor.scss` 팔레트를 되살리지 않는다. ⚠️ **화면을 바꾸라는 뜻이 아니다** (2026-07-30 정정) | `broken-styles.md` §0              |
+| **QueryClient 기본값을 레거시에 맞춘다** — 전역 토스트 끄기, `throwOnError: false`, `retry: 0`, `staleTime: 0`                                    | 〃                                 |
 
 **이관 제외 확정 (2026-07-29 사용자 재확인 — "사용처 없으면 쓰지마")**:
 미출차 내역 **일체**(라우트·컴포넌트 3·훅 2·API 2·상수) · `postRejectCarRelease` ·
@@ -281,11 +281,11 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 
 ### A. 착수 전 사용자 결정 — ✅ **3건 전부 확정 (2026-07-30)**
 
-| #     | 항목            | 결정                                                                                                                                                                                                                       |
-| ----- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | **의존성 승인** | ✅ **8개 승인** — `react-day-picker` · `dompurify` · `swiper` · `qrcode` · `html2canvas` · `quill-delta-to-html` · `he` · `posthog-js`<br>🚫 **`@sentry/vite-plugin` 제외** ("일단 sentry는 빼고") · 🚫 `lodash-es` 불필요 |
-| **2** | **`MF-Q1`**     | ✅ **관리비 목업 화면도 이관한다.** ApexCharts 2개 → recharts. 목업 데이터·`TODO` 주석 유지, 진입 경로는 만들지 않는다                                                                                                     |
-| **3** | **`B-Q2`**      | ✅ **미생성 클래스 6건을 현 Tailwind 토큰으로 매핑.** `globalColor.scss` 팔레트를 되살리지 않고 `@theme`에 새 색을 추가하지 않는다                                                                                         |
+| #     | 항목            | 결정                                                                                                                                                                                                                                                                                                                                           |
+| ----- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | **의존성 승인** | ✅ **8개 승인** — `react-day-picker` · `dompurify` · `swiper` · `qrcode` · `html2canvas` · `quill-delta-to-html` · `he` · `posthog-js`<br>🚫 **`@sentry/vite-plugin` 제외** ("일단 sentry는 빼고") · 🚫 `lodash-es` 불필요                                                                                                                     |
+| **2** | **`MF-Q1`**     | ✅ **관리비 목업 화면도 이관한다.** ApexCharts 2개 → recharts. 목업 데이터·`TODO` 주석 유지, 진입 경로는 만들지 않는다                                                                                                                                                                                                                         |
+| **3** | **`B-Q2`**      | ✅ **미생성 클래스를 현 Tailwind 토큰으로 표현.** `globalColor.scss` 팔레트를 되살리지 않고 `@theme`에 새 색을 추가하지 않는다.<br>🔴 **2026-07-30 정정** — 이 결정은 "어떤 토큰으로 표현할지"였고 **화면을 바꾸라는 것이 아니었다.** 죽은 클래스는 **렌더값**(text `#111927` · border `#E5E7EB` · bg 없음)으로 옮긴다 → `broken-styles.md` §0 |
 
 > 🎯 **Phase 4 착수 블로커 0건.**
 
@@ -302,18 +302,23 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 Sentry 통합 자체를 걷어내려면 `env` 스키마·`main.tsx`·`QueryErrorBoundary`·`sentryApiError`
 4곳을 함께 정리해야 한다 — **그 결정은 아직 받지 않았다.**
 
-#### 미생성 클래스 매핑 (`broken-styles.md` §5)
+#### 미생성 클래스 조치 (`broken-styles.md` §0)
 
-| 깨진 클래스                                   | 확정 토큰                                    | 화면 변화                 |
-| --------------------------------------------- | -------------------------------------------- | ------------------------- |
-| `border-deep-glue-20`                         | `border-defaults-secondary-border-secondary` | 미세 (`#E5E7EB`)          |
-| `border-bg-gray`                              | `border-defaults-tertiary-border-tertiary`   | 입력칸과 통일             |
-| `text-brand-primary-50` · `-100`              | `text-brand-default-text-brand`              | 🔴 **검정 → 브랜드 파랑** |
-| `border-defaults-secondary-border-primary`    | `border-defaults-primary-border-primary`     | 없음 (죽은 variant)       |
-| `bg-brand-default-background-brand-secondary` | `bg-primary-pc-indigo-50`                    | 🔴 **배경 없음 → 연파랑** |
+🔴 **2026-07-30 정정.** 이전에는 아래 표의 "확정 토큰"을 적용해 **화면이 달라지는 것**을
+의도된 변화로 적어뒀다. 그것은 결정을 잘못 기록한 것이다 — 사용자 지시는
+*"화면은 그대로여야지"*였다. **이관 시에는 레거시가 실제로 렌더한 값을 쓴다.**
 
-🔴 **아래 두 건은 눈에 보이는 변화다** — 도메인 이관 시 대조 필수.
-MyPage·관리사무소 제목이 파랑으로, 소방 점검표 라디오(21×2)·이사예약 라디오에 연파랑 배경이 생긴다.
+| 깨진 클래스                                                            | 레거시 렌더값    | 이관 시 쓸 것               |
+| ---------------------------------------------------------------------- | ---------------- | --------------------------- |
+| `text-brand-primary-50` · `-100`                                       | 상속색 `#111927` | `text-neutral-b-gray-900`   |
+| `text-neutral-90`                                                      | 〃               | 〃 (값이 같아 그대로)       |
+| `text-neutral-70` · `-40`                                              | 〃               | 〃                          |
+| `border-neutral-20` · `-10` · `border-deep-glue-20` · `border-bg-gray` | 기본 `#E5E7EB`   | `border-neutral-b-gray-200` |
+| `bg-neutral-10` · `bg-brand-...-brand-secondary`                       | 배경 없음        | 클래스 제거                 |
+
+> 디자이너 의도 복원(파랑 제목·회색 placeholder·연파랑 배경)은 **전환 후 별도 작업**이다.
+> 예외는 `SignUpAptInfoRadio`뿐이다 — 렌더값을 그대로 옮기면 선택 표시가 보이지 않아
+> SignUp 착수 시 결정이 필요하다 (`broken-styles.md` §0).
 
 ### B. 공용 인프라 ↔ 소비 도메인 (Phase 4에서 대부분 해소)
 

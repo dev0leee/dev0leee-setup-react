@@ -103,7 +103,7 @@ export const PasswordEditModal = ({ open, onClose }: { open: boolean; onClose: (
               <div key={field.id} className={field.className}>
                 <label
                   htmlFor={field.id}
-                  className="mb-1 block pretendard-14Medium text-neutral-b-gray-700"
+                  className="mb-1 block pretendard-14Medium text-neutral-b-gray-900"
                 >
                   {field.label} <span className="text-[#ef4444]">*</span>
                 </label>

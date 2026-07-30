@@ -300,7 +300,28 @@ vee-validate는 입력 중 검증한다. RHF 기본(`onSubmit`)을 쓰면 에러
 - **의사요소는 Tailwind로 표현할 수 없다** → `src/index.css`에 원시 CSS로 넣는다
   (`14-styling.md`의 문서화된 예외). 전역이므로 **클래스명을 구체적으로** 짓고
   (`progress-bar` → `font-size-progress`) `@apply` 대신 값을 풀어 쓴다
-- 오타 클래스는 `broken-styles.md`의 결정을 따른다 — 렌더 결과가 같아지는 쪽으로
+
+### 죽은 클래스 (MUST) — Phase 5에서 실제로 틀린 자리
+
+레거시에는 **`tailwind.config.js`에 없어서 아무 효과가 없는 클래스가 26개** 있다
+(`broken-styles.md`). 옮길 때 **이름이 암시하는 색이 아니라 실제로 렌더된 값**을 쓴다.
+
+| 종류       | 레거시 렌더값    | 쓸 것                                             |
+| ---------- | ---------------- | ------------------------------------------------- |
+| `text-*`   | 상속색 `#111927` | `text-neutral-b-gray-900`                         |
+| `border-*` | 기본 `#E5E7EB`   | `border-neutral-b-gray-200` (또는 색 클래스 제거) |
+| `bg-*`     | 없음             | 클래스 제거                                       |
+
+`text-brand-primary-50`이라는 이름을 보고 브랜드 파랑을 넣으면 **레거시 화면과 달라진다.**
+Phase 5에서 MyPage 11곳을 그렇게 바꿨다가 되돌렸다 — `broken-styles.md` §0이 정본이다.
+**디자이너 의도 복원은 전환 후 별도 작업이다.**
+
+> 판정이 애매하면 레거시 `tailwind.config.js`를 직접 조회한다:
+> `node -e "const c=require('./tailwind.config.js'); ..."` (`broken-styles.md` §0)
+
+**빌드 산출물로 검증한다.** Tailwind는 없는 토큰의 유틸리티를 조용히 생성하지 않으므로,
+`pnpm build` 후 `dist/assets/*.css`에 `.클래스명` 셀렉터가 있는지 확인한다 — 눈으로는
+"색이 좀 흐린가?" 정도로만 보여서 UI 대조로 잡히지 않는다.
 
 ---
 

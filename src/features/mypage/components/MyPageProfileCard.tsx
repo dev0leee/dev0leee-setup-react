@@ -35,7 +35,7 @@ export const MyPageProfileCard = () => {
         }}
       >
         <div className="flex items-center gap-2.5">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-neutral-b-gray-100 bg-neutral-b-gray-100">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-neutral-b-gray-200">
             <img
               className="h-12 w-12 shrink-0"
               src="/assets/images/Profile.svg"

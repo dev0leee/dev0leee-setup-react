@@ -4,7 +4,6 @@ import { PROFILE_TEXT } from '@/features/mypage/constants/mypage'
 import { AppBar } from '@/shared/components/layouts/AppBar'
 import { ROUTE_PATH } from '@/shared/constants/routes'
 import { useAuthStore } from '@/shared/stores/authStore'
-import { cn } from '@/shared/utils/cn'
 
 /**
  * 내 프로필 (P2). 레거시 `MyProfileView.vue` 이식.
@@ -21,6 +20,11 @@ import { cn } from '@/shared/utils/cn'
  * 렌더 중 계산이라 자동으로 최신값이 된다 — 프로필 수정 후 돌아오면 즉시 반영된다는
  * 뜻이다. 레거시도 수정 성공 시 `navigateBack`하면서 화면을 다시 만들므로
  * **결과는 같다** (`deferred.md` D-45).
+ *
+ * ⚠️ **닉네임 미설정 시 회색으로 흐려지지 않는다.** 레거시가 `text-neutral-40`으로
+ * 그러려고 했지만 **그 클래스가 config에 없어서** 설정된 닉네임과 똑같은 색으로 렌더된다.
+ * 세 값 모두 상속색 `#111927`이다 — 그래서 값별 색 분기 없이 한 클래스로 그린다.
+ * 회색 placeholder 복원은 전환 후 별도 작업이다 (`broken-styles.md` §2).
  */
 export const ProfilePage = () => {
   const navigate = useNavigate()
@@ -32,19 +36,9 @@ export const ProfilePage = () => {
     {
       title: PROFILE_TEXT.NICKNAME_LABEL,
       data: aptInfo.residentNickName || PROFILE_TEXT.NICKNAME_PLACEHOLDER,
-      // 닉네임만 값이 없을 때 회색으로 흐려진다
-      className: aptInfo.residentNickName ? 'text-neutral-b-gray-900' : 'text-neutral-b-gray-400',
     },
-    {
-      title: PROFILE_TEXT.NAME_LABEL,
-      data: aptInfo.residentName || PROFILE_TEXT.EMPTY,
-      className: 'text-neutral-b-gray-900',
-    },
-    {
-      title: PROFILE_TEXT.APT_NAME_LABEL,
-      data: aptInfo.aptName || PROFILE_TEXT.EMPTY,
-      className: 'text-neutral-b-gray-900',
-    },
+    { title: PROFILE_TEXT.NAME_LABEL, data: aptInfo.residentName || PROFILE_TEXT.EMPTY },
+    { title: PROFILE_TEXT.APT_NAME_LABEL, data: aptInfo.aptName || PROFILE_TEXT.EMPTY },
   ]
 
   return (
@@ -61,7 +55,7 @@ export const ProfilePage = () => {
       </AppBar>
       <ul className="h-full w-full space-y-8 px-5 pt-16">
         <li className="flex items-center justify-center">
-          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-neutral-b-gray-100">
+          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-neutral-b-gray-200">
             <img className="h-20 w-20" src="/assets/images/Profile.svg" alt="프로필 이미지" />
           </div>
         </li>
@@ -71,7 +65,7 @@ export const ProfilePage = () => {
             return (
               <li key={userInfo.title} className="flex w-full items-start justify-between gap-2.5">
                 <span className="w-[140px] pretendard-15SemiBold">{userInfo.title}</span>
-                <span className={cn('pretendard-15Regular', userInfo.className)}>
+                <span className="pretendard-15Regular text-neutral-b-gray-900">
                   {userInfo.data}
                 </span>
               </li>

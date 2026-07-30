@@ -75,7 +75,7 @@ export const ProfileEditPage = () => {
       </AppBar>
 
       <div className="h-full w-full px-5 pt-16">
-        <div className="mx-auto h-20 w-20 overflow-hidden rounded-full border border-neutral-b-gray-100">
+        <div className="mx-auto h-20 w-20 overflow-hidden rounded-full border border-neutral-b-gray-200">
           <img className="h-20 w-20" src="/assets/images/Profile.svg" alt="프로필 이미지" />
         </div>
 

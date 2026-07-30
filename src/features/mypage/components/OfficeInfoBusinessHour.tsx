@@ -13,7 +13,7 @@ export const OfficeInfoBusinessHour = () => {
 
   return (
     <div className="flex flex-col items-start gap-1 self-stretch bg-base-b-white px-5 py-4">
-      <h2 className="flex items-center justify-center gap-1 px-2.5 py-[7px] pretendard-13SemiBold text-brand-default-text-brand">
+      <h2 className="flex items-center justify-center gap-1 px-2.5 py-[7px] pretendard-13SemiBold text-neutral-b-gray-900">
         <img src="/assets/icons/Clock.svg" className="h-4 w-4" alt="시간 아이콘" />
         <span>운영시간</span>
       </h2>
@@ -26,7 +26,7 @@ export const OfficeInfoBusinessHour = () => {
                 <span className="pretendard-15SemiBold text-neutral-b-gray-900">
                   {formatDay({ dayType: item.dayType })}
                 </span>
-                <div className="flex items-center justify-end gap-[2px] pretendard-15Regular text-brand-default-text-brand">
+                <div className="flex items-center justify-end gap-[2px] pretendard-15Regular text-neutral-b-gray-900">
                   {item.startTime?.slice(0, BUSINESS_HOUR_LENGTH)}~
                   {item.endTime?.slice(0, BUSINESS_HOUR_LENGTH)}
                 </div>
