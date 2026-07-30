@@ -199,7 +199,7 @@ Tailwind 3.4의 기본 스케일에 없는 숫자를 썼다. **디자인 확인 
 
 ```html
 <!-- 같은 폼 안의 텍스트 입력들 -->
-<input class="border-defaults-tertiary-border-tertiary border … …" />
+<input class="border border-defaults-tertiary-border-tertiary … …" />
 <!-- textarea만 다른 클래스였다 -->
 <textarea class="border-bg-gray border … …" />
 ```

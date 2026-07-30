@@ -763,7 +763,7 @@ icons-plus-circle-common.svg
 ### 할인내역 (조건부 아코디언)
 
 ```html
-<div v-if="reductions.length > 0" class="bg-base-b-white mt-2 flex flex-col"></div>
+<div v-if="reductions.length > 0" class="mt-2 flex flex-col bg-base-b-white"></div>
 ```
 
 - **`reductions`가 비면 섹션 전체가 없다**
@@ -780,7 +780,7 @@ icons-plus-circle-common.svg
 ```html
 <span
   v-dompurify-html="item.itemName"
-  class="text-defaults-primary-text-primary pretendard-16Medium"
+  class="pretendard-16Medium text-defaults-primary-text-primary"
 />
 ```
 
@@ -868,7 +868,7 @@ const toggleDueDateSection = () => {
 
 ```html
 <div
-  class="text-base-b-black pretendard-16SemiBold flex items-center gap-1.5"
+  class="flex items-center gap-1.5 pretendard-16SemiBold text-base-b-black"
   :class="[customClass, nonePadding ? '' : 'px-6 py-3']"
   @click="openDrawer"
 >
@@ -942,7 +942,7 @@ watch(
   <template #content>
     <ul class="flex max-h-[80vh] flex-col items-start self-stretch overflow-auto px-5">
       <li
-        class="border-defaults-tertiary-border-tertiary flex items-center self-stretch border-b p-4 last:border-b-0"
+        class="flex items-center self-stretch border-b border-defaults-tertiary-border-tertiary p-4 last:border-b-0"
         :class="isSelected(…) ? 'font-semibold text-brand-default-text-brand' : ''"
         @click="selectDate(month.year, month.month)"
       >

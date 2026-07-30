@@ -516,7 +516,7 @@ iOS에는 송수신 항목이 없다 — 4번째 항목이 사라진다.
 
 ```html
 <div
-  class="border-defaults-tertiary-border-tertiary bg-defaults-secondary-background-secondary flex h-[52px] w-full flex-col gap-3 self-stretch rounded-lg border p-4"
+  class="flex h-[52px] w-full flex-col gap-3 self-stretch rounded-lg border border-defaults-tertiary-border-tertiary bg-defaults-secondary-background-secondary p-4"
 >
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-3">
@@ -598,7 +598,7 @@ iOS에는 송수신 항목이 없다 — 4번째 항목이 사라진다.
 
 ```html
 <div
-  class="text-base-b-black pretendard-12SemiBold flex h-5 w-fit items-center gap-[2px] rounded-[31px] bg-[rgba(0,187,64,0.1)] px-1.5 py-[3px]"
+  class="flex h-5 w-fit items-center gap-[2px] rounded-[31px] bg-[rgba(0,187,64,0.1)] px-1.5 py-[3px] pretendard-12SemiBold text-base-b-black"
 >
   <svg width="5" height="6" viewBox="0 0 5 6">
     <circle cx="2.54663" cy="3" r="2.04663" fill="#00BB40" />

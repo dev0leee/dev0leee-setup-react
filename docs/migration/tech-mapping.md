@@ -377,6 +377,56 @@ zod 3→4 변환은 `zod-migration.md`. 폼 컴포넌트(`InputBase`·`InputPass
 라우트 meta의 `appBarBackgroundColor` hex 직접 지정 4곳(`#f9fafb` ×3, `#f3f4f6`, `rgba(248,248,248)`)도
 그대로 유지한다.
 
+### 10-1. ⚠️ Tailwind 3 → 4 클래스 이름·값 변경 (2026-07-30 실측)
+
+**레거시 마크업을 그대로 붙여넣으면 조용히 깨지는 클래스가 있다.**
+`.vue` 306개의 `class` 속성에서 토큰 1,118종을 뽑아 전수 대조한 결과 **대상은 4종 55곳**이다.
+
+| 레거시 (v3)       | 곳수 | v4에서 벌어지는 일                                 | **이관 시 쓸 것**  |
+| ----------------- | ---: | -------------------------------------------------- | ------------------ |
+| `rounded`         |   46 | 🔴 **v4에 없는 클래스 → 무시된다** (모서리가 각짐) | `rounded-sm`       |
+| `bg-opacity-50`   |    1 | 🔴 **v4에서 제거 → 무시된다**                      | `bg-black/50` 형태 |
+| `bg-opacity-75`   |    1 | 〃                                                 | `bg-black/75` 형태 |
+| `shadow-sm`       |    1 | v4 `shadow-sm`은 v3 `shadow` 값이다 (더 진해짐)    | `shadow-xs`        |
+| `outline-none`    |    1 | v3는 투명 2px 아웃라인, v4는 `outline-style:none`  | `outline-hidden`   |
+| `text-red-500`    |    5 | v4 기본 팔레트가 oklch로 바뀜 (#EF4444 → #FB2C36)  | `text-[#ef4444]`   |
+| `bg-slate-100`    |    2 | 〃 (차이 미세)                                     | 그대로 둬도 무방   |
+| `text-yellow-500` |    1 | 〃                                                 | `text-[#eab308]`   |
+
+> `rounded` 46곳이 실질적인 위험이다. **값은 같고 이름만 바뀐 것**(v3 `rounded` = v4 `rounded-sm` = 0.25rem)
+> 이라 고치면 픽셀이 정확히 같아진다. 반면 안 고치면 `border-radius`가 사라진다.
+> 도메인 이관마다 이 표를 확인한다.
+
+**0곳으로 확인돼 신경 쓸 필요 없는 것**: `rounded-sm`(v3) · `shadow`(bare) · `blur`/`blur-sm` ·
+`ring`(bare) · `ring-*` · `flex-shrink-*` · `flex-grow-*` · `text-opacity-*` · `border-opacity-*` ·
+`overflow-ellipsis` · `decoration-slice` · `md:`/`lg:`/`xl:` 브레이크포인트.
+
+### 10-2. 적용 결과 — `src/index.css` (Phase 4 2단계)
+
+| 이식 항목                  | 결과                                                                                                                                                                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 색상 207개                 | `@theme`. 레거시 config를 **파싱해 생성**했다(손으로 옮기지 않음)                                                                                                                                                               |
+| 타이포 67종                | `@utility pretendard-*` / `outfit-*`. 대문자 클래스명이 Tailwind 4에서 동작함을 빌드로 확인                                                                                                                                     |
+| `--font-scale` 0.8~1.2     | `[data-font-size='...']` 5단계. 타이포 유틸리티의 `calc()`가 곱한다                                                                                                                                                             |
+| `screens.sm: 392px`        | `--breakpoint-sm`. 빌드 결과 `@media (width>=392px)` 확인                                                                                                                                                                       |
+| `input.css` 전역 스타일    | `@layer base` + 전역 선택자. `.app` 규칙은 **이식하지 않았다**(레거시에서 죽은 코드)                                                                                                                                            |
+| `public/assets` 210개      | 그대로 복사 (`input.css`가 `/assets/icons/CloseCircle.svg`를 참조)                                                                                                                                                              |
+| Pretendard·Outfit CDN      | `index.html`에 레거시와 같은 URL·버전                                                                                                                                                                                           |
+| `globalColor.scss`         | **이식하지 않음** (죽은 팔레트, `broken-styles.md` §5 결정)                                                                                                                                                                     |
+| `@tailwindcss/typography`  | **설치하지 않음** — `prose` 사용처 0곳                                                                                                                                                                                          |
+| `vue-quill.snow.css` (937) | **Phase 6 board로 미룸.** 레거시도 전역이 아니라 공지 상세 2화면에서만 import한다 (`NoticeDetailView.vue:14`, `GlobalNoticeDetailView.vue:5`). 전역 import하면 `.ql-*` 937줄이 전 화면에 실린다 → `features/board/`와 함께 이식 |
+| `addComponents` 3종        | **이식하지 않음** — `scroll-hidden`·`select-background-position-custom`·`show-recent-entry` 전부 사용처 0곳                                                                                                                     |
+
+**등가성을 위해 템플릿에서 되돌린 것**
+
+| 템플릿 기본값                        | 문제                                                    | 조치                                        |
+| ------------------------------------ | ------------------------------------------------------- | ------------------------------------------- |
+| `--radius-lg: calc(var(--radius)*1)` | 레거시 `rounded-lg`가 0.5rem → 0.625rem으로 커진다      | radius 매핑 **삭제** (v4 기본값 사용)       |
+| `--border: oklch(0.922 0 0)`         | v3 preflight의 기본 테두리색은 `#E5E7EB`였다            | `--border: #e5e7eb`                         |
+| `--font-sans: 'Geist Variable'`      | 레거시는 Pretendard 스택                                | 레거시 스택 그대로                          |
+| `dark:` = OS 설정                    | OS를 다크로 쓰는 사용자만 shadcn 컴포넌트 색이 달라진다 | `@custom-variant dark (&:is(.dark *))` 유지 |
+| shadcn 시맨틱 변수(무채색 oklch)     | shadcn 컴포넌트만 레거시와 다른 색                      | `:root`에서 레거시 토큰 값으로 매핑         |
+
 ---
 
 ## 11. 빌드·인프라

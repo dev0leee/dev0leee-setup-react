@@ -698,7 +698,7 @@ const totalPrice = computed(() =>
 ### 취소 정보 (`AptMallMyOrderDetailCancel` 40줄)
 
 ```html
-<ul v-if="findStatus.status === 'CANCELED'" class="bg-base-b-white space-y-3 border-t p-5"></ul>
+<ul v-if="findStatus.status === 'CANCELED'" class="space-y-3 border-t bg-base-b-white p-5"></ul>
 ```
 
 | 행       | 라벨 / 값                                                                                                |

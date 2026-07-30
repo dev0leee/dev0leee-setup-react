@@ -218,6 +218,18 @@
 | D-39 | 액세스 토큰을 URL 쿼리스트링으로 외부 사이트에 전달     | `MainNavigationSwiper.vue:48`(커뮤니티V2), `useShoppingNavigation.js:28`(쇼핑몰 토큰 4개)   | 히스토리·리퍼러·서버로그에 토큰 잔존. D-15·D-16과 같은 계열                                                |
 | D-40 | 대부분 단지의 배너가 `mocks/BannerTemp.png`             | `MainAdvertisementBanner.vue:75`                                                            | 임시 이미지가 프로덕션에 노출. `features/main.md` M-Q4                                                     |
 
+## 스타일 — 이식하며 발견 (Phase 4 2단계)
+
+| #     | 항목                                                                     | 근거                                                                                                       | 비고                                                                                                                   |
+| ----- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| D-184 | `.pretendard-20Regular`의 `fontFamily`가 소문자 `pretendard`             | `tailwind.config.js:489` — 나머지 66종은 `Pretendard`                                                      | CSS 폰트명은 대소문자를 구분하지 않아 **동작은 같다.** 이식 시 원본 그대로 뒀다                                        |
+| D-185 | `@supports { .app { height: -webkit-fill-available } }` 규칙이 죽어 있다 | `input.css:30-34` — `.app` 클래스를 가진 요소가 `.vue` 306개에 **0곳**. 마운트 지점은 `#app`(id 선택자)    | iOS Safari 100vh 대응 의도였으나 선택자가 틀려 한 번도 적용되지 않았다. **이식하지 않았다.** 필요하면 새로 설계        |
+| D-186 | `addComponents` 3종 전부 미사용                                          | `tailwind.config.js:808-815` — `select-background-position-custom`·`scroll-hidden`·`show-recent-entry` 0곳 | 이식하지 않았다                                                                                                        |
+| D-187 | `@tailwindcss/typography` 플러그인이 미사용                              | `tailwind.config.js:817` — `prose` 클래스 0곳                                                              | 설치하지 않았다. Quill 본문은 `vue-quill.snow.css`가 담당한다                                                          |
+| D-188 | `globalColor.scss` 66줄이 죽은 팔레트                                    | 이전 디자인 시스템의 SCSS 변수. `broken-styles.md` §5                                                      | 이식하지 않았다 (B-Q2 결정)                                                                                            |
+| D-189 | 레거시가 v3 기본 팔레트를 8곳에서 직접 쓴다                              | `text-red-500`×5 · `bg-slate-100`×2 · `text-yellow-500`×1                                                  | 디자인 시스템 토큰이 있는데 기본 팔레트를 썼다. v4에서 값이 달라지므로 이관 시 hex로 고정한다(`tech-mapping.md` §10-1) |
+| D-190 | Vue `<Transition>` 클래스 4세트가 프레임워크 규약에 묶여 있다            | `input.css:84-133` — `fade-*`·`slide-up-*`·`scale-*`                                                       | 타이밍·이징 값만 `@utility transition-*`으로 옮겼다. 실제 전환 구현은 Phase 4 7·9단계                                  |
+
 ## 서버·앱 계약 오타 (그대로 유지 — 앱·백엔드 협의 후 수정)
 
 > **2026-07-29 결정 (사용자)**: 아래는 오타지만 **서버·앱이 그 철자를 기대**하므로 고치면 기능이 깨진다.

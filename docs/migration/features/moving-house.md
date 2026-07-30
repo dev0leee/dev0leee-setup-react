@@ -667,7 +667,7 @@ const copyDepositAccount = async (value) => {
 
 ```html
 <p
-  class="bg-defaults-secondary-background-secondary text-defaults-secondary-text-secondary pretendard-14Regular flex flex-col gap-3 px-4 py-3"
+  class="flex flex-col gap-3 bg-defaults-secondary-background-secondary px-4 py-3 pretendard-14Regular text-defaults-secondary-text-secondary"
 >
   <template v-if="movingHouseDetail?.moveReservationStatus === 'CANCELED'">{{ CANCELED }}</template>
   <template v-else>
@@ -755,10 +755,10 @@ const handleMovingCancel = () => {
 <div class="h-full overflow-auto">
   <AppBar title="이사예약 작성" is-modal-visible @open-modal="handleBackModalOpen" />
   <SpinnerDots v-if="isMovingHouseSettingLoading || isMovingHouseHolidayListLoading" />
-  <div v-else class="bg-base-b-white space-y-2 pt-12 pb-28">
+  <div v-else class="space-y-2 bg-base-b-white pt-12 pb-28">
     <form
       id="movingHouseForm"
-      class="bg-base-b-white flex w-full flex-col items-start gap-6 px-5 pb-5"
+      class="flex w-full flex-col items-start gap-6 bg-base-b-white px-5 pb-5"
       @submit="onSubmit"
     >
       …
@@ -990,11 +990,11 @@ const onSubmit = handleSubmit((submitValues) => {
 
 ```html
 <div
-  class="border-defaults-tertiary-border-tertiary bg-defaults-primary-background-primary pretendard-13SemiBold flex justify-between border-t px-5 py-6"
+  class="flex justify-between border-t border-defaults-tertiary-border-tertiary bg-defaults-primary-background-primary px-5 py-6 pretendard-13SemiBold"
 >
   <span>총 사용료</span>
   <span class="flex items-center">
-    <span class="pretendard-20Bold mr-0.5">{{ moveReservationPrice?.toLocaleString() || 0 }}</span>
+    <span class="mr-0.5 pretendard-20Bold">{{ moveReservationPrice?.toLocaleString() || 0 }}</span>
     <span>원</span>
   </span>
 </div>

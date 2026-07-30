@@ -1,13 +1,714 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/geist';
 
+/* 다크모드는 도입하지 않는다(decisions/tech-choices.md). 하지만 shadcn 컴포넌트에는
+   `dark:` 유틸리티가 박혀 있다. Tailwind 4 기본 `dark:`는 OS 설정을 따르므로
+   이 선언이 없으면 **OS를 다크로 쓰는 사용자에게만** 레거시와 다른 색이 나온다.
+   `.dark` 클래스 기준으로 묶어두면 우리가 그 클래스를 붙이지 않는 한 절대 켜지지 않는다. */
 @custom-variant dark (&:is(.dark *));
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   레거시 디자인 토큰 이식
+   ---------------------------------------------------------------------------
+   apt-resident-fe의 `tailwind.config.js`(819줄)를 Tailwind 4 CSS-first로 옮긴 것.
+   **클래스명을 그대로 유지한다** — 그래야 266개 컴포넌트의 마크업이 1:1로 이관되고
+   픽셀이 같아진다 (docs/migration/tech-mapping.md §10).
+
+   값을 손으로 옮기지 않았다. 레거시 config를 파싱해 생성했다.
+   디자인 시스템이 바뀌면 레거시 config가 아니라 이 파일이 원본이다.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@theme {
+  /* 레거시 `theme.screens`는 extend가 아니라 **교체**였다 — sm 하나뿐이었다.
+     md/lg/xl은 레거시 마크업에서 0회 쓰이므로 Tailwind 4 기본값을 그대로 남긴다.
+     sm은 모바일 설계 폭이라 반드시 392px이어야 한다(레거시 `sm:flex` 2곳). */
+  --breakpoint-sm: 392px;
+
+  /* 레거시 `theme.fontFamily`도 교체였다. 폰트는 index.html에서 CDN으로 받는다. */
+  --font-pretendard: 'Pretendard';
+  --font-outfit: 'Outfit';
+  /* 레거시 `input.css`의 html font-family 스택 그대로. */
+  --font-sans:
+    'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+  /* ── 디자인 시스템 색상 207개 ─────────────────────────────────────────── */
+  --color-base-b-white: #ffffff;
+  --color-base-b-black: #0a0e15;
+  --color-neutral-b-gray-25: #fcfcfd;
+  --color-neutral-b-gray-50: #f9fafb;
+  --color-neutral-b-gray-100: #f3f4f6;
+  --color-neutral-b-gray-200: #e5e7eb;
+  --color-neutral-b-gray-300: #d2d6db;
+  --color-neutral-b-gray-400: #9da4ae;
+  --color-neutral-b-gray-500: #6c727e;
+  --color-neutral-b-gray-600: #4d5761;
+  --color-neutral-b-gray-700: #384250;
+  --color-neutral-b-gray-800: #1f2a37;
+  --color-neutral-b-gray-900: #111927;
+  --color-primary-pc-indigo-25: #f5f8ff;
+  --color-primary-pc-indigo-50: #e6ebf9;
+  --color-primary-pc-indigo-100: #e0eaff;
+  --color-primary-pc-indigo-200: #c7d7fe;
+  --color-primary-pc-indigo-300: #a3bbfd;
+  --color-primary-pc-indigo-400: #7f98f9;
+  --color-primary-pc-indigo-500: #0037be;
+  --color-primary-pc-indigo-600: #444ce7;
+  --color-primary-pc-indigo-700: #3537cc;
+  --color-primary-pc-indigo-800: #2d31a5;
+  --color-primary-pc-indigo-900: #2d3282;
+  --color-accent-ac-purple-25: #fcfaff;
+  --color-accent-ac-purple-50: #f9f5ff;
+  --color-accent-ac-purple-100: #f4ebff;
+  --color-accent-ac-purple-200: #e9d7fe;
+  --color-accent-ac-purple-300: #d6bbfb;
+  --color-accent-ac-purple-400: #b692f6;
+  --color-accent-ac-purple-500: #0082fe;
+  --color-accent-ac-purple-600: #7e56d8;
+  --color-accent-ac-purple-700: #6840c6;
+  --color-accent-ac-purple-800: #52379e;
+  --color-accent-ac-purple-900: #422f7d;
+  --color-accent-ac-navy-25: #f5f6ff;
+  --color-accent-ac-navy-50: #ebeeff;
+  --color-accent-ac-navy-100: #d6daff;
+  --color-accent-ac-navy-200: #adb4ff;
+  --color-accent-ac-navy-300: #848fff;
+  --color-accent-ac-navy-400: #5b69ff;
+  --color-accent-ac-navy-500: #00063f;
+  --color-accent-ac-navy-600: #000534;
+  --color-accent-ac-navy-700: #00042a;
+  --color-accent-ac-navy-800: #000320;
+  --color-accent-ac-navy-900: #000215;
+  --color-blue-s-info-25: #f4f9ff;
+  --color-blue-s-info-50: #eff8ff;
+  --color-blue-s-info-100: #d1e9ff;
+  --color-blue-s-info-200: #b2ddff;
+  --color-blue-s-info-300: #84caff;
+  --color-blue-s-info-400: #53b0fd;
+  --color-blue-s-info-500: #2e90fa;
+  --color-green-s-success-25: #f6fff9;
+  --color-green-s-success-50: #ecfdf3;
+  --color-green-s-success-100: #d1fadf;
+  --color-green-s-success-200: #a6f4c5;
+  --color-green-s-success-300: #6be9a6;
+  --color-green-s-success-400: #31d583;
+  --color-green-s-success-500: #12b669;
+  --color-orange-s-warning-25: #fffcf5;
+  --color-orange-s-warning-50: #fffaeb;
+  --color-orange-s-warning-100: #fef0c7;
+  --color-orange-s-warning-200: #fedf89;
+  --color-orange-s-warning-300: #fec84b;
+  --color-orange-s-warning-400: #fdb022;
+  --color-orange-s-warning-500: #f79009;
+  --color-red-s-error-25: #fffbfa;
+  --color-red-s-error-50: #fef3f2;
+  --color-red-s-error-100: #fee4e2;
+  --color-red-s-error-200: #fecdca;
+  --color-red-s-error-300: #fda19b;
+  --color-red-s-error-400: #f97066;
+  --color-red-s-error-500: #f04437;
+  --color-defaults-foreground-text-gray-600: #4b5565;
+  --color-defaults-primary-text-primary: #111927;
+  --color-defaults-primary-text-primary-inverse: #fcfcfd;
+  --color-defaults-primary-background-primary: #ffffff;
+  --color-defaults-primary-background-primary-inverse: #111927;
+  --color-defaults-primary-background-mono: #ffffff;
+  --color-defaults-primary-background-mono-inverse: #111927;
+  --color-defaults-primary-background-dimmed: #00000080;
+  --color-defaults-primary-border-primary: #d2d6db;
+  --color-defaults-primary-border-primary-inverse: #6c727e;
+  --color-defaults-primary-border-mono: #384250;
+  --color-defaults-primary-border-mono-inverse: #f9fafb;
+  --color-defaults-primary-icon-primary: #111927;
+  --color-defaults-primary-icon-primary-inverse: #f3f4f6;
+  --color-defaults-secondary-text-secondary: #6c727e;
+  --color-defaults-secondary-text-secondary-inverse: #f3f4f6;
+  --color-defaults-secondary-background-secondary: #f3f4f6;
+  --color-defaults-secondary-background-mono: #f9fafb;
+  --color-defaults-secondary-background-mono-inverse: #384250;
+  --color-defaults-secondary-border-secondary: #e5e7eb;
+  --color-defaults-secondary-icon-secondary: #6c727e;
+  --color-defaults-tertiary-text-tertiary: #9da4ae;
+  --color-defaults-tertiary-background-tertiary: #e5e7eb;
+  --color-defaults-tertiary-background-mono: #f3f4f6;
+  --color-defaults-tertiary-background-mono-inverse: #6c727e;
+  --color-defaults-tertiary-border-tertiary: #f3f4f6;
+  --color-defaults-tertiary-icon-tertiary: #9da4ae;
+  --color-defaults-hover-text-hover: #4d5761;
+  --color-defaults-hover-background-hover: #f3f4f6;
+  --color-defaults-hover-border-hover: #e5e7eb;
+  --color-defaults-hover-icon-hover: #4d5761;
+  --color-defaults-focus-text-focus: #384250;
+  --color-defaults-focus-background-focus: #e5e7eb;
+  --color-defaults-focus-border-focus: #d2d6db;
+  --color-defaults-focus-icon-focus: #384250;
+  --color-defaults-disabled-text-disabled: #6c727e;
+  --color-defaults-disabled-background-disabled: #f3f4f6;
+  --color-defaults-disabled-border-disabled: #d2d6db;
+  --color-defaults-disabled-icon-disabled: #6c727e;
+  --color-brand-default-text-brand: #0037be;
+  --color-brand-default-text-brand-inverse: #ffffff;
+  --color-brand-default-background-brand: #0037be;
+  --color-brand-default-border-brand: #0037be;
+  --color-brand-default-border-brand-inverse: #ffffff;
+  --color-brand-default-icon-brand: #0037be;
+  --color-brand-default-icon-brand-inverse: #ffffff;
+  --color-brand-hover-text-brand-hover: #444ce7;
+  --color-brand-hover-background-brand-hover: #444ce7;
+  --color-brand-hover-border-brand-hover: #444ce7;
+  --color-brand-hover-icon-brand-hover: #444ce7;
+  --color-brand-focus-text-brand-focus: #3537cc;
+  --color-brand-focus-background-brand-focus: #3537cc;
+  --color-brand-focus-border-brand-focus: #3537cc;
+  --color-brand-focus-icon-brand-focus: #3537cc;
+  --color-brand-disabled-text-brand-disabled: #7f98f9;
+  --color-brand-disabled-background-brand-disabled: #e6ebf9;
+  --color-brand-disabled-border-brand-disabled: #7f98f9;
+  --color-brand-disabled-icon-brand-disabled: #7f98f9;
+  --color-brand-disabled-icon-brand-disabled-inverse: #f5f8ff;
+  --color-navy-default-text-navy: #00063f;
+  --color-navy-default-text-navy-inverse: #ffffff;
+  --color-navy-default-background-navy: #00063f;
+  --color-navy-default-border-navy: #00063f;
+  --color-navy-default-border-navy-inverse: #ffffff;
+  --color-navy-default-icon-navy: #00063f;
+  --color-navy-default-icon-navy-inverse: #ffffff;
+  --color-navy-hover-text-navy-hover: #000534;
+  --color-navy-hover-background-navy-hover: #000534;
+  --color-navy-hover-border-navy-hover: #000534;
+  --color-navy-hover-icon-navy-hover: #000534;
+  --color-navy-focus-text-navy-focus: #00042a;
+  --color-navy-focus-background-navy-focus: #00042a;
+  --color-navy-focus-border-navy-focus: #00042a;
+  --color-navy-focus-icon-navy-focus: #00042a;
+  --color-navy-disabled-text-navy-disabled: #5b69ff;
+  --color-navy-disabled-background-navy-disabled: #ebeeff;
+  --color-navy-disabled-border-navy-disabled: #5b69ff;
+  --color-navy-disabled-icon-navy-disabled: #5b69ff;
+  --color-navy-disabled-icon-navy-disabled-inverse: #f5f6ff;
+  --color-alerts-informal-text-informal: #2e90fa;
+  --color-alerts-informal-text-informal-disabled: #b2ddff;
+  --color-alerts-informal-background-informal: #2e90fa;
+  --color-alerts-informal-background-informal-primary: #eff8ff;
+  --color-alerts-informal-background-informal-secondary: #d1e9ff;
+  --color-alerts-informal-border-informal: #2e90fa;
+  --color-alerts-informal-icon-informal: #2e90fa;
+  --color-alerts-informal-icon-informal-hover: #84caff;
+  --color-alerts-informal-icon-informal-focus: #53b0fd;
+  --color-alerts-informal-icon-informal-disabled: #b2ddff;
+  --color-alerts-success-text-success: #12b669;
+  --color-alerts-success-background-success: #12b669;
+  --color-alerts-success-background-success-primary: #ecfdf3;
+  --color-alerts-success-background-success-secondary: #d1fadf;
+  --color-alerts-success-border-success: #12b669;
+  --color-alerts-success-icon-success: #12b669;
+  --color-alerts-success-icon-success-hover: #6be9a6;
+  --color-alerts-success-icon-success-focus: #31d583;
+  --color-alerts-success-icon-success-disabled: #a6f4c5;
+  --color-alerts-warning-text-warning: #f79009;
+  --color-alerts-warning-background-warning: #f79009;
+  --color-alerts-warning-background-warning-primary: #fffaeb;
+  --color-alerts-warning-background-warning-secondary: #fef0c7;
+  --color-alerts-warning-border-warning: #f79009;
+  --color-alerts-warning-icon-warning: #f79009;
+  --color-alerts-warning-icon-warning-hover: #fec84b;
+  --color-alerts-warning-icon-warning-focus: #fdb022;
+  --color-alerts-warning-icon-warning-disabled: #fedf89;
+  --color-alerts-error-text-error: #f04437;
+  --color-alerts-error-text-error-hover: #fda19b;
+  --color-alerts-error-text-error-focus: #f97066;
+  --color-alerts-error-text-error-disabled: #f97066;
+  --color-alerts-error-background-error: #f04437;
+  --color-alerts-error-background-error-hover: #fda19b;
+  --color-alerts-error-background-error-focus: #f97066;
+  --color-alerts-error-background-error-disabled: #fecdca;
+  --color-alerts-error-background-error-primary: #fef3f2;
+  --color-alerts-error-background-error-secondary: #fee4e2;
+  --color-alerts-error-border-error: #f04437;
+  --color-alerts-error-border-error-disabled: #f97066;
+  --color-alerts-error-icon-error: #fda19b;
+  --color-alerts-error-icon-error-hover: #f04437;
+  --color-alerts-error-icon-error-focus: #fda19b;
+  --color-alerts-error-icon-error-disabled: #fee4e2;
+  --color-charts-chart-mono: #f3f4f6;
+  --color-charts-chart-brand: #0037be;
+  --color-charts-chart-first: #7f98f9;
+  --color-charts-chart-second: #a3bbfd;
+  --color-charts-chart-third: #c7d7fe;
+  --color-charts-chart-fourth: #e0eaff;
+  --color-focus-ring-focus-primary: #7f98f9;
+  --color-focus-ring-focus-secondary: #f3f4f6;
+  --color-focus-ring-focus-success: #d1fadf;
+  --color-focus-ring-focus-error: #fee4e2;
+}
+
+/* ── 레거시 타이포 유틸리티 67종 ─────────────────────────────────────────────
+   레거시는 `addUtilities`로 만들었고, 값에 `var(--font-scale)`를 곱해 접근성
+   폰트 배율(0.8~1.2)을 지원한다. 클래스명·값·계산식을 그대로 옮겼다.
+   `.pretendard-20Regular`의 소문자 `pretendard` font-family도 원본 그대로다
+   (CSS 폰트명은 대소문자를 구분하지 않아 동작이 같다 — deferred.md).
+   ─────────────────────────────────────────────────────────────────────────── */
+@utility pretendard-72Regular {
+  font-family: Pretendard;
+  font-size: calc(72px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(80px * var(--font-scale, 1));
+  letter-spacing: calc(-1.8px * var(--font-scale, 1));
+}
+@utility pretendard-72Medium {
+  font-family: Pretendard;
+  font-size: calc(72px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(80px * var(--font-scale, 1));
+  letter-spacing: calc(-1.8px * var(--font-scale, 1));
+}
+@utility pretendard-72Bold {
+  font-family: Pretendard;
+  font-size: calc(72px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(80px * var(--font-scale, 1));
+  letter-spacing: calc(-1.8px * var(--font-scale, 1));
+}
+@utility pretendard-64Regular {
+  font-family: Pretendard;
+  font-size: calc(64px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(72px * var(--font-scale, 1));
+  letter-spacing: calc(-1.8px * var(--font-scale, 1));
+}
+@utility pretendard-64Medium {
+  font-family: Pretendard;
+  font-size: calc(64px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(72px * var(--font-scale, 1));
+  letter-spacing: calc(-1.8px * var(--font-scale, 1));
+}
+@utility pretendard-64Bold {
+  font-family: Pretendard;
+  font-size: calc(64px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(72px * var(--font-scale, 1));
+  letter-spacing: calc(-1.8px * var(--font-scale, 1));
+}
+@utility pretendard-56Regular {
+  font-family: Pretendard;
+  font-size: calc(56px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(62px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-56Medium {
+  font-family: Pretendard;
+  font-size: calc(56px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(62px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-56Bold {
+  font-family: Pretendard;
+  font-size: calc(56px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(62px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-44Regular {
+  font-family: Pretendard;
+  font-size: calc(44px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(48px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-44Medium {
+  font-family: Pretendard;
+  font-size: calc(44px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(48px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-44Bold {
+  font-family: Pretendard;
+  font-size: calc(44px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(48px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-32Regular {
+  font-family: Pretendard;
+  font-size: calc(32px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(40px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-32Medium {
+  font-family: Pretendard;
+  font-size: calc(32px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(40px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-32Bold {
+  font-family: Pretendard;
+  font-size: calc(32px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(40px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-24Regular {
+  font-family: Pretendard;
+  font-size: calc(24px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(32px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-24Medium {
+  font-family: Pretendard;
+  font-size: calc(24px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(32px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-24SemiBold {
+  font-family: Pretendard;
+  font-size: calc(24px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(32px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-24Bold {
+  font-family: Pretendard;
+  font-size: calc(24px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(32px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-22Regular {
+  font-family: Pretendard;
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(30px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-22Medium {
+  font-family: Pretendard;
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(30px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-22SemiBold {
+  font-family: Pretendard;
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(30px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-22Bold {
+  font-family: Pretendard;
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(30px * var(--font-scale, 1));
+  letter-spacing: calc(-0.55px * var(--font-scale, 1));
+}
+@utility pretendard-20Regular {
+  font-family: pretendard;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-20Medium {
+  font-family: Pretendard;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-20SemiBold {
+  font-family: Pretendard;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-20Bold {
+  font-family: Pretendard;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-18Regular {
+  font-family: Pretendard;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-18Medium {
+  font-family: Pretendard;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-18SemiBold {
+  font-family: Pretendard;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-18Bold {
+  font-family: Pretendard;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility pretendard-17SemiBold {
+  font-family: Pretendard;
+  font-size: calc(17px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(20px * var(--font-scale, 1));
+  letter-spacing: calc(-0.16px * var(--font-scale, 1));
+}
+@utility pretendard-16Regular {
+  font-family: Pretendard;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(20px * var(--font-scale, 1));
+  letter-spacing: calc(-0.16px * var(--font-scale, 1));
+}
+@utility pretendard-16Medium {
+  font-family: Pretendard;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(20px * var(--font-scale, 1));
+  letter-spacing: calc(-0.16px * var(--font-scale, 1));
+}
+@utility pretendard-16SemiBold {
+  font-family: Pretendard;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(20px * var(--font-scale, 1));
+  letter-spacing: calc(-0.16px * var(--font-scale, 1));
+}
+@utility pretendard-16Bold {
+  font-family: Pretendard;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(20px * var(--font-scale, 1));
+  letter-spacing: calc(-0.16px * var(--font-scale, 1));
+}
+@utility pretendard-15Regular {
+  font-family: Pretendard;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(19px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-15Medium {
+  font-family: Pretendard;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(19px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-15SemiBold {
+  font-family: Pretendard;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(19px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-15Bold {
+  font-family: Pretendard;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(19px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-14Regular {
+  font-family: Pretendard;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(18px * var(--font-scale, 1));
+}
+@utility pretendard-14Medium {
+  font-family: Pretendard;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(18px * var(--font-scale, 1));
+}
+@utility pretendard-14SemiBold {
+  font-family: Pretendard;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(18px * var(--font-scale, 1));
+}
+@utility pretendard-14Bold {
+  font-family: Pretendard;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(18px * var(--font-scale, 1));
+}
+@utility pretendard-13Regular {
+  font-family: Pretendard;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(16px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-13Medium {
+  font-family: Pretendard;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(16px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-13SemiBold {
+  font-family: Pretendard;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(16px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-13Bold {
+  font-family: Pretendard;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(16px * var(--font-scale, 1));
+  letter-spacing: calc(-0.3px * var(--font-scale, 1));
+}
+@utility pretendard-12Regular {
+  font-family: Pretendard;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(16px * var(--font-scale, 1));
+}
+@utility pretendard-12Medium {
+  font-family: Pretendard;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(16px * var(--font-scale, 1));
+}
+@utility pretendard-12SemiBold {
+  font-family: Pretendard;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(16px * var(--font-scale, 1));
+}
+@utility pretendard-12Bold {
+  font-family: Pretendard;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(16px * var(--font-scale, 1));
+}
+@utility pretendard-10Regular {
+  font-family: Pretendard;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(13px * var(--font-scale, 1));
+}
+@utility pretendard-10Medium {
+  font-family: Pretendard;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(13px * var(--font-scale, 1));
+}
+@utility pretendard-10SemiBold {
+  font-family: Pretendard;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(13px * var(--font-scale, 1));
+}
+@utility pretendard-10Bold {
+  font-family: Pretendard;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(13px * var(--font-scale, 1));
+}
+@utility pretendard-8Regular {
+  font-family: Pretendard;
+  font-size: calc(8px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(11px * var(--font-scale, 1));
+}
+@utility pretendard-8Medium {
+  font-family: Pretendard;
+  font-size: calc(8px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(11px * var(--font-scale, 1));
+}
+@utility pretendard-8Bold {
+  font-family: Pretendard;
+  font-size: calc(8px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(11px * var(--font-scale, 1));
+}
+@utility outfit-20Regular {
+  font-family: Outfit;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-20Medium {
+  font-family: Outfit;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-20SemiBold {
+  font-family: Outfit;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-20Bold {
+  font-family: Outfit;
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(28px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-18Regular {
+  font-family: Outfit;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-18Medium {
+  font-family: Outfit;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-18SemiBold {
+  font-family: Outfit;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+@utility outfit-18Bold {
+  font-family: Outfit;
+  font-size: calc(18px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: calc(24px * var(--font-scale, 1));
+  letter-spacing: calc(-0.2px * var(--font-scale, 1));
+}
+
+/* ── shadcn 시맨틱 변수 → 레거시 토큰 매핑 ───────────────────────────────────
+   shadcn 컴포넌트는 --background/--primary 같은 시맨틱 변수를 본다.
+   기본값(무채색 oklch)을 그대로 두면 shadcn 컴포넌트만 레거시와 다른 색이 된다.
+   래퍼에서 매번 덮는 대신 변수 자체를 레거시 값으로 맞춰둔다.
+   ─────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,92 +740,171 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+/* ⚠️ 템플릿의 `--radius-*: calc(var(--radius) * n)` 매핑은 **제거했다.**
+   그것을 두면 레거시 마크업의 `rounded-lg`가 0.5rem → 0.625rem으로 커진다.
+   Tailwind 4 기본 radius 스케일이 v3와 값이 같으므로 기본값을 쓰는 것이 등가다. */
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* 레거시 디자인 시스템 값으로 맞춘 shadcn 시맨틱 변수 */
+  --background: #ffffff; /* base-b-white */
+  --foreground: #111927; /* defaults-primary-text-primary */
+  --card: #ffffff;
+  --card-foreground: #111927;
+  --popover: #ffffff;
+  --popover-foreground: #111927;
+  --primary: #0037be; /* brand-default-background-brand */
+  --primary-foreground: #ffffff; /* brand-default-text-brand-inverse */
+  --secondary: #f3f4f6; /* defaults-secondary-background-secondary */
+  --secondary-foreground: #111927;
+  --muted: #f3f4f6;
+  --muted-foreground: #6c727e; /* defaults-secondary-text-secondary */
+  --accent: #f3f4f6;
+  --accent-foreground: #111927;
+  --destructive: #f04437; /* alerts-error-text-error */
+  /* ⚠️ 레거시 기본 테두리색을 재현한 값이다. Tailwind 3 preflight는 색 없는 `border`에
+     gray-200(#E5E7EB)을 넣었고, Tailwind 4는 currentColor를 넣는다. 아래 base 레이어의
+     `* { border-border }`가 이 변수를 쓰므로 여기서 #E5E7EB이어야 레거시와 같아진다.
+     디자인 토큰으로는 defaults-secondary-border-secondary와 같은 값이다. */
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #7f98f9; /* focus-ring-focus-primary */
+  --chart-1: #0037be; /* charts-chart-brand */
+  --chart-2: #7f98f9; /* charts-chart-first */
+  --chart-3: #a3bbfd; /* charts-chart-second */
+  --chart-4: #c7d7fe; /* charts-chart-third */
+  --chart-5: #e0eaff; /* charts-chart-fourth */
+  --radius: 0.5rem;
+  --sidebar: #f9fafb;
+  --sidebar-foreground: #111927;
+  --sidebar-primary: #0037be;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f4f6;
+  --sidebar-accent-foreground: #111927;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #7f98f9;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+/* ── 접근성 폰트 배율 ────────────────────────────────────────────────────────
+   레거시 `src/styles/fontSize.css` 그대로. `data-font-size` 속성은 fontSize
+   스토어가 <html>에 붙인다. 위 타이포 유틸리티의 calc()가 이 값을 곱한다.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-font-size='very-small'] {
+  --font-scale: 0.8;
 }
 
+[data-font-size='small'] {
+  --font-scale: 0.9;
+}
+
+[data-font-size='medium'] {
+  --font-scale: 1;
+}
+
+[data-font-size='large'] {
+  --font-scale: 1.1;
+}
+
+[data-font-size='very-large'] {
+  --font-scale: 1.2;
+}
+
+/* ── 전역 스타일 ─────────────────────────────────────────────────────────────
+   레거시 `src/input.css` 이식. 순서·선택자·값을 그대로 둔다.
+   ─────────────────────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  /* 웹뷰 전용 앱이라 body 자체는 스크롤하지 않는다. 스크롤은 각 화면이 갖는다. */
+  body {
+    height: 100vh;
+    overflow-y: hidden;
+    background-color: #fff;
+    color: #111927;
+  }
+
+  li {
+    list-style-type: none;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  textarea:focus {
+    outline: none;
+  }
+}
+
+/* 스크롤바를 전역으로 숨긴다(모바일 웹뷰). textarea만 예외로 되살린다. */
+::-webkit-scrollbar {
+  display: none;
+}
+
+textarea::-webkit-scrollbar {
+  display: auto;
+}
+
+/* 입력 포커스 테두리. 디자인 토큰이 아닌 하드코딩 값이라 레거시 그대로 둔다. */
+input[type='text']:focus,
+input[type='number']:focus,
+input[type='tel']:focus,
+input[type='password']:focus,
+input[type='email']:focus {
+  border: 1px solid #2563eb;
+  outline: none;
+}
+
+/* 자동완성 배경이 노랗게 뜨는 것을 막는다. transition 5000s는 브라우저가
+   autofill 배경을 다시 칠하지 못하게 무한 지연시키는 관용적 트릭이다. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #000;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  box-shadow: 0 0 0px 1000px #fff inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: url('/assets/icons/CloseCircle.svg') center center no-repeat;
+  cursor: pointer;
+}
+
+/* ── 화면·오버레이 전환 ──────────────────────────────────────────────────────
+   레거시는 Vue `<Transition>`의 클래스 규약(`*-enter-from` 등)을 썼다.
+   React에는 그 규약이 없으므로 **값만** 가져와 우리 전환 컴포넌트가 쓴다
+   (PageTransition, 오버레이 래퍼). 타이밍·이징이 등가 이관의 대상이다.
+   ─────────────────────────────────────────────────────────────────────────── */
+@utility transition-page-fade {
+  transition: opacity 0.3s ease;
+}
+
+@utility transition-drawer-slide-up {
+  transition: transform 0.3s ease;
+}
+
+@utility transition-modal-scale-in {
+  transition:
+    opacity 0.32s ease,
+    transform 0.42s cubic-bezier(0.2, 0.9, 0.2, 1.15);
+}
+
+@utility transition-modal-scale-out {
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }

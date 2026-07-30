@@ -850,7 +850,7 @@ return { value: formatHtmlText(props.repairInfo[field.key]) || '-' };
 <ul v-if="repairInfo?.fileList" class="grid w-full grid-cols-3 gap-2 sm:flex sm:flex-wrap">
   <li v-for="image in repairInfo?.fileList" :key="image?.fileUuid" class="flex justify-center">
     <img
-      class="border-defaults-tertiary-border-tertiary h-28 w-28 rounded-md border object-cover"
+      class="h-28 w-28 rounded-md border border-defaults-tertiary-border-tertiary object-cover"
       :src="`${s3UrlFile}${image?.fileUrl}`"
       :alt="`${image?.fileUrl.split('/').at(-1)}`"
     />

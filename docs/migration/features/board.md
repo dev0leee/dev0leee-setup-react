@@ -689,7 +689,7 @@ if (boardType.value === 'community') { 소통공간 신고 } else { 민원공간
 <div class="relative h-9 w-full">
   <input
     type="search"
-    class="border-defaults-tertiary-border-tertiary bg-defaults-secondary-background-secondary text-defaults-primary-text-primary pretendard-16Regular placeholder:text-defaults-tertiary-text-tertiary h-9 w-full rounded-[4px] border py-2.5 pr-3 pl-[38px] outline-none"
+    class="h-9 w-full rounded-[4px] border border-defaults-tertiary-border-tertiary bg-defaults-secondary-background-secondary py-2.5 pr-3 pl-[38px] pretendard-16Regular text-defaults-primary-text-primary outline-none placeholder:text-defaults-tertiary-text-tertiary"
     placeholder="검색"
     @input="handleInput"
   />
@@ -1368,7 +1368,7 @@ getCookie(name):
 ```html
 <button
   type="button"
-  class="border-defaults-secondary-border-secondary text-defaults-primary-text-primary pretendard-14Regular flex w-fit items-center gap-[3px] rounded-[5px] border px-2.5 py-2"
+  class="flex w-fit items-center gap-[3px] rounded-[5px] border border-defaults-secondary-border-secondary px-2.5 py-2 pretendard-14Regular text-defaults-primary-text-primary"
   @click="postLikeFn"
 >
   <img class="h-4 w-4" :src="thumbsUpIcon" alt="엄지 아이콘" />
@@ -1968,7 +1968,7 @@ submitForm = handleSubmit(async (value) => {
 ```html
 <button
   type="button"
-  class="border-defaults-tertiary-border-tertiary text-defaults-primary-text-primary pretendard-16Regular flex w-full items-center justify-between self-stretch rounded-md border p-2.5"
+  class="flex w-full items-center justify-between self-stretch rounded-md border border-defaults-tertiary-border-tertiary p-2.5 pretendard-16Regular text-defaults-primary-text-primary"
 >
   <span v-if="boardFormStore.category">{{ boardFormStore.category.category }}</span>
   <p v-else class="text-defaults-tertiary-text-tertiary">게시글의 주제를 선택해주세요</p>
@@ -2731,7 +2731,7 @@ onMounted(() => boardFormStore.setSubmitHandler(postComplaintsPostMutationAsync)
 ```html
 <button
   type="button"
-  class="border-navy-default-border-navy text-navy-default-text-navy pretendard-13SemiBold flex items-center justify-center gap-[5px] rounded-lg border bg-white py-2 pr-4 pl-3 text-center"
+  class="flex items-center justify-center gap-[5px] rounded-lg border border-navy-default-border-navy bg-white py-2 pr-4 pl-3 text-center pretendard-13SemiBold text-navy-default-text-navy"
   @click="handleUnblockButton"
 >
   <img src="/assets/icons/EyeOff.svg" alt="안보기 아이콘" />
@@ -2744,7 +2744,7 @@ onMounted(() => boardFormStore.setSubmitHandler(postComplaintsPostMutationAsync)
 ```html
 <button
   type="button"
-  class="bg-navy-default-background-navy pretendard-13SemiBold flex items-center justify-center gap-[5px] rounded-lg py-2 pr-4 pl-3 text-center text-white"
+  class="flex items-center justify-center gap-[5px] rounded-lg bg-navy-default-background-navy py-2 pr-4 pl-3 text-center pretendard-13SemiBold text-white"
   @click="handleBlockButton"
 >
   <img src="/assets/icons/Eye.svg" alt="안보기 아이콘" />

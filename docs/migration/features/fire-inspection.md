@@ -684,7 +684,7 @@ if (submissionStatus === SUBMITTED && householdFireInspectionUuid) {
 ### 셸
 
 ```html
-<div class="bg-base-b-white flex h-full w-full flex-col">
+<div class="flex h-full w-full flex-col bg-base-b-white">
   <AppBar title="자가점검표 작성" :navigate-fn="handleClose" />
   <template v-if="isSignatureStep"> ... </template>
   <template v-else>
@@ -693,7 +693,7 @@ if (submissionStatus === SUBMITTED && householdFireInspectionUuid) {
       <div class="flex flex-col gap-4 px-5 py-6">...</div>
     </div>
   </template>
-  <div class="border-defaults-tertiary-border-tertiary border-t px-5 py-4">
+  <div class="border-t border-defaults-tertiary-border-tertiary px-5 py-4">
     <ButtonBase ...>{{ isSignatureStep ? '완료' : '다음' }}</ButtonBase>
   </div>
 </div>
@@ -726,14 +726,14 @@ const isNextButtonEnabled = computed(() =>
 
 ```html
 <div
-  class="border-defaults-tertiary-border-tertiary bg-base-b-white sticky top-0 z-10 flex flex-col gap-2 border-b px-5 pt-4 pb-4"
+  class="sticky top-0 z-10 flex flex-col gap-2 border-b border-defaults-tertiary-border-tertiary bg-base-b-white px-5 pt-4 pb-4"
 >
   <p class="pretendard-16SemiBold">자가점검표를 체크하여 완료해주세요.</p>
   <div class="flex items-center gap-2">
-    <span class="text-brand-default-text-brand pretendard-14Medium">{{ percent }}%</span>
-    <div class="bg-defaults-secondary-background-secondary h-1 flex-1 rounded-full">
+    <span class="pretendard-14Medium text-brand-default-text-brand">{{ percent }}%</span>
+    <div class="h-1 flex-1 rounded-full bg-defaults-secondary-background-secondary">
       <div
-        class="bg-brand-default-background-brand h-full rounded-full transition-all duration-300"
+        class="h-full rounded-full bg-brand-default-background-brand transition-all duration-300"
         :style="{ width: `${percent}%` }"
       />
     </div>
@@ -1094,7 +1094,7 @@ const handleGoToHome = () => {
 ### 셸
 
 ```html
-<div class="bg-base-b-white flex h-full w-full flex-col">
+<div class="flex h-full w-full flex-col bg-base-b-white">
   <AppBar :title="appBarTitle" />
   <div class="flex flex-1 flex-col overflow-auto pt-12">
     <SpinnerDots v-if="isInspectionDetailLoading" />

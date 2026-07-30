@@ -684,7 +684,7 @@ parkingMenuList = computed(() => {
 ```html
 <button
   type="button"
-  class="border-defaults-tertiary-border-tertiary bg-defaults-primary-background-primary active:bg-defaults-tertiary-border-tertiary/40 [isLarge ? 'flex-col items-start' : 'items-center'] flex justify-between gap-2 overflow-hidden rounded-lg border p-3"
+  class="[isLarge ? 'flex-col items-start' : 'items-center'] flex justify-between gap-2 overflow-hidden rounded-lg border border-defaults-tertiary-border-tertiary bg-defaults-primary-background-primary p-3 active:bg-defaults-tertiary-border-tertiary/40"
 >
   <span class="pretendard-14SemiBold whitespace-nowrap">{{ info.name }}</span>
   <img
@@ -1181,7 +1181,7 @@ useForm({
 
 ```html
 <button
-  class="border-navy-default-border-navy bg-base-b-white text-navy-default-text-navy pretendard-12SemiBold flex h-6 items-center justify-center gap-1 rounded-full border px-3"
+  class="flex h-6 items-center justify-center gap-1 rounded-full border border-navy-default-border-navy bg-base-b-white px-3 pretendard-12SemiBold text-navy-default-text-navy"
 >
   <img src="/assets/icons/Star.svg" alt="별 아이콘" />
   <span>즐겨찾기 차량 불러오기</span>

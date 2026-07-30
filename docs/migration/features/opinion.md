@@ -374,7 +374,7 @@ routes: [
 ```html
 <!-- LayoutOpinionBase.vue — <slot>이 없다 -->
 <div class="bg-defaults-secondary-background-mono">
-  <div class="bg-base-b-white mx-auto h-screen w-screen max-w-[480px] overflow-auto shadow-lg">
+  <div class="mx-auto h-screen w-screen max-w-[480px] overflow-auto bg-base-b-white shadow-lg">
     <AppBar v-if="layoutConfig.showAppBar" … />
     <main
       :class="`${showBottomNav ? 'h-[calc(100%-67px)]' : 'h-full'} ${showAppBar ? 'pt-6' : ''}`"
@@ -595,7 +595,7 @@ const isOpinionExternal = import.meta.env.MODE.includes('opinion');
   </div>
   <div class="flex flex-col items-center justify-center gap-5">
     <img src="/assets/icons/InfoCircleGray.svg" alt="경고 아이콘" class="w-10" />
-    <p class="text-defaults-secondary-text-secondary pretendard-20Regular">
+    <p class="pretendard-20Regular text-defaults-secondary-text-secondary">
       경로가 올바르지 않습니다
     </p>
   </div>
@@ -614,7 +614,7 @@ onMounted(() => {
 ```
 
 ```html
-<p class="text-defaults-secondary-text-secondary pretendard-20Regular px-10 leading-10">
+<p class="px-10 pretendard-20Regular leading-10 text-defaults-secondary-text-secondary">
   ERROR : {{ errorMessage }}
 </p>
 ```
