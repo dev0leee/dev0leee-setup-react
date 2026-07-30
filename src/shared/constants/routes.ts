@@ -15,13 +15,24 @@ export const ROUTE_PATH = {
   LOGIN_PENDING: '/login/pending',
   /** 버전1 사용자의 약관 재동의 */
   VERSION_ONE_TERMS: '/versionOne/terms',
+  /** 버전1 전환의 KMC 콜백 랜딩 */
+  VERSION_ONE_TERMS_RESPONSE: '/versionOne/terms/response',
 
   /** 비밀번호 재설정을 위한 휴대폰 인증 (`auth.md` A2) */
   PASSWORD_CERT: '/password/cert',
   /** 새 비밀번호 입력. 인증 토큰을 state로 받아야 열린다 (`auth.md` A3) */
   PASSWORD_RESET: '/password/reset',
-  /** 가입 위저드 1단계. 인트로가 링크하지만 화면은 SignUp 이관에서 만든다 */
+  // ── 회원가입 위저드 (4단계) ─────────────────────────────────────────────────
+  /** 1단계 — 약관 동의. 인트로의 `회원가입`이 여기로 온다 */
   SIGNUP_TERMS: '/signup/terms',
+  /** 2단계 — KMC 본인인증 콜백 랜딩. 화면 요소가 없다 */
+  SIGNUP_CERT_RESPONSE: '/signup/certification/response',
+  /** 3단계 — 이름·닉네임·비밀번호 */
+  SIGNUP_INFO_USER: '/signup/info/user',
+  /** 4단계 — 아파트·동·호수·세대주 여부 */
+  SIGNUP_INFO_APT: '/signup/info/apt',
+  /** 완료 — 승인 대기 안내 */
+  SIGNUP_COMPLETED: '/signup/completed',
 
   /** 일시적 오류 안내. 미인증 상태로도 열린다 */
   ERROR: '/error',

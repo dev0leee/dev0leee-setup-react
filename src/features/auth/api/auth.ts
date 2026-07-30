@@ -1,13 +1,9 @@
-import type {
-  LoginInfo,
-  LoginPayload,
-  LoginResponseBody,
-  LoginResult,
-} from '@/features/auth/types/auth'
+import type { LoginPayload, LoginResponseBody, LoginResult } from '@/features/auth/types/auth'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api, publicApi } from '@/shared/lib/apiClient'
 import { readHeader } from '@/shared/lib/responseHeaders'
 import type { ServerSuccessBody } from '@/shared/types/api'
+import type { LoginInfo } from '@/shared/types/resident'
 
 /**
  * 로그인. 레거시 `api/auth.js`의 `postLogin`.
@@ -32,23 +28,6 @@ export const postLogin = async ({ id, password }: LoginPayload): Promise<LoginRe
 /** 로그인 정보 조회. 단지 컨텍스트와 네이티브 발신 페이로드의 원천이다 */
 export const getLoginInfo = async (): Promise<LoginInfo | undefined> => {
   const response = await api.get<ServerSuccessBody<LoginInfo>>(`${API_PREFIX.APARTMANT}/login/info`)
-  return response.data.success
-}
-
-/**
- * 미승인 입주민의 로그인 정보 조회.
- *
- * ⚠️ **비밀번호를 쿼리스트링으로 보낸다.** 레거시 그대로다 —
- * 히스토리·서버 로그에 남는다 (`deferred.md` D-16, E-Q2에서 유지 확정).
- */
-export const getWaitingMemberLoginInfo = async ({
-  id,
-  password,
-}: LoginPayload): Promise<LoginInfo | undefined> => {
-  const response = await publicApi.get<ServerSuccessBody<LoginInfo>>(
-    `${API_PREFIX.APARTMANT}/login/waiting-info`,
-    { params: { id, password } },
-  )
   return response.data.success
 }
 

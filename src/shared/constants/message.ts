@@ -34,3 +34,15 @@ export const TOAST_DURATION_MS = 3_000
  * 고정 id를 주면 sonner도 같은 동작이 된다.
  */
 export const TOAST_ID = 'app-toast'
+
+/**
+ * 가입 에러코드별 문구. **회원가입(`signup.md` S4)과 버전1 전환(`auth.md` A6)이
+ * 같은 표를 쓴다** — 코드가 `shared/constants/errorCode.ts`의 `SIGNUP_ERROR_CODE`에
+ * 있으므로 문구도 함께 둔다. 두 도메인의 차이는 문구가 아니라 그 뒤 처리다.
+ */
+export const SIGNUP_ERROR_MESSAGE = {
+  RESIDENT_ALREADY_EXISTS: '이미 등록된 입주민입니다.',
+  HOUSEHOLD_NOT_FOUND: '존재하지 않는 세대입니다.',
+  HOUSEHOLD_HEAD_ALREADY_EXISTS: '이미 등록된 세대주가 존재합니다.',
+  KMC_ERROR: '인증 유효시간이 만료됐습니다. 다시 시도해주세요.',
+} as const

@@ -24,32 +24,6 @@ export interface LoginResult {
   oldResidentFlag: boolean
 }
 
-/** 단지가 제공하는 서비스 한 건. `name`을 `trim()`해서 비교한다 — 서버 값에 공백이 섞여 있다 */
-export interface LoginInfoContent {
-  name: string
-}
-
-/**
- * `GET /login/info` 응답. 단지 컨텍스트와 네이티브 발신 페이로드가 여기서 나온다.
- * 필드가 빠질 수 있어 optional로 둔다 — 레거시도 전부 옵셔널 체이닝으로 읽는다.
- */
-export interface LoginInfo {
-  /** 입주민 uuid. `aptInfo.aptResidentUuid`가 된다 */
-  uuid?: string
-  aptName?: string
-  aptId?: string | number
-  aptLogoFileUrl?: string
-  name?: string
-  nickName?: string
-  /** 구 아파트먼트 커뮤니티 토큰 */
-  oldApartmantToken?: string
-  contentList?: LoginInfoContent[]
-  /** 입주민의 A-PASS 서비스 가입 여부 */
-  apassUseFlag?: boolean
-  /** 기기 A-PASS 활성화 여부 */
-  apassOnOffFlag?: boolean
-}
-
 /**
  * A2(휴대폰 인증) → A3(비밀번호 재설정)로 넘기는 라우터 state.
  *

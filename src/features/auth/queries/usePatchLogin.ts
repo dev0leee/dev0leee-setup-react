@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { postLogin } from '@/features/auth/api/auth'
 import { LOGIN_ERROR_MESSAGE } from '@/features/auth/constants/loginInfo'
 import { useLoginData } from '@/features/auth/hooks/useLoginData'
-import { useWaitingMemberFcmToken } from '@/features/auth/hooks/useWaitingMemberFcmToken'
 import type { LoginPayload } from '@/features/auth/types/auth'
 import { LOGIN_ERROR_CODE } from '@/shared/constants/errorCode'
 import { ROUTE_PATH } from '@/shared/constants/routes'
 import { useLogoutFlow } from '@/shared/hooks/useLogoutFlow'
+import { useWaitingMemberFcmToken } from '@/shared/hooks/useWaitingMemberFcmToken'
 import { showErrorModal } from '@/shared/lib/errorModal'
 import { setTokens } from '@/shared/lib/tokenStore'
 import { useAuthStore } from '@/shared/stores/authStore'
@@ -98,7 +98,10 @@ export const usePatchLogin = () => {
         case LOGIN_ERROR_CODE.RESIDENT_NOT_APPROVED:
           // 승인 결과를 문자 대신 푸시로 보내기 위해 FCM 토큰을 먼저 등록시킨다.
           try {
-            await sendWaitingMemberInfo(variables)
+            await sendWaitingMemberInfo({
+              id: cleanPhoneHyphen({ phone: variables.id }),
+              password: variables.password,
+            })
           } catch (fcmError) {
             console.error('[usePatchLogin] 미승인 입주민 정보 발신 실패', fcmError)
           }

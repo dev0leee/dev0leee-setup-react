@@ -99,8 +99,10 @@ S1은 `hasBackButton:true`, `backPath:'/'`. 상세는 `routes.md` §3-2.
 > `tailwind.config.js`에 있는 것은 `border-tertiary`이고 **`tertiary0`·`primary0`은 없다.**
 > Tailwind가 무시하므로 색상이 적용되지 않고 **기본 border/text 색으로 렌더된다.**
 >
-> **고치면 안 된다.** 오타를 바로잡으면 테두리·글자 색이 바뀌어 화면이 달라진다.
-> 오타 그대로 이식하거나, 아예 클래스를 빼서 같은 결과를 만든다.
+> 🔵 **2026-07-30 정정 — 오타를 고쳐서 옮긴다.** 대상 토큰(`border-tertiary`·`text-primary`)이
+> config에 그대로 있어 추측이 필요 없다 (`broken-styles.md` §0 A그룹, 사용자 결정).
+> `text-defaults-primary-text-primary`(`#111927`)는 상속색과 같아 **화면이 바뀌지 않고**,
+> 테두리만 기본 `#E5E7EB` → `#F3F4F6`로 미세하게 밝아진다.
 > 사용처 3곳: `TermsOfUseAgreeView.vue:36,45`, `TermsCheckboxList.vue:32`.
 
 ### 고정 문구
@@ -440,9 +442,18 @@ navigateTo('/signup/info/user')
 > 키가 바뀌면 TanStack Query가 자동으로 새로 fetch한다. 이관 시 이 `watch`는 **옮기지 않아도
 > 동작이 같다.** → `deferred.md` D-30
 
-### 세대주 라디오 — `SignUpAptInfoRadio`
+### 세대주 라디오 — 🔴 `SignUpAptInfoRadio.vue`는 **죽은 파일이다**
 
-`<input type="radio" class="hidden">` + `<label>` 스타일링으로 만든 세그먼트 컨트롤이다.
+> **2026-07-30 실측 정정.** 전수 검색 결과 `SignUpAptInfoRadio.vue`를 import하는 곳이
+> **0곳**이다. S4가 실제로 쓰는 것은 공용 **`InputRadioDual`**이고, 그 선택 상태는
+> `bg-brand-default-background-brand`(`#0037BE`, **살아 있는 토큰**) + 흰 글자다 —
+> **선택 표시가 처음부터 잘 보인다.**
+>
+> 따라서 아래 표와 `bg-primary-400`(B-Q1) 논의는 **화면에 영향이 없다.**
+> 결정 자체는 유효하지만 적용할 자리가 없어 이 파일은 이관하지 않았다 (`deferred.md` D-213).
+> 실제 이관본은 `InputRadioDual` + `HOUSEHOLD_HEAD_OPTIONS`다.
+
+아래는 죽은 파일의 내용 기록이다.
 
 | 상태          | 클래스                                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------------------ |

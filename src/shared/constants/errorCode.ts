@@ -16,3 +16,17 @@ export const LOGIN_ERROR_CODE = {
   /** 미승인 세대 → 승인 대기 화면으로 */
   RESIDENT_NOT_APPROVED: 'RESIDENT_NOT_APPROVED',
 } as const
+
+/**
+ * 가입(회원가입 · 버전1 전환) 에러코드.
+ *
+ * **두 도메인이 같은 표를 쓴다** — `signup.md` S4와 `auth.md` A6의 매핑이 동일하다.
+ * 차이는 처리뿐이다: 버전1은 에러 시 세션을 지우고 `/`로 보내지만 회원가입은 그렇지 않다.
+ */
+export const SIGNUP_ERROR_CODE = {
+  RESIDENT_ALREADY_EXISTS: 'RESIDENT_ALREADY_EXISTS',
+  HOUSEHOLD_NOT_FOUND: 'HOUSEHOLD_NOT_FOUND',
+  HOUSEHOLD_HEAD_ALREADY_EXISTS: 'HOUSEHOLD_HEAD_ALREADY_EXISTS',
+  /** KMC 인증 유효시간 만료. 모달을 닫으면 처음으로 돌려보낸다 */
+  KMC_ERROR: 'KMC_ERROR',
+} as const

@@ -11,6 +11,8 @@ import {
   LogoutPage,
   PasswordCertPage,
   PasswordResetPage,
+  VersionOneCertResponsePage,
+  VersionOneTermsPage,
 } from '@/features/auth'
 import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
 import { ROUTE_PATH } from '@/shared/constants/routes'
@@ -80,6 +82,84 @@ export const routes = [
                 element: <LoginPendingPage />,
                 handle: layout({ showAppBar: false }),
                 loader: publicRouteLoader,
+              },
+
+              // ── 버전1 입주민 전환 ───────────────────────────────────────────
+              // 로그인 직후(토큰은 있고 단지 정보는 없는 상태)에 오는 화면이라
+              // `publicRouteLoader`를 걸어도 `hasStoredSession()`이 false다.
+              // 레거시가 `requiresAuth: false`를 명시한 것과 같은 결과다.
+              {
+                path: ROUTE_PATH.VERSION_ONE_TERMS,
+                element: <VersionOneTermsPage />,
+                // 제목은 빈 문자열, 뒤로가기는 히스토리가 아니라 `/`로 보낸다
+                handle: layout({ backPath: ROUTE_PATH.HOME }),
+                loader: publicRouteLoader,
+              },
+              {
+                path: ROUTE_PATH.VERSION_ONE_TERMS_RESPONSE,
+                element: <VersionOneCertResponsePage />,
+                handle: layout({ showAppBar: false }),
+                loader: publicRouteLoader,
+              },
+
+              // ── 회원가입 위저드 ─────────────────────────────────────────────
+              {
+                // ⚠️ `authOptional`이라 **로그인 여부를 묻지 않는다** → loader를 걸지 않는다
+                path: ROUTE_PATH.SIGNUP_TERMS,
+                handle: layout({ backPath: ROUTE_PATH.HOME }),
+                lazy: async () => {
+                  const { TermsAndConditionsPage } = await import('@/features/signup')
+                  return { Component: TermsAndConditionsPage }
+                },
+              },
+              {
+                path: ROUTE_PATH.SIGNUP_CERT_RESPONSE,
+                handle: layout({ showAppBar: false }),
+                loader: publicRouteLoader,
+                lazy: async () => {
+                  const { SignUpCertResponsePage } = await import('@/features/signup')
+                  return { Component: SignUpCertResponsePage }
+                },
+              },
+              {
+                // ⚠️ **레거시 meta가 `showAppBar: true`인데 화면도 AppBar를 렌더한다** —
+                // 같은 자리에 두 개가 겹친다. 위에 오는 화면 쪽이 클릭을 받아 동작은
+                // 화면 것이 이긴다. 등가 이관으로 그대로 재현했다 (`deferred.md` D-212)
+                path: ROUTE_PATH.SIGNUP_INFO_USER,
+                loader: publicRouteLoader,
+                lazy: async () => {
+                  const { UserInfoPage } = await import('@/features/signup')
+                  return { Component: UserInfoPage }
+                },
+              },
+              {
+                path: ROUTE_PATH.SIGNUP_INFO_APT,
+                handle: layout({ showAppBar: false }),
+                loader: publicRouteLoader,
+                lazy: async () => {
+                  const { AptInfoPage } = await import('@/features/signup')
+                  return { Component: AptInfoPage }
+                },
+              },
+              {
+                path: ROUTE_PATH.SIGNUP_COMPLETED,
+                handle: layout({ showAppBar: false }),
+                loader: publicRouteLoader,
+                lazy: async () => {
+                  const { SignUpCompletedPage } = await import('@/features/signup')
+                  return { Component: SignUpCompletedPage }
+                },
+              },
+
+              {
+                // 약관 본문(iframe). `authOptional`이라 **로그인 상태에서도 열려야 한다** —
+                // 마이페이지 약관 및 정책(P6)이 여기로 온다. loader를 걸면 `/main`으로 튕긴다
+                path: `${ROUTE_PATH.TERMS_OF_USE_DETAIL}/:termsId`,
+                handle: layout({ appBarTitle: '약관 상세' }),
+                lazy: async () => {
+                  const { TermsDetailPage } = await import('@/features/terms')
+                  return { Component: TermsDetailPage }
+                },
               },
               {
                 // 레거시 `authOptional` — 가드를 우회한다. 인증이 깨져서 오는 화면이라

@@ -43,3 +43,29 @@ export interface ResidentApt {
   aptName?: string
   residentState?: string
 }
+
+/**
+ * `GET /login/info` · `GET /login/waiting-info` 응답.
+ *
+ * **두 엔드포인트가 같은 모양을 준다.** 승인 전(waiting)에도 같은 필드를 받아
+ * 네이티브에 발신해야 FCM 토큰이 등록된다 (`auth.md` A4).
+ *
+ * `shared/`에 있는 이유: 이 값으로 만드는 네이티브 페이로드를 **auth와 signup이 함께**
+ * 보낸다. 전 필드 optional인 것은 레거시가 전부 옵셔널 체이닝으로 읽기 때문이다.
+ */
+export interface LoginInfo {
+  /** 입주민 uuid. `aptInfo.aptResidentUuid`가 된다 */
+  uuid?: string
+  aptName?: string
+  aptId?: string | number
+  aptLogoFileUrl?: string
+  name?: string
+  nickName?: string
+  /** 구 아파트먼트 커뮤니티 토큰 */
+  oldApartmantToken?: string
+  contentList?: AptContentItem[]
+  /** 입주민의 A-PASS 서비스 가입 여부 */
+  apassUseFlag?: boolean
+  /** 기기 A-PASS 활성화 여부 */
+  apassOnOffFlag?: boolean
+}

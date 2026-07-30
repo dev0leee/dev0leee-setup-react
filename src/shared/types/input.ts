@@ -48,6 +48,11 @@ export interface InputSearchProps {
   onChange: (value: string) => void
   onBlur?: () => void
   /**
+   * 읽기 전용 검색창을 눌렀을 때. 레거시는 컴포넌트에 `@click`을 달아 루트 요소로
+   * 흘려보냈다(Vue fallthrough) — 회원가입 아파트 검색이 이 방식으로 모달을 연다.
+   */
+  onClick?: () => void
+  /**
    * 읽기 전용. 이때 버튼의 `type`이 `submit`이 아니라 `button`이 된다 —
    * 검색창을 눌러 다른 화면으로 보내는 용도로 쓰기 때문이다.
    */

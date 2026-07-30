@@ -14,11 +14,14 @@ export const InputSearch = ({
   value,
   onChange,
   onBlur,
+  onClick,
   isReadonly = false,
   placeholder = '검색',
 }: InputSearchProps) => {
   return (
-    <div className="relative flex h-10 w-full">
+    // 읽기 전용일 때 클릭을 루트에서 받는다 — 레거시가 컴포넌트에 `@click`을 달았다.
+    // 입력·버튼 어디를 눌러도 같은 동작이어야 하므로 개별 요소가 아니라 루트에 둔다.
+    <div className="relative flex h-10 w-full" onClick={onClick} role="presentation">
       <input
         id={id}
         type="search"

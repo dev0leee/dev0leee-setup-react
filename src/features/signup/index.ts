@@ -1,0 +1,5 @@
+export { AptInfoPage } from '@/features/signup/pages/AptInfoPage'
+export { SignUpCertResponsePage } from '@/features/signup/pages/SignUpCertResponsePage'
+export { SignUpCompletedPage } from '@/features/signup/pages/SignUpCompletedPage'
+export { TermsAndConditionsPage } from '@/features/signup/pages/TermsAndConditionsPage'
+export { UserInfoPage } from '@/features/signup/pages/UserInfoPage'
