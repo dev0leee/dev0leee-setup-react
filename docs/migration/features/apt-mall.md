@@ -1,7 +1,7 @@
 # 도메인 명세 — 아파트몰 / 주말조식 예약 (aptMall)
 
 > 기준 SHA `6d5bf22` · 레거시 `views/AptMallView/` 19개 파일 1,472 LOC
-> 타깃 슬라이스 `features/apt-mall/`
+> 타깃 슬라이스 `features/aptMall/`
 > API 8개 (`endpoints.md` #102~#109) · 쿼리 훅 8개 · Pinia 스토어 1개 · 라우트 **3개**
 
 **라우트는 3개인데 화면은 11개다.** 예약 생성 전체가 라우트 없는 **바텀시트 5단계 위저드**로 들어있다
@@ -1439,7 +1439,7 @@ const dateTime = computed(
 ## 타깃 슬라이스 구조 (제안)
 
 ```
-src/features/apt-mall/
+src/features/aptMall/
 ├── api/
 │   └── aptMall.ts                      # #102~#109
 ├── queries/

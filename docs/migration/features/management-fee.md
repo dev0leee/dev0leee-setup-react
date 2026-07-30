@@ -2,7 +2,7 @@
 
 > 기준 SHA `6d5bf22` · 레거시 `views/ManagementFeeView/` 3개 파일 906 LOC
 > (쿼리 94 + API 25 포함 **도메인 1,025 LOC**, 메인 카드 193 별도)
-> 타깃 슬라이스 `features/management-fee/`
+> 타깃 슬라이스 `features/managementFee/`
 > API 2개 (`endpoints.md` #146~#147) · 쿼리 훅 2개 · Pinia 스토어 **없음** · 라우트 2개
 
 **파일 수는 3개인데 906줄이다.** 파일당 평균 302줄로 전 도메인 중 가장 밀도가 높다.
@@ -968,7 +968,7 @@ Base UI `Dialog`(바텀시트 변형) 위에 목록을 올리는 형태로 재�
 ## 타깃 슬라이스 구조 (제안)
 
 ```
-src/features/management-fee/
+src/features/managementFee/
 ├── api/
 │   └── managementFee.ts              # #146 · #147 (startDateTIme 오타 유지)
 ├── queries/

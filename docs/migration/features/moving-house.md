@@ -2,7 +2,7 @@
 
 > 기준 SHA `6d5bf22` · 레거시 `views/MovingHouseView/` 10개 파일 1,071 LOC
 > (상수 111 + 스키마 34 + 쿼리 300 + API 87 포함 **총 1,660 LOC**)
-> 타깃 슬라이스 `features/moving-house/`
+> 타깃 슬라이스 `features/movingHouse/`
 > API 7개 (`endpoints.md` #124~#130) · 쿼리 훅 7개 · Pinia 스토어 1개 · zod 스키마 1개 · 라우트 4개
 
 **이 도메인의 핵심은 "단지 설정(`chargeFlag`)에 따라 화면이 갈린다"는 것이다.**
@@ -1132,7 +1132,7 @@ MH4를 **직접 URL로 열거나** 새로고침하면 `-2`가 앱 밖으로 나�
 ## 타깃 슬라이스 구조 (제안)
 
 ```
-src/features/moving-house/
+src/features/movingHouse/
 ├── api/
 │   └── movingHouse.ts                  # #124~#130
 ├── queries/

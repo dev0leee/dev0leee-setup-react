@@ -5,6 +5,32 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+/**
+ * feature 슬라이스 전수. `docs/migration/features/*.md`의 「타깃 슬라이스」와 1:1로 대응한다.
+ * 폴더명은 camelCase (docs/conventions/02-naming.md).
+ * `dashboard`는 템플릿 데모라 이관 완료 후 제거한다.
+ */
+const FEATURE_SLICES = [
+  'apass',
+  'aptMall',
+  'auth',
+  'board',
+  'dashboard',
+  'exception',
+  'fireInspection',
+  'main',
+  'managementFee',
+  'movingHouse',
+  'mypage',
+  'parking',
+  'repair',
+  'signup',
+  'survey',
+  'terms',
+  'visit',
+  'vote',
+]
+
 export default tseslint.config(
   { ignores: ['dist', 'coverage', 'node_modules', 'playwright-report', 'public'] },
 
@@ -85,12 +111,14 @@ export default tseslint.config(
         {
           zones: [
             // feature 는 다른 feature 를 모른다.
-            { target: './src/features/auth', from: './src/features', except: ['./auth'] },
-            {
-              target: './src/features/dashboard',
-              from: './src/features',
-              except: ['./dashboard'],
-            },
+            // 새 feature 슬라이스를 만들면 이 목록에 한 줄 추가한다. 빠뜨리면 무방비다.
+            ...FEATURE_SLICES.map((slice) => {
+              return {
+                target: `./src/features/${slice}`,
+                from: './src/features',
+                except: [`./${slice}`],
+              }
+            }),
             // 역방향 금지. app 은 features 를 알지만 그 반대는 아니다.
             { target: './src/features', from: './src/app' },
             { target: './src/shared', from: ['./src/features', './src/app'] },
@@ -129,12 +157,17 @@ export default tseslint.config(
 
   {
     // shadcn이 생성/갱신하는 파일. 직접 수정하지 않으므로 규칙을 끈다.
+    // 스타일 규칙(import 순서·화살표 본문)도 끈다 — CLI 출력이 우리 규칙을 모르므로
+    // 켜두면 `shadcn add` 한 번에 lint가 깨지고, 손으로 고치면 CLAUDE.md 규칙 7을 어기게 된다.
     files: ['src/shared/components/ui/**'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'react-refresh/only-export-components': 'off',
       'no-shadow': 'off',
       '@typescript-eslint/no-shadow': 'off',
+      'import/order': 'off',
+      'sort-imports': 'off',
+      'arrow-body-style': 'off',
     },
   },
 

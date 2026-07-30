@@ -2,7 +2,7 @@
 
 > 기준 SHA `6d5bf22` · 레거시 `views/FireInspectionView/` 13개 파일 1,231 LOC
 > (상수 308 + composable 309 + 쿼리 134 + API 51 포함 **총 2,087 LOC**)
-> 타깃 슬라이스 `features/fire-inspection/`
+> 타깃 슬라이스 `features/fireInspection/`
 > API 3개 (`endpoints.md` #137~#139) · 쿼리 훅 3개 · composable 1개 · Pinia 스토어 **없음** · 라우트 4개
 
 **이 도메인은 다른 도메인과 성격이 다르다.**
@@ -1200,7 +1200,7 @@ const isCategoryNotApplicable = (category) =>
 ## 타깃 슬라이스 구조 (제안)
 
 ```
-src/features/fire-inspection/
+src/features/fireInspection/
 ├── api/
 │   └── fireInspection.ts               # 3개
 ├── queries/

@@ -99,6 +99,28 @@ e2e/            Playwright
 코드에서 `import.meta.env`를 직접 쓰지 말고 `env` 객체를 쓴다.
 `eslint.config.js`의 `no-restricted-syntax`가 `src/**`에서 이를 강제한다.
 
+`pnpm test`는 `.env.test`를 쓰지 않는다. `vite.config.ts`의 `test.env`가 전 변수를 고정 주입해
+로컬과 CI가 같은 값으로 돌게 한다. 스키마에 변수를 추가하면 **여기도 같이 고친다.**
+
+### 변수 목록
+
+| 변수                                                                                            | 필수                      | 비고                                       |
+| ----------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
+| `VITE_API_URL`                                                                                  | ✅                        | API 서버 baseURL                           |
+| `VITE_ENV`                                                                                      | ✅                        | `development` \| `staging` \| `production` |
+| `VITE_BASE_URL`                                                                                 | ✅                        | 앱 자신의 배포 URL                         |
+| `VITE_S3_BUCKET_URL_FILE`                                                                       | ✅                        | 첨부파일 버킷                              |
+| `VITE_S3_BUCKET_URL_STATICS` · `VITE_VERSION_ONE_URL` · `VITE_TERMS_URL` · `VITE_COMMUNITY_URL` | ✅ (메인 앱만)            | `getMainEnv()`가 검증. opinion 빌드는 제외 |
+| `VITE_SENTRY_DSN`                                                                               | —                         | 없으면 Sentry 초기화를 건너뛴다            |
+| `VITE_BUILD_ID`                                                                                 | — (기본 `local`)          | 배포 커밋 SHA. 새 배포 감지에 쓴다         |
+| `VITE_POSTHOG_PROJECT_TOKEN`                                                                    | —                         | 없으면 PostHog를 초기화하지 않는다         |
+| `VITE_POSTHOG_HOST`                                                                             | — (기본 us.i.posthog.com) |                                            |
+| `VITE_ENABLE_MSW`                                                                               | — (기본 `false`)          | 개발 중 목 서버                            |
+
+**메인 앱 전용 변수 4개는 `env`가 아니라 `getMainEnv()`로 읽는다.** opinion 빌드에는 이 변수가
+주입되지 않으므로(`docs/migration/env-vars.md` §1-2) `env`에 합치면 opinion 앱이 부팅하지 못한다.
+`src/main.tsx`가 부팅 시 `getMainEnv()`를 한 번 불러 메인 앱의 fail-fast를 유지한다.
+
 ### `import.meta.env` 직접 접근이 허용되는 곳 (공식 예외 2곳)
 
 | 파일                | 이유                                                                                                                                                                   |

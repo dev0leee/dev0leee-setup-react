@@ -3,7 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { App } from '@/app/App'
-import { env } from '@/config/env'
+import { env, getMainEnv } from '@/config/env'
 import {
   DEVELOPMENT_TRACES_SAMPLE_RATE,
   PRODUCTION_TRACES_SAMPLE_RATE,
@@ -39,6 +39,10 @@ const enableMocking = async (): Promise<void> => {
 }
 
 const bootstrap = async (): Promise<void> => {
+  // 메인 앱 전용 환경변수를 부팅 시점에 검증한다(config/env.ts 참고).
+  // opinion 엔트리는 이 호출을 하지 않는다 — 해당 변수를 주입받지 않기 때문이다.
+  getMainEnv()
+
   const rootElement = document.getElementById('root')
   if (!rootElement) throw new Error('#root 엘리먼트를 찾을 수 없습니다.')
 
