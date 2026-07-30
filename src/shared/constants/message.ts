@@ -10,6 +10,12 @@ export const NETWORK_ERROR_MESSAGE = '네트워크 상태를 확인해주세요'
 /** 자동 로그인 실패로 대기 요청을 거부할 때의 에러 메시지. 레거시 문구 그대로. */
 export const AUTO_LOGIN_FAILED_MESSAGE = '자동 로그인 실패'
 
+/**
+ * 세대 전출 안내. `RESIDENT_NOT_FOUND` 응답을 받았을 때 뜬다.
+ * 레거시에서 **유일하게 `icon: 'info'`를 쓰는 모달**이다 (`useGetResidentDetailInfo.js`).
+ */
+export const MOVED_OUT_MESSAGE = '세대에서 전출되었습니다.'
+
 /** 에러 모달의 기본 본문. 레거시 `swalErrorModal`의 `text` 기본값 그대로. */
 export const DEFAULT_ERROR_MODAL_TEXT = '에러가 발생했습니다. 잠시 후 다시 시도해주세요.'
 

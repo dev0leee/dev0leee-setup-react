@@ -1,25 +1,10 @@
 import { useCallback } from 'react'
 
-import { getLoginInfo, getResidentAptList } from '@/features/auth/api/auth'
-import { APT_SERVICE_NAME } from '@/features/auth/constants/loginInfo'
-import type { LoginInfo } from '@/features/auth/types/auth'
+import { getLoginInfo } from '@/features/auth/api/auth'
+import { APT_CONTENT_NAME } from '@/shared/constants/aptContent'
+import { fetchResidentAptList, hasAptContent } from '@/shared/lib/aptContext'
 import { nativeSendInitialResidentInfo } from '@/shared/lib/native/auth'
 import { useAuthStore } from '@/shared/stores/authStore'
-
-/** `contentList`에서 서비스 보유 여부를 본다. **`trim()`이 필수다** */
-export const hasAptService = ({
-  loginInfo,
-  serviceName,
-}: {
-  loginInfo: LoginInfo | undefined
-  serviceName: string
-}): boolean => {
-  return (
-    loginInfo?.contentList?.some((content) => {
-      return content.name.trim() === serviceName
-    }) ?? false
-  )
-}
 
 /**
  * 로그인 직후 단지 컨텍스트를 채우고 네이티브에 입주민 정보를 발신한다.
@@ -37,7 +22,10 @@ export const useLoginData = () => {
   return useCallback(async () => {
     try {
       // 두 요청을 병렬로 보낸다(레거시도 Promise.all).
-      const [loginInfo, residentAptList] = await Promise.all([getLoginInfo(), getResidentAptList()])
+      const [loginInfo, residentAptList] = await Promise.all([
+        getLoginInfo(),
+        fetchResidentAptList(),
+      ])
 
       // aptUuid는 login/info에 없어서 단지 목록에서 uuid로 찾아온다.
       const matchedApt = residentAptList.find((apt) => {
@@ -55,14 +43,17 @@ export const useLoginData = () => {
         aptLogoFileUrl: loginInfo?.aptLogoFileUrl,
       })
 
-      const hasLobbyPhone = hasAptService({
-        loginInfo,
-        serviceName: APT_SERVICE_NAME.LOBBY_PHONE,
+      const hasLobbyPhone = hasAptContent({
+        contentList: loginInfo?.contentList,
+        contentName: APT_CONTENT_NAME.LOBBY_PHONE,
       })
 
       nativeSendInitialResidentInfo({
         aptResidentUuid: loginInfo?.uuid ?? '',
-        hasAptApassService: hasAptService({ loginInfo, serviceName: APT_SERVICE_NAME.APASS }),
+        hasAptApassService: hasAptContent({
+          contentList: loginInfo?.contentList,
+          contentName: APT_CONTENT_NAME.APASS,
+        }),
         hasResidentApassService: loginInfo?.apassUseFlag ?? false,
         isDeviceApassActive: loginInfo?.apassOnOffFlag ?? false,
         hasAptLobbyPhoneService: hasLobbyPhone,

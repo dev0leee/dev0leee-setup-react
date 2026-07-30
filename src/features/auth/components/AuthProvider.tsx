@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 
-import { useLogoutFlow } from '@/features/auth/hooks/useLogoutFlow'
 import { usePatchLogin } from '@/features/auth/queries/usePatchLogin'
 import type { AuthProviderProps } from '@/features/auth/types/auth'
 import { ROUTE_PATH } from '@/shared/constants/routes'
+import { useLogoutFlow } from '@/shared/hooks/useLogoutFlow'
 import { nativeEndSplash } from '@/shared/lib/native/common'
 import { useAuthStore } from '@/shared/stores/authStore'
 

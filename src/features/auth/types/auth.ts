@@ -50,12 +50,6 @@ export interface LoginInfo {
   apassOnOffFlag?: boolean
 }
 
-/** `GET /apt-resident/apt` 항목 */
-export interface ResidentApt {
-  aptResidentUuid?: string
-  aptUuid?: string
-}
-
 /** ProtectedRoute가 리다이렉트 시 남기는 원래 위치 */
 export interface LocationState {
   from?: { pathname: string }

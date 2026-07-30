@@ -3,7 +3,6 @@ import type {
   LoginPayload,
   LoginResponseBody,
   LoginResult,
-  ResidentApt,
 } from '@/features/auth/types/auth'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api, publicApi } from '@/shared/lib/apiClient'
@@ -34,14 +33,6 @@ export const postLogin = async ({ id, password }: LoginPayload): Promise<LoginRe
 export const getLoginInfo = async (): Promise<LoginInfo | undefined> => {
   const response = await api.get<ServerSuccessBody<LoginInfo>>(`${API_PREFIX.APARTMANT}/login/info`)
   return response.data.success
-}
-
-/** 입주민이 속한 단지 목록. `aptUuid`를 얻으려고 호출한다 */
-export const getResidentAptList = async (): Promise<ResidentApt[]> => {
-  const response = await api.get<ServerSuccessBody<ResidentApt[]>>(
-    `${API_PREFIX.APARTMANT}/apt-resident/apt`,
-  )
-  return response.data.success ?? []
 }
 
 /**

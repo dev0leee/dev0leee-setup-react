@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 
 import { getWaitingMemberLoginInfo } from '@/features/auth/api/auth'
-import { APT_SERVICE_NAME } from '@/features/auth/constants/loginInfo'
-import { hasAptService } from '@/features/auth/hooks/useLoginData'
 import type { LoginPayload } from '@/features/auth/types/auth'
+import { APT_CONTENT_NAME } from '@/shared/constants/aptContent'
+import { hasAptContent } from '@/shared/lib/aptContext'
 import { nativeSendInitialResidentInfo } from '@/shared/lib/native/auth'
 import { nativeEndSplash } from '@/shared/lib/native/common'
 import { cleanPhoneHyphen } from '@/shared/utils/cleanPhoneHyphen'
@@ -23,11 +23,17 @@ export const useWaitingMemberFcmToken = () => {
     })
     if (!loginInfo) return
 
-    const hasLobbyPhone = hasAptService({ loginInfo, serviceName: APT_SERVICE_NAME.LOBBY_PHONE })
+    const hasLobbyPhone = hasAptContent({
+      contentList: loginInfo.contentList,
+      contentName: APT_CONTENT_NAME.LOBBY_PHONE,
+    })
 
     nativeSendInitialResidentInfo({
       aptResidentUuid: loginInfo.uuid ?? '',
-      hasAptApassService: hasAptService({ loginInfo, serviceName: APT_SERVICE_NAME.APASS }),
+      hasAptApassService: hasAptContent({
+        contentList: loginInfo.contentList,
+        contentName: APT_CONTENT_NAME.APASS,
+      }),
       hasResidentApassService: loginInfo.apassUseFlag ?? false,
       isDeviceApassActive: loginInfo.apassOnOffFlag ?? false,
       hasAptLobbyPhoneService: hasLobbyPhone,

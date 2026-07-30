@@ -2,9 +2,10 @@ import { useMutation } from '@tanstack/react-query'
 
 import { deleteLogout } from '@/features/auth/api/auth'
 import { putLobbyPhoneResidentLogout } from '@/features/auth/api/lobbyPhone'
-import { APT_SERVICE_NAME } from '@/features/auth/constants/loginInfo'
-import { useLogoutFlow } from '@/features/auth/hooks/useLogoutFlow'
+import { APT_CONTENT_NAME } from '@/shared/constants/aptContent'
 import { ROUTE_PATH } from '@/shared/constants/routes'
+import { useLogoutFlow } from '@/shared/hooks/useLogoutFlow'
+import { hasAptContent } from '@/shared/lib/aptContext'
 import { showErrorModal } from '@/shared/lib/errorModal'
 import { getRefreshToken } from '@/shared/lib/tokenStore'
 import { getAptInfo, useAuthStore } from '@/shared/stores/authStore'
@@ -31,10 +32,10 @@ export const useDeleteLogout = () => {
       if (isAutoLoginInProgress) setAutoLoginInProgress(false)
 
       const aptInfo = getAptInfo()
-      const hasLobbyPhone =
-        aptInfo.contentList?.some((content) => {
-          return content.name.trim() === APT_SERVICE_NAME.LOBBY_PHONE
-        }) ?? false
+      const hasLobbyPhone = hasAptContent({
+        contentList: aptInfo.contentList,
+        contentName: APT_CONTENT_NAME.LOBBY_PHONE,
+      })
 
       try {
         // 로비폰 세대는 로비폰 서버에도 로그아웃을 알린다.

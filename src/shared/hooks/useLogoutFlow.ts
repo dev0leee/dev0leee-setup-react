@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { RESIDENT_DETAIL_INFO_QUERY_KEY } from '@/features/auth/constants/query'
+import { RESIDENT_DETAIL_INFO_QUERY_KEY } from '@/shared/constants/query'
 import { nativeLogoutApp } from '@/shared/lib/native/auth'
 import { useAuthStore } from '@/shared/stores/authStore'
 
@@ -14,6 +14,11 @@ import { useAuthStore } from '@/shared/stores/authStore'
  *
  * ⚠️ **순서를 지킨다.** 캐시 제거 → 스토어 정리 → 네이티브 통보 → 이동.
  * 이동을 먼저 하면 다음 화면이 아직 남아 있는 토큰으로 요청을 보낸다.
+ *
+ * `features/auth`가 아니라 `shared/`에 있다. 로그인·로그아웃이라는 **동작**은 auth 도메인이지만
+ * 이 함수는 "세션을 버린다"는 **하부구조 조작**이고, 세대 전출(`useResidentDetailInfo`)·
+ * 회원 탈퇴(mypage)처럼 auth 밖에서도 부른다. feature가 feature를 import하지 않으려면
+ * 여기 있어야 한다 (`01-folder-structure.md` "feature 간 의존").
  */
 export const useLogoutFlow = () => {
   const queryClient = useQueryClient()
