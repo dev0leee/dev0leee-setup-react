@@ -3,9 +3,9 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppRoot } from '@/app/AppRoot'
 import { AppLayout } from '@/app/layouts/AppLayout'
 import { RootLayout } from '@/app/layouts/RootLayout'
-import { NotFoundPage } from '@/app/NotFoundPage'
 import { ProtectedRoute } from '@/app/ProtectedRoute'
 import { LoginPage } from '@/features/auth'
+import { NotFoundPage } from '@/features/exception'
 import { FullPageSpinner } from '@/shared/components/common/FullPageSpinner'
 import { ROUTE_PATH } from '@/shared/constants/routes'
 import type { RouteLayoutConfig } from '@/shared/types/layout'
@@ -51,6 +51,16 @@ export const routes = [
                 element: <LoginPage />,
                 handle: layout({ showAppBar: false }),
               },
+              {
+                // 레거시 `authOptional` — 가드를 우회한다. 인증이 깨져서 오는 화면이라
+                // 가드 안에 두면 인트로로 튕겨 에러 내용을 볼 수 없다.
+                path: ROUTE_PATH.ERROR,
+                handle: layout({ showAppBar: false }),
+                lazy: async () => {
+                  const { ErrorPage } = await import('@/features/exception')
+                  return { Component: ErrorPage }
+                },
+              },
 
               // ── 인증 필요 ───────────────────────────────────────────────────
               {
@@ -62,6 +72,15 @@ export const routes = [
                     lazy: async () => {
                       const { MainPage } = await import('@/features/main')
                       return { Component: MainPage }
+                    },
+                  },
+                  {
+                    // E1과 같은 화면이다. 여기만 하단 탭이 보인다 (`exception.md` E2)
+                    path: ROUTE_PATH.ERROR_AUTH,
+                    handle: layout({ showAppBar: false, showBottomNav: true }),
+                    lazy: async () => {
+                      const { ErrorPage } = await import('@/features/exception')
+                      return { Component: ErrorPage }
                     },
                   },
                 ],

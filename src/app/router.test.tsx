@@ -145,7 +145,7 @@ describe('로그인 → 메인 진입', () => {
 
     // `/login/pending` 화면은 Phase 6에서 만든다. 지금은 NotFound가 뜨는 것이
     // "이동은 일어났다"는 증거다 — 라우트가 추가되면 이 기대값을 바꾼다.
-    expect(await screen.findByText('404')).toBeInTheDocument()
+    expect(await screen.findByText('경로가 올바르지 않습니다')).toBeInTheDocument()
   })
 
   it('저장된 세션이 있으면 인트로에서 메인으로 넘긴다', async () => {

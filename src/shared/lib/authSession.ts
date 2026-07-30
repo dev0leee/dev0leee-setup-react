@@ -17,3 +17,15 @@ export const hasStoredSession = (): boolean => {
 
   return hasAptInfo && hasAccessToken
 }
+
+/**
+ * 레거시 `authStore.isLoggedIn` — **액세스 토큰만** 본다
+ * (`useAuthStorage.js:67` `!!accessToken`).
+ *
+ * `hasStoredSession`과 갈리는 지점이다: 토큰은 있고 단지 정보는 없는 상태에서
+ * 라우터 가드는 막지만 에러 화면(`exception.md` E1)은 "로그인됨"으로 취급해
+ * `/main`으로 보낸다. 레거시가 두 판정을 다르게 쓰는 것을 그대로 옮겼다.
+ */
+export const isLoggedIn = (): boolean => {
+  return Boolean(getAccessToken())
+}
