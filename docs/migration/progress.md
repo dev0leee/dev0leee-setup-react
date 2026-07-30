@@ -123,8 +123,8 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 | Repair            |     11 |  964 | **완료** | 미착수 |                  |
 | ManagementFee     |      3 |  906 | **완료** | 미착수 |                  |
 | Apass             |      3 |  301 | **완료** | 미착수 |                  |
-| TermsOfUse        |      3 |  158 | **부분** | 미착수 |                  |
-| opinion 앱        |      — |    — | 미착수   | 미착수 |                  |
+| TermsOfUse        |      3 |  158 | **완료** | 미착수 | ← `signup.md` 내 |
+| opinion 앱        |      — |    — | **완료** | 미착수 |                  |
 
 ---
 
@@ -148,8 +148,36 @@ git -C ~/Desktop/working/smcom/apt-resident-fe log --oneline 6d5bf22..origin/dev
 ### A. Phase 2 도메인 명세 — `features/<domain>.md`
 
 기반 도메인 6개 **완료** · 대형 4개(Board·Parking·Visit·Vote) **완료** ·
-Survey·AptMall·FireInspection·MovingHouse·Repair·ManagementFee·Apass **완료**.
-남은 것: **TermsOfUse(3/158 — `signup.md`에 포함됨. 커버리지 확인만) · opinion**
+
+### 🎯 **Phase 2 종료 — 도메인 19/19 완료**
+
+| 문서                 |       줄수 | 담당 범위                                           |
+| -------------------- | ---------: | --------------------------------------------------- |
+| `auth.md`            |        560 | Intro + Login                                       |
+| `signup.md`          |        696 | SignUp + **TermsOfUse**                             |
+| `exception.md`       |        231 | 에러·404 (메인 + opinion)                           |
+| `main.md`            |      1,000 | Main (카드 5종 포함)                                |
+| `mypage.md`          |        641 | MyPage                                              |
+| `board.md`           |      2,984 | 소통공간 + 민원공간 + 공지                          |
+| `parking.md`         |      2,221 | 주차관리 (미출차 제외)                              |
+| `visit.md`           |      1,463 | 방문·로비폰·안면인식                                |
+| `vote.md`            |      1,293 | 전자투표 (메인 + opinion)                           |
+| `survey.md`          |      1,053 | 설문조사 (메인 + opinion)                           |
+| `apt-mall.md`        |      1,584 | 아파트몰/주말조식                                   |
+| `fire-inspection.md` |      1,345 | 소방 자가점검                                       |
+| `moving-house.md`    |      1,265 | 이사예약                                            |
+| `repair.md`          |      1,080 | 하자보수                                            |
+| `management-fee.md`  |        765 | 관리비                                              |
+| `apass.md`           |        745 | A-PASS                                              |
+| `opinion.md`         |        765 | **opinion 앱 껍데기** (엔트리·빌드·레이아웃·라우터) |
+| **합계**             | **20,231** | 라우트 121개 전부 커버                              |
+
+> **TermsOfUse 3파일 1라우트는 `signup.md`가 전부 다룬다** —
+> `TermsOfUseDetailView`(T1) · `TermsOfUseAgreeView`(S1·A5 공유) · `CertButton`(KMC).
+> 별도 문서를 만들지 않는다.
+>
+> **`opinion.md`는 화면이 아니라 앱 껍데기를 다룬다.** 화면 18개는
+> `vote.md`(7) · `survey.md`(8) · `exception.md`(3)에 있다.
 
 > ⚠️ **Repair는 Board보다 먼저 이관하지 않는다** — `ImageUploader`·`useUploadProgress`·
 > `convertFormDataFile`·`validImage`를 Board(사용처 10~11곳)에서 확정한 뒤 물려받는다
@@ -181,32 +209,34 @@ Phase 4의 인증 슬라이스·레이아웃 셸이 Login·Main·MyPage 명세�
 
 ## 세션 로그
 
-| 날짜       | 작업                                                                                                                                                                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-29 | 계획 승인. 기준 SHA 고정(`6d5bf22`). `feat/migration-inventory` 브랜치 생성                                                                                                                                   |
-| 2026-07-29 | `routes.md` 완료 — 화면 라우트 121개 전수                                                                                                                                                                     |
-| 2026-07-29 | `endpoints.md` 완료 — 엔드포인트 148개 전수                                                                                                                                                                   |
-| 2026-07-29 | 확인 항목 11건 전부 확정. `decisions/inventory-questions.md`, `deferred.md` 작성                                                                                                                              |
-| 2026-07-29 | **인증 방침 변경** — 레거시 방식 유지로 확정. `decisions/auth-strategy.md` 작성. 계획서 반영(Phase 0 블로커 3→1, R3·R4·R11 소멸, R12·R13 추가)                                                                |
-| 2026-07-29 | `native-protocol.md` 완료 — 브릿지 24종 전수. **0-4 해소**(웹이 레거시 프로토콜에 맞춤). 외부 블로커 0건                                                                                                      |
-| 2026-07-29 | `query-keys.md`·`domain-codes.md`·`env-vars.md` 완료. **Phase 1 종료**                                                                                                                                        |
-| 2026-07-29 | 기술 선택 4건 확정 (0-5·0-6·에러 모달·QueryClient 기본값). `decisions/tech-choices.md`                                                                                                                        |
-| 2026-07-29 | `zod-migration.md` 완료 (0-7). **Phase 0 종료**                                                                                                                                                               |
-| 2026-07-29 | `tech-mapping.md` 완료. **Phase 3 종료**                                                                                                                                                                      |
-| 2026-07-29 | `features/auth.md`(Intro+Login) · `features/exception.md` 완료. Phase 2 착수                                                                                                                                  |
-| 2026-07-29 | `features/signup.md` 완료 (SignUp 8 + TermsOfUse 3). 확인 항목 S-Q1 코드로 확정                                                                                                                               |
-| 2026-07-29 | `features/main.md` 완료 (22파일). 콘텐츠 플래그 4개 미사용 확인, M-Q3 확정                                                                                                                                    |
-| 2026-07-29 | `features/mypage.md` 완료. **기반 도메인 6개 전부 완료.** P-Q3·P-Q4 코드로 확정                                                                                                                               |
-| 2026-07-29 | `broken-styles.md` 작성 — Tailwind 빌드로 미생성 클래스 16개 확정. 12개 수정, 4개는 디자인 확인 대기                                                                                                          |
-| 2026-07-29 | `features/board.md` 완료 (48파일 · 화면 20 + 팝업 1 · 2,984줄). 결함 15건·소통↔민원 차이 17건 정리. 확인 항목 BD-Q1~Q15                                                                                       |
-| 2026-07-29 | **`broken-styles.md` 2차 조사 — 미생성 클래스 16 → 25로 정정.** 토큰 821개 전수 빌드 검증                                                                                                                     |
-| 2026-07-29 | `features/parking.md` 완료 (31파일 · 화면 15 · 2,221줄). 미출차 일체 제외 확정 반영. 확인 항목 PK-Q1~Q11                                                                                                      |
-| 2026-07-29 | `features/visit.md` 완료 (23파일 · 화면 13 · 1,463줄). 브릿지 6종 의존. 확인 항목 V-Q1~Q9. PK-Q6 해소                                                                                                         |
-| 2026-07-29 | `features/vote.md` 완료 (23파일 · 라우트 13 = 메인 6 + opinion 7 · 1,293줄). 확인 항목 VT-Q1~Q9. 미생성 클래스 `center` 추가 발견(25→26)                                                                      |
-| 2026-07-29 | `features/survey.md` 완료 (19파일 · 라우트 14 = 메인 6 + opinion 8 · 1,053줄). **Vote와의 차이 9건** 정리. 확인 항목 SV-Q1~Q10. SV-Q5 해소                                                                    |
-| 2026-07-30 | `features/apt-mall.md` 완료 (19파일 · 라우트 3 + 드로어 위저드 8 = 화면 11 · 1,584줄). **브릿지 의존 0.** 결함 13건. 확인 항목 AM-Q1~Q22. E-Q6 전제 정정                                                      |
-| 2026-07-30 | `features/fire-inspection.md` 완료 (13파일 · 라우트 4 + 단계 2 · 1,350줄). 점검표 21항목이 클라이언트 하드코딩. `lodash` 제거 가능 확인. 확인 항목 F-Q1~Q16                                                   |
-| 2026-07-30 | `features/moving-house.md` 완료 (10파일 · 라우트 4 · 1,265줄). `chargeFlag`가 6곳을 동시에 바꾼다. 신축 입주 기간 로직. 달력 5개 전수 비교. 확인 항목 MH-Q1~Q15                                               |
-| 2026-07-30 | `features/repair.md` 완료 (11파일 · 라우트 4 · 1,080줄). Pinia 안의 vee-validate `useForm`. 결함 밀도 최고 — 무한 스크롤 미동작·AppBar 이중·`'write'`/`'create'` 불일치. 확인 항목 RP-Q1~Q12                  |
-| 2026-07-30 | `features/management-fee.md` 완료 (3파일 · 라우트 2 · 765줄). 🔴 **`/managementFee/info`(524줄)가 도달 불가 + 전부 목업** → 이관 제외 권장(`MF-Q1`). `startDateTIme` 오타 유지 재확인. 확인 항목 MF-Q1~Q9     |
-| 2026-07-30 | `features/apass.md` 완료 (3파일 · 라우트 1 · 620줄). 브릿지 4종 왕복. 🔴 `invalidateQueries` v4가 **UI 갱신의 유일한 경로**. 7초 타임아웃이 전역 로딩 플래그를 못 내려 뒤로가기 영구 차단. 확인 항목 AP-Q1~Q6 |
+| 날짜       | 작업                                                                                                                                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-29 | 계획 승인. 기준 SHA 고정(`6d5bf22`). `feat/migration-inventory` 브랜치 생성                                                                                                                                                           |
+| 2026-07-29 | `routes.md` 완료 — 화면 라우트 121개 전수                                                                                                                                                                                             |
+| 2026-07-29 | `endpoints.md` 완료 — 엔드포인트 148개 전수                                                                                                                                                                                           |
+| 2026-07-29 | 확인 항목 11건 전부 확정. `decisions/inventory-questions.md`, `deferred.md` 작성                                                                                                                                                      |
+| 2026-07-29 | **인증 방침 변경** — 레거시 방식 유지로 확정. `decisions/auth-strategy.md` 작성. 계획서 반영(Phase 0 블로커 3→1, R3·R4·R11 소멸, R12·R13 추가)                                                                                        |
+| 2026-07-29 | `native-protocol.md` 완료 — 브릿지 24종 전수. **0-4 해소**(웹이 레거시 프로토콜에 맞춤). 외부 블로커 0건                                                                                                                              |
+| 2026-07-29 | `query-keys.md`·`domain-codes.md`·`env-vars.md` 완료. **Phase 1 종료**                                                                                                                                                                |
+| 2026-07-29 | 기술 선택 4건 확정 (0-5·0-6·에러 모달·QueryClient 기본값). `decisions/tech-choices.md`                                                                                                                                                |
+| 2026-07-29 | `zod-migration.md` 완료 (0-7). **Phase 0 종료**                                                                                                                                                                                       |
+| 2026-07-29 | `tech-mapping.md` 완료. **Phase 3 종료**                                                                                                                                                                                              |
+| 2026-07-29 | `features/auth.md`(Intro+Login) · `features/exception.md` 완료. Phase 2 착수                                                                                                                                                          |
+| 2026-07-29 | `features/signup.md` 완료 (SignUp 8 + TermsOfUse 3). 확인 항목 S-Q1 코드로 확정                                                                                                                                                       |
+| 2026-07-29 | `features/main.md` 완료 (22파일). 콘텐츠 플래그 4개 미사용 확인, M-Q3 확정                                                                                                                                                            |
+| 2026-07-29 | `features/mypage.md` 완료. **기반 도메인 6개 전부 완료.** P-Q3·P-Q4 코드로 확정                                                                                                                                                       |
+| 2026-07-29 | `broken-styles.md` 작성 — Tailwind 빌드로 미생성 클래스 16개 확정. 12개 수정, 4개는 디자인 확인 대기                                                                                                                                  |
+| 2026-07-29 | `features/board.md` 완료 (48파일 · 화면 20 + 팝업 1 · 2,984줄). 결함 15건·소통↔민원 차이 17건 정리. 확인 항목 BD-Q1~Q15                                                                                                               |
+| 2026-07-29 | **`broken-styles.md` 2차 조사 — 미생성 클래스 16 → 25로 정정.** 토큰 821개 전수 빌드 검증                                                                                                                                             |
+| 2026-07-29 | `features/parking.md` 완료 (31파일 · 화면 15 · 2,221줄). 미출차 일체 제외 확정 반영. 확인 항목 PK-Q1~Q11                                                                                                                              |
+| 2026-07-29 | `features/visit.md` 완료 (23파일 · 화면 13 · 1,463줄). 브릿지 6종 의존. 확인 항목 V-Q1~Q9. PK-Q6 해소                                                                                                                                 |
+| 2026-07-29 | `features/vote.md` 완료 (23파일 · 라우트 13 = 메인 6 + opinion 7 · 1,293줄). 확인 항목 VT-Q1~Q9. 미생성 클래스 `center` 추가 발견(25→26)                                                                                              |
+| 2026-07-29 | `features/survey.md` 완료 (19파일 · 라우트 14 = 메인 6 + opinion 8 · 1,053줄). **Vote와의 차이 9건** 정리. 확인 항목 SV-Q1~Q10. SV-Q5 해소                                                                                            |
+| 2026-07-30 | `features/apt-mall.md` 완료 (19파일 · 라우트 3 + 드로어 위저드 8 = 화면 11 · 1,584줄). **브릿지 의존 0.** 결함 13건. 확인 항목 AM-Q1~Q22. E-Q6 전제 정정                                                                              |
+| 2026-07-30 | `features/fire-inspection.md` 완료 (13파일 · 라우트 4 + 단계 2 · 1,350줄). 점검표 21항목이 클라이언트 하드코딩. `lodash` 제거 가능 확인. 확인 항목 F-Q1~Q16                                                                           |
+| 2026-07-30 | `features/moving-house.md` 완료 (10파일 · 라우트 4 · 1,265줄). `chargeFlag`가 6곳을 동시에 바꾼다. 신축 입주 기간 로직. 달력 5개 전수 비교. 확인 항목 MH-Q1~Q15                                                                       |
+| 2026-07-30 | `features/repair.md` 완료 (11파일 · 라우트 4 · 1,080줄). Pinia 안의 vee-validate `useForm`. 결함 밀도 최고 — 무한 스크롤 미동작·AppBar 이중·`'write'`/`'create'` 불일치. 확인 항목 RP-Q1~Q12                                          |
+| 2026-07-30 | `features/management-fee.md` 완료 (3파일 · 라우트 2 · 765줄). 🔴 **`/managementFee/info`(524줄)가 도달 불가 + 전부 목업** → 이관 제외 권장(`MF-Q1`). `startDateTIme` 오타 유지 재확인. 확인 항목 MF-Q1~Q9                             |
+| 2026-07-30 | `features/apass.md` 완료 (3파일 · 라우트 1 · 620줄). 브릿지 4종 왕복. 🔴 `invalidateQueries` v4가 **UI 갱신의 유일한 경로**. 7초 타임아웃이 전역 로딩 플래그를 못 내려 뒤로가기 영구 차단. 확인 항목 AP-Q1~Q6                         |
+| 2026-07-30 | `features/opinion.md` 완료 (엔트리·빌드·레이아웃·라우터 · 765줄). 🔴 **`LayoutOpinionBase` 2중 중첩** — `pt-6`×2=48px에 의존, `ToastContainer`가 버려져 **모든 토스트 무음**. `O-Q4`·`O-Q10` 실측으로 해소. **Phase 2 종료 (19/19)**  |
+| 2026-07-30 | 🎯 **`broken-styles.md` §5 2건 해소** — `globalColor.scss`(이전 SCSS 팔레트)에서 `border-deep-glue-20`→`$deep-blue-20 #e6e6ec`, `border-bg-gray`→`$bg-gray #f8f8f8` 확인. Tailwind config 이식 시 `deep-blue`·`bg-*` 계열이 누락된 것 |

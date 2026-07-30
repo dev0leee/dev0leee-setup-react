@@ -145,13 +145,61 @@ Tailwind 3.4의 기본 스케일에 없는 숫자를 썼다. **디자인 확인 
 `bg-deep-blue`는 같은 `class` 문자열 안에 유효한 배경색이 함께 있어 그쪽이 적용된다.
 `center`는 `items-center`/`text-center`를 쓰려다 남은 조각으로 보인다 — 전역 CSS에도 정의가 없다.
 
+> ⚠️ **`bg-bg-deep-blue`·`bg-deep-blue`의 의도한 색도 `globalColor.scss`에 있다**
+> (`$bg-deep-blue: #fafbfc` · `$deep-blue-100: #00063f`). §5 상단 참조.
+> **다만 둘 다 렌더에 영향이 없으므로 삭제 방침은 그대로다.**
+
 > **삭제해도 등가 이관에 어긋나지 않는다.** 현재 렌더 결과와 동일하다.
 
 ---
 
-## 5. 대응 토큰 불명 (5건) — ⚠️ 디자인 확인 필요
+## 5. 대응 토큰 불명 (6건) — ⚠️ 디자인 확인 필요 (2건 해소)
 
 config에 유사한 이름이 없어 **의도한 색을 추정할 수 없다.** 확인 전까지 현행 유지.
+
+> ### 🎯 2026-07-30 — `globalColor.scss`에서 2건의 답을 찾았다
+>
+> `src/styles/globalColor.scss`(69줄)에 **이전 디자인 시스템의 SCSS 색 팔레트**가 남아 있다.
+> `vite.config.js`가 모든 SCSS 블록에 이것을 주입한다
+> (`css.preprocessorOptions.scss.additionalData`).
+>
+> ```scss
+> // deep-blue
+> $deep-blue-100: #00063f;
+> $deep-blue-90: #1a1f52;
+> $deep-blue-80: #4d5179;
+> $deep-blue-70: #666a8c;
+> $deep-blue-60: #80829f;
+> $deep-blue-50: #999bb2;
+> $deep-blue-40: #b3b4c5;
+> $deep-blue-30: #cccdd9;
+> $deep-blue-20: #e6e6ec;
+> $deep-blue-10: #f2f3f5;
+>
+> // bg-color
+> $bg-gray: #f8f8f8;
+> $bg-blue: #f6faff;
+> $bg-deep-blue: #fafbfc;
+> $bg-orange: #fff8f3;
+> ```
+>
+> **깨진 클래스 이름들이 이 팔레트를 그대로 따르고 있다.**
+> Tailwind config로 팔레트를 옮길 때 `deep-blue`·`bg-*` 계열이 누락된 것으로 보인다.
+>
+> | 깨진 클래스            | `globalColor.scss` 대응 | 값        |
+> | ---------------------- | ----------------------- | --------- |
+> | `border-deep-glue-20`  | **`$deep-blue-20`**     | `#e6e6ec` |
+> | `border-bg-gray`       | **`$bg-gray`**          | `#f8f8f8` |
+> | `bg-bg-deep-blue` (§4) | **`$bg-deep-blue`**     | `#fafbfc` |
+> | `bg-deep-blue` (§4)    | `$deep-blue-100` (추정) | `#00063f` |
+>
+> ⚠️ **`globalColor.scss`의 변수는 코드 어디에서도 쓰이지 않는다** —
+> `$` 변수 참조를 전수 검색한 결과 0곳이다. 주입만 되고 소비되지 않는 **죽은 설정**이다.
+> 그래서 이 팔레트는 **"의도한 색의 근거"로만 쓴다.**
+>
+> `#e6e6ec`·`#f8f8f8`은 기존 `neutral-b-gray` 스케일에 정확히 일치하는 값이 없다
+> (`#E5E7EB`·`#F9FAFB`가 가장 가깝다). **원래 색을 그대로 살릴지, 현 디자인 토큰으로 흡수할지**
+> 결정이 필요하다. → `B-Q2`에 병합
 
 | 현재 (깨짐)                                   | 사용처                                                                                                                | 상황                                                                                                                                                   |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -159,8 +207,8 @@ config에 유사한 이름이 없어 **의도한 색을 추정할 수 없다.** 
 | `text-brand-primary-100`                      | OfficeInfoBusinessHour (운영시간), OfficeInfoContactList (전화번호)                                                   | 〃                                                                                                                                                     |
 | `border-defaults-secondary-border-primary`    | `components/common/ButtonBase.vue`                                                                                    | `defaults.secondary`에는 `border-secondary`가, `defaults.primary`에는 `border-primary`가 있다. 둘 중 어느 쪽인지 불명                                  |
 | `bg-brand-default-background-brand-secondary` | `components/common/InputRadioList.vue`                                                                                | `brand.default.background-brand`는 있으나 `-secondary` 변형이 없다                                                                                     |
-| `border-deep-glue-20` ⭐                      | 주차 카드 4종 (`CarManagementList` · `InOutCarHistoryListView` · `MileageHistoryListView` · `ReservationCarListView`) | `glue`→`blue` 오타로 보이나 **config에 `deep-blue`도 `deep-glue`도 없다.** 현재는 `border`의 기본색(회색)으로 렌더된다                                 |
-| `border-bg-gray` ⭐                           | `views/MovingHouseView/MovingHouseWriteView.vue`<br>`views/RepairView/RepairFormDetail.vue`(2곳)                      | `bg.gray` 색상군이 config에 없다. textarea 테두리이며 현재는 기본 회색                                                                                 |
+| ~~`border-deep-glue-20`~~ ⭐ **해소**         | 주차 카드 4종 (`CarManagementList` · `InOutCarHistoryListView` · `MileageHistoryListView` · `ReservationCarListView`) | **`globalColor.scss`의 `$deep-blue-20: #e6e6ec`.** Tailwind config 이식 시 `deep-blue` 계열이 누락됐다. 현재는 `border` 기본색(회색)                   |
+| ~~`border-bg-gray`~~ ⭐ **해소**              | `views/MovingHouseView/MovingHouseWriteView.vue`<br>`views/RepairView/RepairFormDetail.vue`(2곳)                      | **`globalColor.scss`의 `$bg-gray: #f8f8f8`.** textarea 테두리. 현재는 기본 회색                                                                        |
 
 > ⚠️ `ButtonBase`·`InputRadioList`는 **공용 컴포넌트**라 영향 범위가 넓다.
 > `ButtonBase`는 거의 모든 화면에서 쓰인다 — 어떤 variant에서 이 클래스가 붙는지 확인 필요.
