@@ -639,7 +639,10 @@ watch(editedRepairProgressPercent, (v) => repairFormStore.setSubmitProgressPerce
 
 🔴 **`border-bg-gray`가 textarea 2개에 붙어 있다** (`content`·`requirement`).
 `broken-styles.md` §5의 미생성 클래스 — 현재 `border` 기본 회색으로 렌더된다.
-**이사예약 MH3와 같은 클래스** → 함께 결정한다. → `RP-Q10`
+
+✅ **2026-07-30 확정 — `border-defaults-tertiary-border-tertiary`(`#F3F4F6`)로 바꾼다.**
+같은 폼의 `<input>`들이 이미 이 토큰을 쓰므로 **입력칸 테두리가 통일된다.**
+(이사예약 MH3의 textarea도 동일 처리)
 
 ### 기본값 주입 순서
 
@@ -1052,32 +1055,32 @@ Pinia useForm 싱글턴
 
 ## 스타일
 
-| 항목                                | 상태                                                                |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| `border-bg-gray` (textarea 2곳)     | 🔴 **미생성 클래스** (`broken-styles.md` §5). MH3과 공통 → `RP-Q10` |
-| `phone`의 `disabled:bg-*-secondary` | dong/ho와 다른 회색 → `RP-Q9`                                       |
-| `outfit-20SemiBold`                 | Outfit 폰트. config에 존재 ✅ (`tailwind.config.js:740`)            |
-| `grid-cols-3 sm:flex sm:flex-wrap`  | `sm = 392px`이므로 **대부분 flex가 적용**된다                       |
-| 그 외 클래스                        | ✅ 이 도메인 고유의 깨진 클래스는 `border-bg-gray` 하나뿐           |
+| 항목                                | 상태                                                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------- |
+| `border-bg-gray` (textarea 2곳)     | ✅ **`border-defaults-tertiary-border-tertiary`(`#F3F4F6`)로 확정** (`broken-styles.md` §5) |
+| `phone`의 `disabled:bg-*-secondary` | dong/ho와 다른 회색 → `RP-Q9`                                                               |
+| `outfit-20SemiBold`                 | Outfit 폰트. config에 존재 ✅ (`tailwind.config.js:740`)                                    |
+| `grid-cols-3 sm:flex sm:flex-wrap`  | `sm = 392px`이므로 **대부분 flex가 적용**된다                                               |
+| 그 외 클래스                        | ✅ 이 도메인 고유의 깨진 클래스는 `border-bg-gray` 하나뿐                                   |
 
 ---
 
 ## 확인 필요 (`RP-Q*`)
 
-| #      | 질문                                                                                                                                                                      | 관련    |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| RP-Q1  | `isWritingPage`가 `'write'`를 찾는데 라우트는 `/repair/create`다 → **등록 화면 제목이 `하자보수 수정`, 뒤로가기 모달이 `수정 그만두기`.** 고치는가 (고치면 화면이 바뀐다) | §1      |
-| RP-Q2  | RP2에 **AppBar가 2개 겹친다** (라우트 meta + 뷰). `showAppBar: false`로 바꾸는가 (Vote `VT-Q1`·Survey `SV-Q1`과 함께)                                                     | §2      |
-| RP-Q3  | RP3(수정) **콘텐츠 상단 48px가 AppBar에 가린다** (`pt-12` 누락). 붙이는가                                                                                                 | §3      |
-| RP-Q4  | 🔴 **무한 스크롤 관측 타깃이 템플릿에 없어 2페이지가 로드되지 않는다.** 11건 이상이면 10건만 보인다. 고치는가                                                             | §4      |
-| RP-Q5  | 폼이 Pinia 싱글턴이라 **레이아웃 back·하드웨어 back으로 나가면 초안이 남는다.** RHF로 옮기면 이 동작이 사라진다. 유지가 필요한가                                          | §5      |
-| RP-Q6  | `처리 불가된 접수는 수정할 수 없습니다` 문법이 어색하다. 문구를 따로 두는가                                                                                               | §6      |
-| RP-Q7  | 등록·수정·취소 후 **`invalidateQueries`가 없다.** 추가하는가                                                                                                              | §7      |
-| RP-Q8  | 상태 필드명이 **목록 `state` / 상세 `repairState`** 로 다르다. 서버 계약인가                                                                                              | RP1     |
-| RP-Q9  | `연락처`의 비활성 배경만 `-secondary`(dong/ho는 `-mono`)다. 통일하는가                                                                                                    | RP2·RP3 |
-| RP-Q10 | `border-bg-gray`가 미생성 클래스다. 어떤 토큰으로 정하는가 (**이사예약 MH-Q11과 함께**)                                                                                   | RP2·RP3 |
-| RP-Q11 | `URL.createObjectURL`이 재계산마다 새 URL을 만들고 revoke하지 않는다. cleanup을 넣는가 (**등가에 영향 없음**)                                                             | RP2·RP3 |
-| RP-Q12 | 첨부 이미지에 **확대(라이트박스)가 없다.** 의도인가                                                                                                                       | RP4     |
+| #          | 질문                                                                                                                                                                      | 관련    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| RP-Q1      | `isWritingPage`가 `'write'`를 찾는데 라우트는 `/repair/create`다 → **등록 화면 제목이 `하자보수 수정`, 뒤로가기 모달이 `수정 그만두기`.** 고치는가 (고치면 화면이 바뀐다) | §1      |
+| RP-Q2      | RP2에 **AppBar가 2개 겹친다** (라우트 meta + 뷰). `showAppBar: false`로 바꾸는가 (Vote `VT-Q1`·Survey `SV-Q1`과 함께)                                                     | §2      |
+| RP-Q3      | RP3(수정) **콘텐츠 상단 48px가 AppBar에 가린다** (`pt-12` 누락). 붙이는가                                                                                                 | §3      |
+| RP-Q4      | 🔴 **무한 스크롤 관측 타깃이 템플릿에 없어 2페이지가 로드되지 않는다.** 11건 이상이면 10건만 보인다. 고치는가                                                             | §4      |
+| RP-Q5      | 폼이 Pinia 싱글턴이라 **레이아웃 back·하드웨어 back으로 나가면 초안이 남는다.** RHF로 옮기면 이 동작이 사라진다. 유지가 필요한가                                          | §5      |
+| RP-Q6      | `처리 불가된 접수는 수정할 수 없습니다` 문법이 어색하다. 문구를 따로 두는가                                                                                               | §6      |
+| RP-Q7      | 등록·수정·취소 후 **`invalidateQueries`가 없다.** 추가하는가                                                                                                              | §7      |
+| RP-Q8      | 상태 필드명이 **목록 `state` / 상세 `repairState`** 로 다르다. 서버 계약인가                                                                                              | RP1     |
+| RP-Q9      | `연락처`의 비활성 배경만 `-secondary`(dong/ho는 `-mono`)다. 통일하는가                                                                                                    | RP2·RP3 |
+| ~~RP-Q10~~ | ~~`border-bg-gray` 토큰 결정~~ → ✅ **2026-07-30 확정: `border-defaults-tertiary-border-tertiary`(`#F3F4F6`).** 같은 폼의 `<input>`들과 통일 (`broken-styles.md` §5)      | RP2·RP3 |
+| RP-Q11     | `URL.createObjectURL`이 재계산마다 새 URL을 만들고 revoke하지 않는다. cleanup을 넣는가 (**등가에 영향 없음**)                                                             | RP2·RP3 |
+| RP-Q12     | 첨부 이미지에 **확대(라이트박스)가 없다.** 의도인가                                                                                                                       | RP4     |
 
 ---
 
@@ -1095,7 +1098,7 @@ Pinia useForm 싱글턴
 | **RP3 상단 콘텐츠가 가리는지** (`RP-Q3`)                                |
 | RP2·RP3 `동`/`호수` 2열 배치 + `mb-[25px]` 간격                         |
 | **`연락처`와 `동`/`호수`의 비활성 배경 차이** (`RP-Q9`)                 |
-| textarea 테두리 색 (`border-bg-gray` 미생성 → 기본 회색)                |
+| textarea 테두리가 **위 입력칸들과 같은 색**인가 (`#F3F4F6`, 수정 확정)  |
 | `TextError`의 `min-h-[13px]` 자리 확보 (에러 없어도 공간이 있는지)      |
 | 이미지 썸네일 80×80 · 삭제 아이콘 위치 · 점선 추가 버튼                 |
 | 제출 중 전체 화면 스피너 + 퍼센트 표시 위치                             |

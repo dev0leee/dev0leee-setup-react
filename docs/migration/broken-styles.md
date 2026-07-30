@@ -14,18 +14,22 @@
 레거시 소스가 쓰는 클래스 중 **26개가 `tailwind.config.js`에 없어 CSS가 생성되지 않는다.**
 Tailwind는 알 수 없는 클래스를 조용히 무시하므로, 해당 선언은 **아무 효과가 없다.**
 
-| 구분                                                          | 건수 | 조치                      |
-| ------------------------------------------------------------- | ---: | ------------------------- |
-| **명백한 오타** (끝에 `0`, `glue`, 단수/복수)                 |    4 | **확실히 수정 가능**      |
-| **스케일 표기 불일치** (`neutral-90` vs `neutral-b-gray-900`) |   10 | 매핑 근거 명확, 수정 가능 |
-| **Tailwind 기본 스케일 밖 값** (`4.75`, `3.5`, `1/2`)         |    4 | 임의값 문법으로 치환      |
-| **효과 없는 죽은 선언** (덮이거나 애초에 무의미)              |    3 | **삭제**                  |
-| **대응 토큰 불명**                                            |    5 | ⚠️ **디자인 확인 필요**   |
+| 구분                                                          | 건수 | 조치                            |
+| ------------------------------------------------------------- | ---: | ------------------------------- |
+| **명백한 오타** (끝에 `0`, `glue`, 단수/복수)                 |    4 | **확실히 수정 가능**            |
+| **스케일 표기 불일치** (`neutral-90` vs `neutral-b-gray-900`) |   10 | 매핑 근거 명확, 수정 가능       |
+| **Tailwind 기본 스케일 밖 값** (`4.75`, `3.5`, `1/2`)         |    4 | 임의값 문법으로 치환            |
+| **효과 없는 죽은 선언** (덮이거나 애초에 무의미)              |    3 | **삭제**                        |
+| **미생성 클래스** (config에 없는 이름)                        |    6 | **Tailwind 토큰으로 확정** (§5) |
 
-영향 파일 **33개**.
+영향 파일 **33개**. **26건 전부 조치 방침이 정해졌다** — 미해결 0건.
 
 > ⚠️ **고치면 화면이 달라진다.** 현재는 색/크기가 안 먹어 기본값으로 보이고, 수정하면 의도한 값이 나온다.
 > 등가 이관 원칙의 **의도적 예외**이며 사용자가 승인했다.
+
+> ✅ **2026-07-30 — `B-Q2` 확정.** 마지막까지 남아 있던 §5 6건을
+> **`globalColor.scss`의 이전 팔레트가 아니라 현 Tailwind 토큰으로** 매핑했다 (사용자 결정).
+> `@theme`에 새 색을 추가하지 않는다.
 
 ## 검증 방법 (재현 가능)
 
@@ -145,74 +149,140 @@ Tailwind 3.4의 기본 스케일에 없는 숫자를 썼다. **디자인 확인 
 `bg-deep-blue`는 같은 `class` 문자열 안에 유효한 배경색이 함께 있어 그쪽이 적용된다.
 `center`는 `items-center`/`text-center`를 쓰려다 남은 조각으로 보인다 — 전역 CSS에도 정의가 없다.
 
-> ⚠️ **`bg-bg-deep-blue`·`bg-deep-blue`의 의도한 색도 `globalColor.scss`에 있다**
-> (`$bg-deep-blue: #fafbfc` · `$deep-blue-100: #00063f`). §5 상단 참조.
-> **다만 둘 다 렌더에 영향이 없으므로 삭제 방침은 그대로다.**
+> ⚠️ **`bg-bg-deep-blue`·`bg-deep-blue`의 의도한 색은 `globalColor.scss`에 있다**
+> (`$bg-deep-blue: #fafbfc` · `$deep-blue-100: #00063f`).
+> **그러나 B-Q2 결정(§5)에 따라 이전 팔레트를 되살리지 않으며, 둘 다 렌더에 영향이 없으므로
+> 삭제 방침은 그대로다.**
 
 > **삭제해도 등가 이관에 어긋나지 않는다.** 현재 렌더 결과와 동일하다.
 
 ---
 
-## 5. 대응 토큰 불명 (6건) — ⚠️ 디자인 확인 필요 (2건 해소)
+## 5. 미생성 클래스 6건 — **Tailwind 토큰으로 확정** (2026-07-30 결정)
 
-config에 유사한 이름이 없어 **의도한 색을 추정할 수 없다.** 확인 전까지 현행 유지.
+> ### ✅ **B-Q2 확정 — `globalColor.scss` 값을 되살리지 않고 현 Tailwind 토큰으로 흡수한다**
+>
+> `src/styles/globalColor.scss`(이전 디자인 시스템 SCSS 팔레트)에서 `$deep-blue-20: #e6e6ec` ·
+> `$bg-gray: #f8f8f8` 같은 "원래 의도한 색"을 찾았지만, **그 hex를 그대로 부활시키지 않는다.**
+>
+> 근거:
+>
+> - `globalColor.scss`의 `$` 변수는 **코드 어디에서도 쓰이지 않는다**(전수 검색 0곳).
+>   주입만 되고 소비되지 않는 죽은 설정이다 → `deferred.md` D-168
+> - 이전 팔레트를 되살리면 **디자인 토큰 체계가 두 벌**이 된다
+> - 어차피 `#e6e6ec` vs `#E5E7EB`, `#f8f8f8` vs `#F9FAFB` 수준의 차이다
+>
+> **따라서 `@theme`에 새 색을 추가하지 않는다.** 아래 표의 토큰만 쓴다.
 
-> ### 🎯 2026-07-30 — `globalColor.scss`에서 2건의 답을 찾았다
->
-> `src/styles/globalColor.scss`(69줄)에 **이전 디자인 시스템의 SCSS 색 팔레트**가 남아 있다.
-> `vite.config.js`가 모든 SCSS 블록에 이것을 주입한다
-> (`css.preprocessorOptions.scss.additionalData`).
->
-> ```scss
-> // deep-blue
-> $deep-blue-100: #00063f;
-> $deep-blue-90: #1a1f52;
-> $deep-blue-80: #4d5179;
-> $deep-blue-70: #666a8c;
-> $deep-blue-60: #80829f;
-> $deep-blue-50: #999bb2;
-> $deep-blue-40: #b3b4c5;
-> $deep-blue-30: #cccdd9;
-> $deep-blue-20: #e6e6ec;
-> $deep-blue-10: #f2f3f5;
->
-> // bg-color
-> $bg-gray: #f8f8f8;
-> $bg-blue: #f6faff;
-> $bg-deep-blue: #fafbfc;
-> $bg-orange: #fff8f3;
-> ```
->
-> **깨진 클래스 이름들이 이 팔레트를 그대로 따르고 있다.**
-> Tailwind config로 팔레트를 옮길 때 `deep-blue`·`bg-*` 계열이 누락된 것으로 보인다.
->
-> | 깨진 클래스            | `globalColor.scss` 대응 | 값        |
-> | ---------------------- | ----------------------- | --------- |
-> | `border-deep-glue-20`  | **`$deep-blue-20`**     | `#e6e6ec` |
-> | `border-bg-gray`       | **`$bg-gray`**          | `#f8f8f8` |
-> | `bg-bg-deep-blue` (§4) | **`$bg-deep-blue`**     | `#fafbfc` |
-> | `bg-deep-blue` (§4)    | `$deep-blue-100` (추정) | `#00063f` |
->
-> ⚠️ **`globalColor.scss`의 변수는 코드 어디에서도 쓰이지 않는다** —
-> `$` 변수 참조를 전수 검색한 결과 0곳이다. 주입만 되고 소비되지 않는 **죽은 설정**이다.
-> 그래서 이 팔레트는 **"의도한 색의 근거"로만 쓴다.**
->
-> `#e6e6ec`·`#f8f8f8`은 기존 `neutral-b-gray` 스케일에 정확히 일치하는 값이 없다
-> (`#E5E7EB`·`#F9FAFB`가 가장 가깝다). **원래 색을 그대로 살릴지, 현 디자인 토큰으로 흡수할지**
-> 결정이 필요하다. → `B-Q2`에 병합
+### 확정 매핑
 
-| 현재 (깨짐)                                   | 사용처                                                                                                                | 상황                                                                                                                                                   |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `text-brand-primary-50`                       | MyPageMenuGroupItem (그룹 제목), OfficeInfoBusinessHour·ContactList (섹션 제목)                                       | `brand`에는 `default`/`hover`/`focus`/`disabled`만 있고 숫자 스케일이 없다. `brand-default-text-brand`(`#0037BE`)가 유력하나 `50`이 뭘 가리키는지 불명 |
-| `text-brand-primary-100`                      | OfficeInfoBusinessHour (운영시간), OfficeInfoContactList (전화번호)                                                   | 〃                                                                                                                                                     |
-| `border-defaults-secondary-border-primary`    | `components/common/ButtonBase.vue`                                                                                    | `defaults.secondary`에는 `border-secondary`가, `defaults.primary`에는 `border-primary`가 있다. 둘 중 어느 쪽인지 불명                                  |
-| `bg-brand-default-background-brand-secondary` | `components/common/InputRadioList.vue`                                                                                | `brand.default.background-brand`는 있으나 `-secondary` 변형이 없다                                                                                     |
-| ~~`border-deep-glue-20`~~ ⭐ **해소**         | 주차 카드 4종 (`CarManagementList` · `InOutCarHistoryListView` · `MileageHistoryListView` · `ReservationCarListView`) | **`globalColor.scss`의 `$deep-blue-20: #e6e6ec`.** Tailwind config 이식 시 `deep-blue` 계열이 누락됐다. 현재는 `border` 기본색(회색)                   |
-| ~~`border-bg-gray`~~ ⭐ **해소**              | `views/MovingHouseView/MovingHouseWriteView.vue`<br>`views/RepairView/RepairFormDetail.vue`(2곳)                      | **`globalColor.scss`의 `$bg-gray: #f8f8f8`.** textarea 테두리. 현재는 기본 회색                                                                        |
+| 현재 (깨짐)                                   | **확정 토큰**                                    | 값        | 화면 변화                                        |
+| --------------------------------------------- | ------------------------------------------------ | --------- | ------------------------------------------------ |
+| `border-deep-glue-20`                         | **`border-defaults-secondary-border-secondary`** | `#E5E7EB` | 회색 기본 테두리 → **연회색**. 미세 변화         |
+| `border-bg-gray`                              | **`border-defaults-tertiary-border-tertiary`**   | `#F3F4F6` | 회색 기본 → **같은 폼의 입력칸과 동일한 테두리** |
+| `text-brand-primary-50`                       | **`text-brand-default-text-brand`**              | `#0037BE` | 🔴 상속색(검정) → **브랜드 파랑**                |
+| `text-brand-primary-100`                      | **`text-brand-default-text-brand`**              | `#0037BE` | 🔴 〃                                            |
+| `border-defaults-secondary-border-primary`    | **`border-defaults-primary-border-primary`**     | `#D2D6DB` | **없음** (죽은 variant — 아래)                   |
+| `bg-brand-default-background-brand-secondary` | **`bg-primary-pc-indigo-50`**                    | `#E6EBF9` | 🔴 배경 없음 → **연한 브랜드 파랑**              |
 
-> ⚠️ `ButtonBase`·`InputRadioList`는 **공용 컴포넌트**라 영향 범위가 넓다.
-> `ButtonBase`는 거의 모든 화면에서 쓰인다 — 어떤 variant에서 이 클래스가 붙는지 확인 필요.
-> → `[확인 필요]` B-Q2
+### 항목별 근거
+
+#### `border-deep-glue-20` → `border-defaults-secondary-border-secondary` (`#E5E7EB`)
+
+주차 카드 4종의 테두리다. 의도한 `#e6e6ec`와 **`#E5E7EB`의 차이는 육안 식별 불가** 수준이다.
+`neutral-b-gray-200`을 가리키는 시맨틱 토큰이 이미 있으므로 그것을 쓴다.
+
+#### `border-bg-gray` → `border-defaults-tertiary-border-tertiary` (`#F3F4F6`)
+
+**이사예약 MH3·하자보수 RP2/RP3의 textarea 테두리**다.
+의도한 `#f8f8f8`보다 이 선택이 나은 이유:
+
+```html
+<!-- 같은 폼 안의 텍스트 입력들 -->
+<input class="border-defaults-tertiary-border-tertiary border … …" />
+<!-- textarea만 다른 클래스였다 -->
+<textarea class="border-bg-gray border … …" />
+```
+
+**같은 폼의 `<input>`들이 이미 `border-defaults-tertiary-border-tertiary`를 쓴다.**
+textarea를 같은 토큰으로 맞추면 **입력칸 테두리가 통일**된다.
+→ `moving-house.md` MH-Q11 · `repair.md` RP-Q10 **확정**
+
+#### `text-brand-primary-50` · `text-brand-primary-100` → `text-brand-default-text-brand` (`#0037BE`)
+
+`brand` 그룹에는 `default`/`hover`/`focus`/`disabled`만 있고 **숫자 스케일이 없다.**
+`primary-pc-indigo-50`(`#E6EBF9`)·`-100`(`#E0EAFF`)은 **흰 배경 위 텍스트로는 보이지 않는다** —
+이름의 `50`/`100`을 그 팔레트로 해석하면 안 된다.
+
+**두 클래스를 같은 토큰으로 합친다.** 현재도 둘 다 클래스가 생성되지 않아
+**상속색으로 렌더되므로 화면상 이미 동일**하다.
+
+🔴 **다만 상속색(검정 계열) → 브랜드 파랑으로 바뀌는 것은 눈에 보이는 변화다.**
+영향: `MyPageMenuGroupItem`(그룹 제목) · `OfficeInfoBusinessHour`(섹션 제목·운영시간) ·
+`OfficeInfoContactList`(섹션 제목·전화번호) — **MyPage 도메인 이관 시 대조 필수.**
+
+#### `border-defaults-secondary-border-primary` → `border-defaults-primary-border-primary` (`#D2D6DB`)
+
+`ButtonBase`의 `hasOutline` + `color="defaults-primary"` 조합에만 붙는다.
+
+```js
+case 'defaults-primary':
+  return 'bg-defaults-primary-background-primary border-2 border-defaults-secondary-border-primary  text-defaults-primary-text-primary …';
+```
+
+**그룹 이름이 어긋난 오타다** — 다른 variant는 전부 `border-{자기 그룹}-…` 형태를 지킨다.
+`defaults.primary.border-primary`(`#D2D6DB`)로 맞춘다.
+
+> ✅ **화면 변화 없음.** `color="defaults-primary"` 사용처를 전수 검색한 결과 **0곳**이다.
+> 죽은 variant이므로 어떤 값을 넣어도 렌더에 영향이 없다.
+> (클래스 문자열에 **공백 2칸**도 있다 — 함께 정리한다.)
+
+#### `bg-brand-default-background-brand-secondary` → `bg-primary-pc-indigo-50` (`#E6EBF9`)
+
+`InputRadioList`의 **선택 상태 배경**이다. 같은 요소에 이런 클래스들이 함께 붙는다.
+
+```js
+'bg-brand-default-background-brand-secondary border-brand-default-border-brand text-brand-default-text-brand pretendard-14SemiBold'
+```
+
+`brand.default.background-brand`(`#0037BE`)를 그대로 쓰면 **파란 배경 + 파란 글자**가 되어 읽을 수 없다.
+**연한 브랜드 틴트**가 필요하다.
+
+| 후보                                             | 값        | 판단                                          |
+| ------------------------------------------------ | --------- | --------------------------------------------- |
+| **`bg-primary-pc-indigo-50`**                    | `#E6EBF9` | ✅ **채택** — 브랜드 파랑의 연한 단계         |
+| `bg-brand-disabled-background-brand-disabled`    | `#E6EBF9` | 값은 같지만 **`disabled` 의미가 맞지 않는다** |
+| `bg-alerts-informal-background-informal-primary` | `#EFF8FF` | `blue-s-info` 계열 — 브랜드색이 아니다        |
+
+🔴 **이것이 이번 결정 중 영향 범위가 가장 넓다.**
+
+| 영향 화면                            | 규모               |
+| ------------------------------------ | ------------------ |
+| 소방 F2a (점검표) · F4 (상세)        | **21항목 × 2옵션** |
+| 이사예약 MH3 (유형·시간대)           | 2 + 시간대 슬롯 수 |
+| 하자보수 — (`InputRadioList` 미사용) | 없음               |
+
+**F4(소방 점검 상세)는 `:disabled="true"`가 겹쳐 `bg-[#e7e7e7] opacity-50`이 함께 적용된다.**
+Tailwind 클래스 충돌이 되므로 **비활성 라디오의 최종 배경을 실기기에서 확인해야 한다.**
+→ `fire-inspection.md` **F-Q11 확정** (색은 확정, 겹침 처리만 대조 항목으로 남긴다)
+
+### 이관 시 적용 방법
+
+**`@theme`에 새 색을 추가하지 않는다.** 마크업의 클래스 이름만 위 표대로 교체한다.
+
+```diff
+- class="border border-deep-glue-20"
++ class="border border-defaults-secondary-border-secondary"
+
+- class="border-bg-gray w-full … border …"
++ class="w-full … border border-defaults-tertiary-border-tertiary …"
+
+- class="text-brand-primary-50 …"
++ class="text-brand-default-text-brand …"
+
+- 'bg-brand-default-background-brand-secondary border-brand-default-border-brand …'
++ 'bg-primary-pc-indigo-50 border-brand-default-border-brand …'
+```
 
 ---
 
@@ -223,8 +293,8 @@ config에 유사한 이름이 없어 **의도한 색을 추정할 수 없다.** 
 | §1 명백한 오타 4건    | **수정한다** (3건). `border-deep-glue-20`은 §5로              |
 | §2 스케일 불일치 10건 | **수정한다.** `neutral-b-gray-*`·`primary-pc-indigo-*`로 매핑 |
 | §3 스케일 밖 값 4건   | **수정한다.** 임의값 문법(`w-[19px]` 등)으로                  |
-| §4 죽은 선언 2건      | **삭제한다.** 화면 변화 없음                                  |
-| §5 불명 5건           | **현행 유지** (효과 없음). B-Q1·B-Q2 확인 후 별도 처리        |
+| §4 죽은 선언 3건      | **삭제한다.** 화면 변화 없음                                  |
+| §5 미생성 6건         | **수정한다.** Tailwind 토큰 매핑 확정 (B-Q2) — §5 표 참조     |
 
 ### 타깃 토큰 설계와의 관계
 
@@ -241,23 +311,29 @@ config에 유사한 이름이 없어 **의도한 색을 추정할 수 없다.** 
 - [ ] 약관 동의 화면 — "모두 동의" 텍스트가 진한 남색, 구분선에 색이 들어가는가
 - [ ] 마이페이지 — 메뉴 그룹 제목·본문 텍스트 색
 - [ ] 마이페이지 프로필 — 아바타 테두리·배경
-- [ ] 관리사무소 — 섹션 제목·운영시간·전화번호 색 (§5 미해결이라 일부는 그대로)
+- [ ] 🔴 관리사무소 — 섹션 제목·운영시간·전화번호가 **브랜드 파랑으로 바뀐다** (§5, 상속색→`#0037BE`)
+- [ ] 🔴 마이페이지 메뉴 그룹 제목이 **브랜드 파랑으로 바뀐다** (§5)
 - [ ] 회원가입 아파트 설정 — 세대주/세대원 선택 배경 (B-Q1)
 - [ ] 아파트 검색 모달 — 결과 영역 테두리, `선택` 버튼 색
 - [ ] 관리비 상세 — 구분선에 색이 들어가는가 (`defaults` 복수 수정)
 - [ ] 공지 목록 — 날짜 행간이 좁아졌는가 (`leading-[14px]`, B-Q4)
 - [ ] 투표·설문 상세 제목 — 부제가 화면 절반 폭에서 줄바꿈되는가
 - [ ] 방문 키오스크 목록 — 아이콘이 19×19px로 고정되는가
-- [ ] 주차 카드 4종·이사/수선 textarea — 테두리 색이 **그대로 회색인가** (§5 미해결)
+- [ ] 주차 카드 4종 — 테두리가 `#E5E7EB` 연회색으로 들어가는가 (§5)
+- [ ] 이사예약·하자보수 textarea — 테두리가 **같은 폼의 입력칸과 동일한가** (`#F3F4F6`, §5)
+- [ ] 🔴 소방 점검표 라디오 — 선택 항목 배경이 **연한 브랜드 파랑(`#E6EBF9`)** 인가 (§5, 21항목×2)
+- [ ] 🔴 소방 점검 **상세**(F4) — 비활성(`opacity-50`)과 겹칠 때 선택 항목이 구분되는가
+- [ ] 이사예약 MH3 — 유형·시간대 라디오 선택 배경 (§5)
+- [ ] `ButtonBase` `defaults-primary` 아웃라인 — **사용처가 없어 변화 없음** (§5)
 - [ ] 게시글 썸네일·키오스크 카드·투표/설문 상세 제목 — 죽은 선언 삭제 후 **변화가 없는가** (§4)
 
 ---
 
 ## `[확인 필요]`
 
-| #    | 질문                                                                                                                                                                                                         |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| B-Q1 | `bg-primary-400`(`#7F98F9`)이 맞는가? 흰 글자와 대비가 약해 `#0037BE`(500)가 의도였을 수 있다                                                                                                                |
-| B-Q2 | `text-brand-primary-50/100`, `border-defaults-secondary-border-primary`, `bg-brand-default-background-brand-secondary`, **`deep-glue-20`(주차 카드 테두리)**, **`bg-gray`(textarea 테두리)** 의 의도한 색은? |
-| B-Q3 | 디자인 시스템 원본(Figma 등)에 `neutral/90` 같은 표기가 있는가? 매핑 근거를 확정할 수 있다                                                                                                                   |
-| B-Q4 | `leading-3.5`의 의도가 `0.875rem`(14px)인가? `lineHeight`와 `spacing` 스케일이 달라 해석이 갈린다                                                                                                            |
+| #        | 질문                                                                                                                                                        |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B-Q1     | `bg-primary-400`(`#7F98F9`)이 맞는가? 흰 글자와 대비가 약해 `#0037BE`(500)가 의도였을 수 있다                                                               |
+| ~~B-Q2~~ | ~~미생성 6건의 의도한 색~~ → ✅ **2026-07-30 확정.** `globalColor.scss` 팔레트를 되살리지 않고 **현 Tailwind 토큰으로 매핑**한다 (사용자 결정). 매핑표는 §5 |
+| B-Q3     | 디자인 시스템 원본(Figma 등)에 `neutral/90` 같은 표기가 있는가? 매핑 근거를 확정할 수 있다                                                                  |
+| B-Q4     | `leading-3.5`의 의도가 `0.875rem`(14px)인가? `lineHeight`와 `spacing` 스케일이 달라 해석이 갈린다                                                           |

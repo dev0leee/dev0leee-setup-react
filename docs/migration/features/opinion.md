@@ -222,8 +222,22 @@ sourcemap: 'hidden',
 🔴 **`filesToDeleteAfterUpload: ['./dist/**/*.map']`가 `dist/main`·`dist/opinion` 둘 다 지운다.**
 두 빌드를 순차로 돌리면 각각 자기 디렉터리만 생성되므로 문제는 없다.
 
-**타깃에는 `sentry-vite-plugin`이 미설정이다** (계획서 3-4). **이 설정을 그대로 이식한다.**
-⚠️ **project 이름을 새 레포명으로 바꿀지 결정해야 한다** (Phase 7 레포 전환과 함께). → `O-Q3`
+### 🚫 이 설정은 이관하지 않는다 (2026-07-30 결정)
+
+> **"일단 sentry는 빼고 하자"** — `@sentry/vite-plugin` 승인 제외 (`tech-mapping.md` §12)
+
+| 레거시                     | 타깃                                   |
+| -------------------------- | -------------------------------------- |
+| `sentryVitePlugin({ … })`  | **설정하지 않는다**                    |
+| `sourcemap: 'hidden'`      | **소스맵을 만들지 않는다**             |
+| `filesToDeleteAfterUpload` | 불필요 (애초에 `.map`이 생기지 않는다) |
+| `SENTRY_AUTH_TOKEN` Secret | 불필요                                 |
+
+**결과: Sentry에 올라가는 스택트레이스가 난독화 상태로 남는다.** 감수하고 진행한다.
+
+⚠️ **에러 리포팅 자체는 유지된다** — 타깃에 `@sentry/react`가 이미 배선돼 있다
+(`package.json` · `src/main.tsx` · `QueryErrorBoundary.tsx`).
+빠지는 것은 **소스맵 업로드**뿐이다. (`O-Q3` 소멸)
 
 ### SCSS 전역 주입
 
@@ -720,7 +734,7 @@ aws s3 cp   "$BUILD_DIR/favicon.ico"  "s3://$BUCKET_NAME/favicon.ico"
 12. **NotFound 문구는 `경로가 올바르지 않습니다`**, 에러는 **`ERROR : {history.state.message}`**.
 13. **에러 화면은 `history.state.message`에서 문구를 읽는다.** 쿼리스트링이 아니다.
 14. **opinion env 변수는 3개다.** 스키마를 분리한다 (V-Q2).
-15. **Sentry 소스맵은 업로드 후 삭제한다** (`filesToDeleteAfterUpload`).
+15. ~~Sentry 소스맵 업로드~~ → **이관하지 않는다** (2026-07-30 결정). 소스맵을 만들지 않는다.
 
 ---
 
@@ -747,7 +761,7 @@ aws s3 cp   "$BUILD_DIR/favicon.ico"  "s3://$BUCKET_NAME/favicon.ico"
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
 | O-Q1      | 레거시가 `main.js`에서 런타임 분기하므로 **두 빌드에 양쪽 앱·라우터가 함께 들어갈 수 있다.** 실측해서 확인하는가 (타깃은 엔트리 분리로 해결)     | §2        |
 | O-Q2      | `manualChunks` 패키지별 청크 전략을 타깃에도 옮기는가 (Vite 8 기본과 다르다)                                                                     | §2        |
-| O-Q3      | Sentry `project: 'apt-resident-fe'`를 새 레포명으로 바꾸는가 (Phase 7 레포 전환과 함께)                                                          | §2        |
+| ~~O-Q3~~  | ~~Sentry project 이름~~ → **소멸.** `@sentry/vite-plugin` 이관 제외 확정 (2026-07-30)                                                            | §2        |
 | ~~O-Q4~~  | ~~SCSS 주입을 이식하는가~~ → **해소.** `$` 변수 사용 0곳 = 죽은 설정, **이식하지 않는다.** 단 이 파일이 `broken-styles.md` §5의 답을 갖고 있었다 | §2        |
 | O-Q5      | opinion URL을 **앱 웹뷰로 여는 경로가 있는가?** (`CALLBACK_GO_BACK` 핸들러의 존재 이유)                                                          | §3        |
 | O-Q6      | 🔴 **`LayoutOpinionBase` 중첩을 없애면 `pt-6`(24px)만 남아 콘텐츠가 24px 가려진다.** `pt-12`로 함께 고치는가                                     | §4        |
@@ -792,5 +806,5 @@ aws s3 cp   "$BUILD_DIR/favicon.ico"  "s3://$BUCKET_NAME/favicon.ico"
 | **eager 라우트 4개**            | 타깃은 전부 lazy가 기본. 초기 로딩 체감이 달라진다                                      |
 | **`CALLBACK_GO_BACK`**          | opinion에 브릿지를 하나만 남길 때 이것만 정확히 골라야 한다                             |
 | **persist 스토어 의존**         | 뒤로가기 목적지가 `voteCertInfo`·`surveyCertInfo`에 있다. KMC 왕복 후에도 유지돼야 한다 |
-| **Sentry 소스맵 삭제**          | `filesToDeleteAfterUpload`를 빠뜨리면 **S3에 소스가 노출된다**                          |
+| ~~Sentry 소스맵 삭제~~          | **소멸** — 소스맵을 만들지 않으므로 노출 위험도 없다 (플러그인 제외 결정)               |
 | **배포 워크플로**               | 두 디렉터리 구조를 바꾸면 `aws-deploy.yml`도 함께 고쳐야 한다 (`O-Q10`)                 |

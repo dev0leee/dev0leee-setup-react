@@ -7,13 +7,16 @@
 
 **파일 수는 3개인데 906줄이다.** 파일당 평균 302줄로 전 도메인 중 가장 밀도가 높다.
 
-**그런데 그 절반(524줄)이 도달 불가한 목업 화면이다.**
+**그런데 그 절반(524줄)이 진입 경로 없는 목업 화면이다** — 그래도 이관한다(`MF-Q1` 확정).
 
-| 화면                             | 라인 | 데이터                 | 도달 가능   |
-| -------------------------------- | ---: | ---------------------- | ----------- |
-| `ManagementFeeDetailView.vue`    |  336 | **실 API** (#146·#147) | ✅          |
-| `ManagementFeeInfoView.vue`      |  524 | **전부 하드코딩 목업** | 🔴 **없음** |
-| `ManagementFeeDetailLoading.vue` |   46 | (스켈레톤)             | ✅          |
+| 화면                             | 라인 | 데이터                 | UI 진입 경로 | 이관        |
+| -------------------------------- | ---: | ---------------------- | ------------ | ----------- |
+| `ManagementFeeDetailView.vue`    |  336 | **실 API** (#146·#147) | 메인 카드    | ✅          |
+| `ManagementFeeInfoView.vue`      |  524 | **전부 하드코딩 목업** | 🔴 **없음**  | ✅ **한다** |
+| `ManagementFeeDetailLoading.vue` |   46 | (스켈레톤)             | —            | ✅          |
+
+> ✅ **2026-07-30 `MF-Q1` 확정 — MF2도 이관한다** (사용자 결정).
+> ApexCharts 2개를 recharts로 옮기고 목업 데이터도 그대로 유지한다. 상세는 §1-2.
 
 > ⚠️ **화면 ID는 `MF*`, 확인 항목은 `MF-Q*`를 쓴다.**
 
@@ -44,7 +47,7 @@
 
 ---
 
-## 🔴 1. MF2는 524줄짜리 목업이고 도달할 수 없다
+## 1. MF2는 524줄짜리 목업이고 진입 경로가 없다 — 그래도 이관한다
 
 ### 근거
 
@@ -129,35 +132,349 @@ gradient colorStops · borderRadius `end` · annotation 말풍선 · 축 숨김 
 **ApexCharts 내부 DOM(`.apexcharts-data-labels`)에 의존하는 선택자다.**
 recharts로 바꾸면 이 규칙은 의미가 없어지고 라벨 위치를 다른 방법으로 맞춰야 한다.
 
-### 🔴 이관 여부를 결정해야 한다
+### ✅ 이관한다 — `MF-Q1` 확정 (2026-07-30)
 
-계획서(3-4)는 **"차트: `recharts`(기설치). ApexCharts 명령형 → recharts 선언형으로 옵션 대조 이관"** 이라고
-정해 뒀다. 하지만 MF2는
+> **"도달불가라는게 사용하고 있지 않다는거지? 이거 이관하자."**
 
-- **도달 경로가 없고**
-- **데이터가 전부 목업이고**
-- **`TODO: API 연동 시 실제 데이터로 교체` 주석이 3곳에 있다**
+**"도달 불가"의 정확한 의미를 먼저 분명히 한다.**
 
-즉 **미완성 화면이 배포에 섞여 들어간 것**으로 보인다.
+| 질문                              | 답                                                                   |
+| --------------------------------- | -------------------------------------------------------------------- |
+| 앱 UI에서 이 화면에 갈 수 있는가? | **아니다.** 메뉴·카드·딥링크 어디에도 `/managementFee/info`가 없다   |
+| 그럼 아무도 못 보는가?            | **URL을 직접 입력하면 보인다.** 라우터에 등록돼 있고 가드도 없다     |
+| 보이는 숫자는 실제 관리비인가?    | **아니다.** 전부 하드코딩된 목업이다 (`210,070원`·`12,892원`·`-21%`) |
+| 서버 API가 있는가?                | **없다.** `TODO: API 연동 시 실제 데이터로 교체` 주석이 3곳          |
 
-| 선택지                         | 비용                                     | 위험                                            |
-| ------------------------------ | ---------------------------------------- | ----------------------------------------------- |
-| **A. 이관 제외**               | 0                                        | 나중에 API가 붙으면 처음부터 다시 만들어야 한다 |
-| B. 목업째로 recharts 이관      | 차트 2개 + 옵션 250줄 대조 (**가장 큼**) | 가짜 숫자를 재현하는 데 최대 공수를 쓴다        |
-| C. 라우트만 남기고 화면은 후속 | 낮음                                     | 진입 경로가 없으니 사실상 A와 같다              |
+**즉 "기능이 아직 안 붙은 미완성 화면"이고, 그래서 메뉴에서 빼둔 상태다.**
 
-**A(이관 제외)를 권한다.** 근거:
+**결정: 목업째로 이관한다.** 나중에 API가 붙을 때 UI를 다시 만들지 않아도 되게 한다.
 
-- 도달 경로 0 → 사용자가 볼 수 없다 → **등가 이관 원칙의 대상이 아니다**
-  (원칙은 "사용자 눈에 보이는 화면"을 지키는 것이다)
-- 이미 확정된 이관 제외 항목들(미출차 내역·`MyPageFontSizeItem` 등)과 **같은 성격**이다
-  (`inventory-questions.md` R-1·R-2 계열)
-- 제외하면 **`ApexCharts` → `recharts` 대조 작업이 `MainCardParkingMileageChart` 1건으로 줄어든다**
+| 이관 방침        | 내용                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| 목업 데이터      | **하드코딩 그대로 유지한다.** 값을 바꾸지 않는다             |
+| `TODO` 주석      | **유지한다.** 미완성 표시가 사라지면 안 된다                 |
+| 차트             | ApexCharts 2개 → **recharts로 옵션 대조 이관** (§1-2)        |
+| 라우트           | `/managementFee/info` 유지. **진입 경로도 만들지 않는다**    |
+| `<style scoped>` | ApexCharts 내부 DOM 선택자 → recharts 방식으로 재현 (§1-2-3) |
 
-→ **`MF-Q1` (사용자 결정 필요)**
+> ⚠️ **이 결정으로 `recharts` 대조 작업이 2건이 된다** —
+> MF2의 차트 2개 + `MainCardParkingMileageChart`(`main.md` 소관).
+> **MF2가 옵션이 훨씬 복잡하므로 recharts 규격은 MF2 기준으로 먼저 세운다.**
 
-> ⚠️ **결정이 나올 때까지 이 문서는 MF2를 "명세하지 않은 상태"로 둔다.**
-> B를 택하면 옵션 250줄을 전수로 풀어쓰는 별도 절이 필요하다.
+---
+
+## 1-2. MF2 화면 상세 — 관리비 정보 (`ManagementFeeInfoView` 524줄)
+
+**목업 화면이지만 이관 대상이므로 전수로 명세한다.**
+
+### 1-2-1. 레이아웃
+
+```
+┌────────────────────────────┐
+│ AppBar  관리비 조회         │
+├────────────────────────────┤  ← bg-neutral-b-gray-50 (전체 배경)
+│ ┌────────────────────────┐ │
+│ │ 2026년 7월분 ▾         │ │  ← DrawerMonth (작은 회색 글씨)
+│ │ 210,070원 [납부 완료]  │ │  ← pretendard-32Bold
+│ │ [ 관리비 내역 확인 ]   │ │  ← ButtonBase → MF1로 이동
+│ └────────────────────────┘ │
+│ ┌────────────────────────┐ │
+│ │ 전월대비 관리비         │ │
+│ │ 지난 달보다             │ │
+│ │ 77,960원 적게 나왔어요. │ │
+│ │ 7월 ████████ 210,070원 >│ │  ← 가로 막대 3개
+│ │ 6월 ██████████ 288,030원│ │
+│ │ 5월 █████████ 277,000원 │ │
+│ └────────────────────────┘ │
+│ ┌────────────────────────┐ │
+│ │ 에너지 사용현황         │ │
+│ │ 동일면적 평균보다        │ │
+│ │ 12,892원 적게 쓰고있어요.│ │
+│ │   [61,642원] [48,750원] │ │  ← 말풍선 annotation
+│ │      ██        ██       │ │  ← 세로 막대 2개
+│ │  동일면적 평균   우리집  │ │
+│ │ [전체 사용량 기준 평균 대비 -21%]│
+│ └────────────────────────┘ │
+└────────────────────────────┘
+```
+
+| 영역           | 클래스                                                                       |
+| -------------- | ---------------------------------------------------------------------------- |
+| 루트           | `h-full w-full overflow-auto bg-neutral-b-gray-50`                           |
+| 내부 패딩      | `p-5`                                                                        |
+| 상단 카드      | `rounded-xl border border-neutral-b-gray-200 bg-base-b-white p-4`            |
+| 월 선택 래퍼   | `mb-2`                                                                       |
+| 금액 행        | `mb-4 flex items-center gap-2`                                               |
+| 금액           | `text-defaults-primary-text-primary pretendard-32Bold`                       |
+| 상태 칩        | `rounded-full px-2 py-1 pretendard-13Medium` (색은 아래)                     |
+| 차트 카드 2개  | `mt-5 rounded-xl bg-base-b-white p-4` (**테두리 없음** — 상단 카드와 다르다) |
+| 카드 라벨      | `mb-1 text-defaults-secondary-text-secondary pretendard-12Medium`            |
+| 문구(전월대비) | `pretendard-18SemiBold`                                                      |
+| 문구(에너지)   | `pretendard-16SemiBold`                                                      |
+| 강조 색        | `text-brand-default-text-brand`                                              |
+| 하단 배너      | `rounded-lg bg-primary-pc-indigo-25 p-3 text-center pretendard-14Medium`     |
+
+⚠️ **상단 카드만 테두리가 있고 차트 카드 2개는 없다.**
+
+⚠️ **`DrawerMonth`에 `custom-class="!text-defaults-secondary-text-secondary pretendard-13Medium"`** 를 넘겨
+`!important`로 색을 덮고 글씨를 작게 만든다. MF1은 기본값(`16SemiBold`)이다.
+
+⚠️ **`ButtonBase`에 `color`를 넘기지 않는다** → 기본값 `brand`. `custom-class="w-full rounded-[8px]"`.
+
+### 1-2-2. 목업 데이터 (그대로 유지)
+
+```js
+const now = new Date()
+const selectedYear = ref(now.getFullYear())
+const selectedMonth = ref(now.getMonth() + 1)
+
+// 현재 달 기준 최근 3개월 데이터 생성
+const generateMonthlyData = () => {
+  const amounts = [277000, 288030, 210070] // TODO: API 연동 시 실제 데이터로 교체
+  return times(3, (i) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (2 - i), 1)
+    return { year: date.getFullYear(), month: date.getMonth() + 1, amount: amounts[i] }
+  })
+}
+
+const mockData = ref({
+  totalAmount: 210070,
+  paymentStatus: '납부 완료',
+  monthlyData: generateMonthlyData(),
+})
+
+const energyData = ref([
+  { label: '동일면적 평균', value: 61642 },
+  { label: '우리집', value: 48750 },
+])
+const selectedEnergyIndex = ref(1)
+```
+
+| 값                    | 내용                                                     |
+| --------------------- | -------------------------------------------------------- |
+| `amounts`             | `[277000, 288030, 210070]` — **2개월 전 → 이번 달 순**   |
+| `totalAmount`         | `210070` (= `amounts[2]`, 이번 달)                       |
+| `paymentStatus`       | **`'납부 완료'`** (MF1은 `'납부완료'` — **공백이 있다**) |
+| `energyData`          | 동일면적 평균 `61642` · 우리집 `48750`                   |
+| `selectedEnergyIndex` | `1` (= 우리집이 강조된다)                                |
+| 템플릿 리터럴         | `12,892원 적게` (= `61642 - 48750`, 손계산) · `-21%`     |
+
+🔴 **`times`는 `lodash`다.** `Array.from({ length: 3 }, (_, i) => …)`로 대체한다 (`tech-mapping.md` §12).
+
+**전월 대비 차이 계산**
+
+```js
+const previousMonthDiff = computed(() => {
+  const currentIdx = mockData.value.monthlyData.findIndex(
+    (d) => d.year === selectedYear.value && d.month === selectedMonth.value,
+  )
+  if (currentIdx > 0) {
+    return (
+      mockData.value.monthlyData[currentIdx].amount -
+      mockData.value.monthlyData[currentIdx - 1].amount
+    )
+  }
+  return 0
+})
+```
+
+`210070 - 288030 = -77960` → 문구는 `77,960원 적게 나왔어요.`
+
+```html
+<span class="text-brand-default-text-brand">
+  {{ formatAmount(Math.abs(previousMonthDiff)) }}원 {{ previousMonthDiff < 0 ? '적게' : '많이' }}
+</span>
+<span class="text-defaults-primary-text-primary"> 나왔어요. </span>
+```
+
+⚠️ **`0`이면 `0원 많이 나왔어요.`** 가 된다 (`< 0`이 거짓 → `많이`).
+
+⚠️ **월 선택기로 가장 오래된 달을 고르면** `currentIdx`가 `0`이 되어 `previousMonthDiff`가 `0`이다
+(비교 대상이 없다). 그래도 문구는 `0원 많이 나왔어요.`로 뜬다.
+
+⚠️ **`handleMonthChange`가 `selectedYear`/`selectedMonth`만 바꾸고 데이터는 갱신하지 않는다**
+(`// TODO: API 호출하여 해당 월 데이터 조회`). 즉 **금액은 항상 `210,070원`으로 고정**이고
+차트의 강조 막대와 `previousMonthDiff`만 바뀐다.
+
+**납부 상태 칩**
+
+```html
+:class="mockData.paymentStatus === '미납' ? 'bg-alerts-error-background-error-primary
+text-alerts-error-text-error' : 'bg-alerts-success-background-success-primary
+text-alerts-success-text-success'"
+```
+
+**`'납부 완료'`는 `'미납'`이 아니므로 항상 초록**이다. MF1과 같은 색 토큰을 쓴다.
+
+### 1-2-3. 차트 ① 전월대비 관리비 (가로 막대)
+
+**ApexCharts 옵션 전수 → recharts 대조표**
+
+| ApexCharts 옵션                           | 값                                                        | recharts 대응                                              |
+| ----------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| `chart.type`                              | `'bar'`                                                   | `<BarChart layout="vertical">`                             |
+| `chart.height` (init에서 주입)            | **`180`**                                                 | `<ResponsiveContainer height={180}>`                       |
+| `chart.toolbar.show`                      | `false`                                                   | (recharts에 없음)                                          |
+| `chart.parentHeightOffset`                | `0`                                                       | —                                                          |
+| `plotOptions.bar.horizontal`              | `true`                                                    | `layout="vertical"`                                        |
+| `plotOptions.bar.barHeight`               | `'40px'`                                                  | `<Bar barSize={40}>`                                       |
+| `plotOptions.bar.distributed`             | `true` (막대별 색)                                        | `<Cell>` per 데이터                                        |
+| `plotOptions.bar.borderRadius`            | `8`                                                       | `<Bar radius={[0, 8, 8, 0]}>`                              |
+| `plotOptions.bar.borderRadiusApplication` | `'end'`                                                   | 위 radius 배열로 표현                                      |
+| `plotOptions.bar.dataLabels.position`     | `'bottom'`                                                | `<LabelList position="insideLeft">`                        |
+| `fill.type` / `gradient.type`             | `'gradient'` / `'horizontal'`                             | `<linearGradient x1="0" x2="1">` + `<Cell fill="url(#…)">` |
+| `colorStops` (선택 막대)                  | `#0037BE` → `#0082FE`                                     | `<stop offset="0%"/><stop offset="100%"/>`                 |
+| `colorStops` (비선택)                     | `#D2D6DB` 단색                                            | 〃                                                         |
+| `dataLabels.enabled`                      | `true`                                                    | `<LabelList content={…}>`                                  |
+| `dataLabels.formatter`                    | 선택 막대만 **`{금액}원 >`**, 나머지 `{금액}원`           | 커스텀 렌더러                                              |
+| `dataLabels.style`                        | `16px` Pretendard 500 · 선택 `#FCFCFD` / 비선택 `#6C727E` | `<Text>` props                                             |
+| `xaxis.categories`                        | `['5월', '6월', '7월']` (`{month}월`)                     | `<YAxis dataKey="month" type="category">`                  |
+| `xaxis.min` / `max`                       | `0` / `maxAmount`                                         | `<XAxis type="number" domain={[0, max]}>`                  |
+| `xaxis.labels/axisBorder/axisTicks.show`  | 전부 `false`                                              | `<XAxis hide>`                                             |
+| `yaxis.labels.style`                      | `14px` 500 · 선택 `#111927` / 비선택 `#6C727E`            | `<YAxis tick={커스텀}>`                                    |
+| `grid.show`                               | `false`                                                   | `<CartesianGrid>` 미사용                                   |
+| `grid.padding`                            | `top: -10, bottom: -10` (**음수**)                        | `<BarChart margin={{ top: -10, bottom: -10 }}>`            |
+| `tooltip.enabled` / `legend.show`         | `false` / `false`                                         | `<Tooltip>`·`<Legend>` 미사용                              |
+| `states.hover.filter.type` / `active`     | `'none'` / `'none'`                                       | recharts 기본이 무효과 — 대응 불필요                       |
+
+**선택 판정은 `month === selectedMonth`다** (연도를 보지 않는다).
+
+```js
+const colorStops = mockData.value.monthlyData.map((d) =>
+  d.month === selectedMonth.value
+    ? [
+        { offset: 0, color: '#0037BE', opacity: 1 },
+        { offset: 100, color: '#0082FE', opacity: 1 },
+      ]
+    : [
+        { offset: 0, color: '#D2D6DB', opacity: 1 },
+        { offset: 100, color: '#D2D6DB', opacity: 1 },
+      ],
+)
+```
+
+⚠️ **연도가 다른 같은 월이 목록에 있으면 둘 다 강조된다** (12월→1월 경계). 목업이라 발생하지 않는다.
+
+🔴 **`<style scoped>`가 ApexCharts 내부 DOM에 의존한다.**
+
+```css
+.chart-container :deep(.apexcharts-data-labels text) {
+  transform: translateX(12px);
+}
+```
+
+**데이터 라벨을 오른쪽으로 12px 밀어** 막대 안쪽 여백을 만든 것이다.
+recharts에서는 `<LabelList dx={12}>` 또는 커스텀 렌더러의 `x + 12`로 재현한다.
+
+⚠️ **주석 처리된 옵션 5줄이 있다** (`plotOptions.bar.colors.backgroundBarColors` 등).
+**이관하지 않는다.**
+
+### 1-2-4. 차트 ② 에너지 사용현황 (세로 막대 + 말풍선)
+
+| ApexCharts 옵션                 | 값                                       | recharts 대응                         |
+| ------------------------------- | ---------------------------------------- | ------------------------------------- |
+| `chart.height` (init에서 주입)  | **`200`**                                | `<ResponsiveContainer height={200}>`  |
+| `plotOptions.bar.columnWidth`   | `'20%'`                                  | `<Bar barSize>` 또는 `barCategoryGap` |
+| `plotOptions.bar.distributed`   | `true`                                   | `<Cell>`                              |
+| `plotOptions.bar.borderRadius`  | `8` · application `'end'`                | `<Bar radius={[8, 8, 0, 0]}>`         |
+| `fill.gradient.type`            | `'vertical'`                             | `<linearGradient y1="0" y2="1">`      |
+| colorStops (선택 = 우리집)      | `#0082FE` → `#0037BE`                    | **① 차트와 방향이 반대다**            |
+| colorStops (비선택)             | `#6C727E` 단색                           | 〃                                    |
+| `dataLabels.enabled`            | **`false`** (말풍선이 대신한다)          | `<LabelList>` 미사용                  |
+| **`annotations.points`**        | 막대마다 말풍선 1개                      | **커스텀 `<LabelList content>`**      |
+| `xaxis.labels.style`            | `12px` 500 · 색 `['#6C727E', '#111927']` | `<XAxis tick={커스텀}>`               |
+| `xaxis.labels.offsetY`          | `-3`                                     | `tick={{ dy: -3 }}`                   |
+| `xaxis.axisBorder.show`         | **`true`** (①과 달리 축선을 보인다)      | `<XAxis axisLine>`                    |
+| `yaxis.min/max/floating/labels` | `0` / `maxValue` / `true` / 숨김         | `<YAxis hide domain={[0, max]}>`      |
+| `grid.padding`                  | `top: 20, right: -40`                    | `<BarChart margin>`                   |
+
+**말풍선 annotation 전수**
+
+```js
+label: {
+  text: `${item.value.toLocaleString('ko-KR')}원`,
+  offsetY: -15,                 // 막대 위로 15px
+  borderRadius: 8,
+  borderWidth: 0,
+  style: {
+    background: '#111927',      // 다크 배경
+    color: '#FFFFFF',
+    fontSize: '12px', fontFamily: 'Pretendard', fontWeight: 500,
+    padding: { left: 12, right: 12, top: 8, bottom: 10 },   // ⚠️ 상하 비대칭
+  },
+},
+marker: { size: 0, strokeWidth: 0, fillColor: 'transparent' },   // 점 숨김
+```
+
+🔴 **recharts에는 annotation 개념이 없다.** `<LabelList content={커스텀 SVG}>`로
+**둥근 사각형 + 텍스트를 직접 그려야 한다.** 이 도메인 이관의 가장 큰 작업이다.
+
+⚠️ **`padding`이 `top: 8` / `bottom: 10`으로 비대칭**이다. 텍스트를 살짝 위로 올린 것이다.
+
+⚠️ **`x: item.label`** — x축 카테고리 이름과 문자열이 일치해야 annotation이 붙는다.
+
+⚠️ **x축 라벨 색이 배열 하드코딩(`['#6C727E', '#111927']`)이다.** `selectedEnergyIndex`를 보지 않는다 —
+즉 **선택이 바뀌어도 라벨 색은 그대로**다. 막대 색만 `selectedEnergyIndex`를 따른다. **비대칭이지만 그대로 옮긴다.**
+
+### 1-2-5. 명령형 차트 생명주기 (recharts에서는 전부 사라진다)
+
+```js
+const initHorizontalChart = () => {
+  if (!horizontalChartRef.value) return
+  const options = {
+    ...chartOptions.value,
+    chart: { ...chartOptions.value.chart, height: 180 }, // ← height가 여기서 주입된다
+    series: chartSeries.value,
+  }
+  horizontalChart = new ApexCharts(horizontalChartRef.value, options)
+  horizontalChart.render()
+}
+
+onMounted(() => {
+  initHorizontalChart()
+  initVerticalChart()
+})
+onUnmounted(() => {
+  horizontalChart?.destroy()
+  verticalChart?.destroy()
+})
+
+watch([chartOptions, chartSeries], () => {
+  horizontalChart.updateOptions(chartOptions.value)
+  horizontalChart.updateSeries(chartSeries.value)
+})
+```
+
+**recharts는 선언형이므로 `init`/`destroy`/`updateOptions`/`updateSeries`가 모두 불필요하다.**
+
+⚠️ **`height`가 옵션 객체가 아니라 `init` 함수에서 주입된다** (180 / 200). 값을 놓치지 않는다.
+
+⚠️ **`watch` 콜백에 `if (horizontalChart)` 가드가 있다** — `onMounted` 이전에 옵션이 바뀌는 경우 대비.
+
+### 1-2-6. QA 체크리스트 (MF2)
+
+**진입 경로가 없으므로 URL을 직접 입력해 확인한다** — `/managementFee/info`
+
+- [ ] AppBar 제목이 **`관리비 조회`** (MF1은 `관리비 상세`)
+- [ ] 전체 배경이 `neutral-b-gray-50`, 카드 3개가 흰색
+- [ ] **상단 카드만 테두리가 있다**
+- [ ] 월 선택기 글씨가 **MF1보다 작고 회색**이다 (`!important` 오버라이드)
+- [ ] 금액 `210,070원` + 초록 `납부 완료` 칩 (**공백 있음**)
+- [ ] `관리비 내역 확인` → **MF1로 이동**
+- [ ] 전월대비: `지난 달보다` / `77,960원 적게` / `나왔어요.`
+- [ ] 가로 막대 3개, **이번 달만 파란 그라데이션 + 흰 글씨 + 뒤에 `>`**
+- [ ] 나머지 2개는 회색 막대 + 회색 글씨
+- [ ] 막대 라벨이 왼쪽 끝에서 **12px 안쪽**에 있다
+- [ ] y축 월 라벨: 이번 달만 검정(`#111927`), 나머지 회색
+- [ ] 에너지: `동일면적 평균보다` / `12,892원 적게` / `쓰고있어요.`
+- [ ] 세로 막대 2개, **우리집만 파란 그라데이션**(아래→위), 평균은 회색
+- [ ] 두 막대 위에 **다크 말풍선** `61,642원` · `48,750원`
+- [ ] x축 라벨 `동일면적 평균`(회색) · `우리집`(검정), **축선 보임**
+- [ ] 하단 배너 `전체 사용량 기준 평균 대비 -21%` (연한 인디고 배경)
+- [ ] **월 선택기로 다른 달을 골라도 금액은 `210,070원` 그대로**이고 강조 막대만 바뀐다
+- [ ] 가장 오래된 달을 고르면 **`0원 많이 나왔어요.`**
+- [ ] 차트에 툴팁·범례·격자선이 **없다**
+- [ ] 막대에 마우스를 올려도 **밝아지지 않는다** (`states.hover: none`)
 
 ---
 
@@ -662,14 +979,21 @@ src/features/management-fee/
 │   ├── ManagementFeeReductions.tsx     # 할인내역 아코디언
 │   ├── ManagementFeeItemList.tsx       # 상세내역 + 증감
 │   └── ManagementFeeDetailSkeleton.tsx # 로딩
+├── charts/
+│   ├── MonthlyComparisonChart.tsx      # MF2 차트 ① (가로 막대 + 그라데이션)
+│   └── EnergyUsageChart.tsx            # MF2 차트 ② (세로 막대 + 말풍선 라벨)
 ├── pages/
-│   └── ManagementFeeDetailPage.tsx     # MF1
+│   ├── ManagementFeeDetailPage.tsx     # MF1
+│   └── ManagementFeeInfoPage.tsx       # MF2 (목업 유지)
 ├── types/
 │   └── managementFee.ts                # 서버 응답 타입 (필드명 그대로)
 └── index.ts
 ```
 
-**`MF-Q1`에서 B(목업 이관)를 택하면 `ManagementFeeInfoPage.tsx` + 차트 2개가 추가된다.**
+✅ **`MF-Q1` 확정에 따라 `ManagementFeeInfoPage.tsx` + 차트 2개를 포함한다.**
+
+> **`charts/`는 이 도메인 안에 둔다.** `MainCardParkingMileageChart`(`main.md`)와 옵션이 달라
+> 공용화 이득이 없다. **recharts 사용 규격만 MF2 기준으로 먼저 세우고 메인 카드가 따른다.**
 
 ### `shared`로 올릴 것
 
@@ -685,13 +1009,19 @@ shadcn `skeleton`은 `bg-muted`를 쓰므로 **색이 달라진다.** 레거시 
 
 ---
 
-## 이관 순서 — 1개 PR
+## 이관 순서 — 2개 PR
 
-| PR       | 범위 | 선행                                                    |
-| -------- | ---- | ------------------------------------------------------- |
-| **MF-1** | MF1  | Phase 4 (`Drawer`·`DrawerMonth`·`Skeleton`·`Accordion`) |
+| PR       | 범위    | 선행                                                            |
+| -------- | ------- | --------------------------------------------------------------- |
+| **MF-1** | MF1     | Phase 4 (`Drawer`·`DrawerMonth`·`Skeleton`·`Accordion`)         |
+| **MF-2** | **MF2** | MF-1 · **recharts 규격 확정** (그라데이션 `Cell` · 커스텀 라벨) |
 
-**MF2는 `MF-Q1` 결정에 따른다.**
+**MF2를 MF1과 분리한다.** 데이터 출처가 전혀 다르고(목업 vs 실 API),
+차트 2개가 이 도메인 작업량의 대부분이기 때문이다.
+
+> ⚠️ **MF-2는 `main.md`의 `MainCardParkingMileageChart`보다 먼저 한다.**
+> ApexCharts→recharts 변환 패턴(그라데이션 `<linearGradient>` + `<Cell>`, 커스텀 `<LabelList>`)을
+> **옵션이 더 복잡한 MF2에서 먼저 확립**하고 메인 카드가 물려받는다.
 
 > **`DrawerMonth`가 이 PR의 유일한 외부 블로커다.** 메인 카드(`main.md` §7-2)도 같은 컴포넌트를
 > 쓰므로 **Main 이관과 함께 확정한다.** 관리비 상세를 Main보다 먼저 이관하지 않는다.
@@ -717,6 +1047,20 @@ shadcn `skeleton`은 `bg-muted`를 쓰므로 **색이 달라진다.** 레거시 
 15. **`DrawerMonth`의 두 아코디언 헤더 위계가 다르다** (`16SemiBold`/`primary` vs `14Medium`/`secondary`).
 16. **`SkeletonBase` 색은 `#CDCBCBFF`다.** shadcn 기본색으로 두지 않는다.
 
+### MF2 (목업 화면)
+
+17. **목업 값을 바꾸지 않는다** — `[277000, 288030, 210070]` · `210070` · `61642`/`48750` ·
+    템플릿의 `12,892원` · `-21%`.
+18. **`TODO: API 연동 시 실제 데이터로 교체` 주석 3곳을 유지한다.**
+19. **월을 바꿔도 금액은 `210,070원` 그대로**이고 강조 막대와 전월대비 문구만 바뀐다.
+20. **`납부 완료`에 공백이 있다** (MF1은 `납부완료`).
+21. **`/managementFee/info`에 진입 경로를 만들지 않는다.**
+22. **차트 높이는 180 / 200이다.**
+23. **막대 선택 판정은 `month === selectedMonth`** (연도를 보지 않는다).
+24. **에너지 차트 x축 라벨 색은 하드코딩 배열**이라 선택이 바뀌어도 변하지 않는다.
+25. **툴팁·범례·격자선·호버 효과가 전부 없다.**
+26. **가로 막대 데이터 라벨은 12px 오른쪽으로 밀려 있다.**
+
 ---
 
 ## 정리해도 되는 것 (등가 영향 없음)
@@ -737,29 +1081,29 @@ shadcn `skeleton`은 `bg-muted`를 쓰므로 **색이 달라진다.** 레거시 
 
 ## 스타일
 
-| 항목                                                | 상태                                                                                                      |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `border-default-secondary-border-secondary`         | 🔴 **오타** (`defaults` 단수). `broken-styles.md` §1 — **수정 확정.** 상단 테두리 색이 바뀐다             |
-| `bg-[#CDCBCBFF]` (`SkeletonBase`)                   | 하드코딩 hex 8자리 → `deferred.md`                                                                        |
-| MF2 `#0037BE`·`#0082FE`·`#D2D6DB`·`#111927`… (차트) | JS 하드코딩 hex 다수. `MF-Q1` 결정에 종속                                                                 |
-| 스켈레톤의 `border-b-2` vs 실제 `border-b`          | 로딩 → 완료 시 1px 튐 → `MF-Q3`                                                                           |
-| 그 외 클래스                                        | ✅ 확인한 토큰 전부 존재 (`primary-pc-indigo-25`·`neutral-b-gray-50`·`blue-s-info-*`·`pretendard-32Bold`) |
+| 항목                                                                                 | 상태                                                                                                         |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `border-default-secondary-border-secondary`                                          | 🔴 **오타** (`defaults` 단수). `broken-styles.md` §1 — **수정 확정.** 상단 테두리 색이 바뀐다                |
+| `bg-[#CDCBCBFF]` (`SkeletonBase`)                                                    | 하드코딩 hex 8자리 → `deferred.md`                                                                           |
+| MF2 차트 hex (`#0037BE`·`#0082FE`·`#D2D6DB`·`#111927`·`#FCFCFD`·`#6C727E`·`#FFFFFF`) | JS 하드코딩. **이관 확정** — 차트 색은 토큰화하지 않고 그대로 옮긴다 (그라데이션 정지점이라 임의값이 불가피) |
+| 스켈레톤의 `border-b-2` vs 실제 `border-b`                                           | 로딩 → 완료 시 1px 튐 → `MF-Q3`                                                                              |
+| 그 외 클래스                                                                         | ✅ 확인한 토큰 전부 존재 (`primary-pc-indigo-25`·`neutral-b-gray-50`·`blue-s-info-*`·`pretendard-32Bold`)    |
 
 ---
 
 ## 확인 필요 (`MF-Q*`)
 
-| #         | 질문                                                                                                                                                            | 관련 |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| MF-Q1     | 🔴 **MF2(`/managementFee/info`, 524줄)는 도달 경로가 없고 데이터가 전부 목업이다.** 이관 제외(A 권장) / 목업째로 recharts 이관(B) / 후속 작업(C) 중 어느 것인가 | §1   |
-| MF-Q2     | 두 훅의 `queryKey`가 `getAptInfo().aptResidentUuid`(옵셔널 없음)를 쓴다. `enabled`와 무관하게 평가되므로 `aptInfo`가 없으면 throw. `?.`를 붙이는가              | §3-1 |
-| MF-Q3     | 스켈레톤의 `상세내역` 헤더가 `border-b-2`인데 실제는 `border-b`다. 로딩→완료 시 1px 튄다. 맞추는가                                                              | MF1  |
-| MF-Q4     | 🔴 **고지서 로딩 중 월 선택기가 2개로 보인다** (실제 것 + 스켈레톤 것). 스켈레톤에서 제거하는가                                                                 | MF1  |
-| MF-Q5     | 자동이체 칩 조건이 `autoTransfer !== 'N'`이다 → 필드가 없으면(`undefined`) 칩이 뜬다. `=== 'Y'`로 바꾸는가                                                      | MF1  |
-| ~~MF-Q6~~ | ~~아이콘 파일명 비대칭~~ → **해소.** `public/assets/icons/`에 두 이름 그대로 존재. 파일을 그대로 복사한다                                                       | MF1  |
-| MF-Q7     | 증감 표시가 `!== null`만 검사한다 → 필드가 `undefined`면 **`▲ NaN원`** 이 보인다. `!= null`로 바꾸는가                                                          | MF1  |
-| MF-Q8     | `DrawerMonth`가 `availableYearmonths` 참조 변경마다 `changeMonth`를 emit한다 → refetch 시 **사용자 선택이 최신 달로 되돌아간다.** 고치는가                      | §4   |
-| MF-Q9     | `DrawerMonth`의 바텀시트에 **X 버튼이 없다** (`title` 미전달로 헤더가 렌더되지 않음). 배경 클릭만 가능하다. 추가하는가                                          | §4   |
+| #         | 질문                                                                                                                                                 | 관련      |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| ~~MF-Q1~~ | ~~MF2 이관 여부~~ → ✅ **2026-07-30 확정: 이관한다.** 목업 데이터·`TODO` 주석 유지, ApexCharts 2개를 recharts로 대조 이관. 진입 경로는 만들지 않는다 | §1 · §1-2 |
+| MF-Q2     | 두 훅의 `queryKey`가 `getAptInfo().aptResidentUuid`(옵셔널 없음)를 쓴다. `enabled`와 무관하게 평가되므로 `aptInfo`가 없으면 throw. `?.`를 붙이는가   | §3-1      |
+| MF-Q3     | 스켈레톤의 `상세내역` 헤더가 `border-b-2`인데 실제는 `border-b`다. 로딩→완료 시 1px 튄다. 맞추는가                                                   | MF1       |
+| MF-Q4     | 🔴 **고지서 로딩 중 월 선택기가 2개로 보인다** (실제 것 + 스켈레톤 것). 스켈레톤에서 제거하는가                                                      | MF1       |
+| MF-Q5     | 자동이체 칩 조건이 `autoTransfer !== 'N'`이다 → 필드가 없으면(`undefined`) 칩이 뜬다. `=== 'Y'`로 바꾸는가                                           | MF1       |
+| ~~MF-Q6~~ | ~~아이콘 파일명 비대칭~~ → **해소.** `public/assets/icons/`에 두 이름 그대로 존재. 파일을 그대로 복사한다                                            | MF1       |
+| MF-Q7     | 증감 표시가 `!== null`만 검사한다 → 필드가 `undefined`면 **`▲ NaN원`** 이 보인다. `!= null`로 바꾸는가                                               | MF1       |
+| MF-Q8     | `DrawerMonth`가 `availableYearmonths` 참조 변경마다 `changeMonth`를 emit한다 → refetch 시 **사용자 선택이 최신 달로 되돌아간다.** 고치는가           | §4        |
+| MF-Q9     | `DrawerMonth`의 바텀시트에 **X 버튼이 없다** (`title` 미전달로 헤더가 렌더되지 않음). 배경 클릭만 가능하다. 추가하는가                               | §4        |
 
 ---
 
@@ -781,17 +1125,25 @@ shadcn `skeleton`은 `bg-muted`를 쓰므로 **색이 달라진다.** 레거시 
 | `DrawerMonth` 바텀시트 항목 `p-4` + `last:border-b-0`                       |
 | 선택 항목의 `font-semibold` (Tailwind 기본 굵기)                            |
 | 폰트 배율 5단계에서 `pretendard-32Bold` 금액이 칩과 겹치지 않는지           |
+| **MF2 카드 3개 중 상단만 테두리** · 차트 카드 `mt-5` 간격                   |
+| **MF2 가로 막대** 높이 40px · `radius 8` 오른쪽만 · 그라데이션 좌→우        |
+| **MF2 막대 라벨** 16px · 선택 흰색 / 비선택 회색 · **12px 오른쪽 이동**     |
+| **MF2 세로 막대** 폭 20% · 그라데이션 아래→위 (①과 반대)                    |
+| **MF2 말풍선** 다크 `#111927` · `radius 8` · 패딩 상8/하10 · 막대 위 15px   |
+| **MF2 하단 배너** `bg-primary-pc-indigo-25` 연한 인디고                     |
 
 ---
 
 ## 회귀 위험 지점
 
-| 지점                               | 위험                                                                           |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| **`startDateTIme` 오타**           | 정상 표기로 "고치면" **관리비 조회가 전부 실패한다.** 가장 위험한 한 글자      |
-| **`DrawerMonth` 자동 선택**        | `immediate` watch + emit 조합. 놓치면 진입 시 아무 달도 선택되지 않는다        |
-| **`DrawerMonth` 재emit** (`MF-Q8`) | 고치면 **refetch 후에도 선택이 유지**된다 — 레거시와 다른 동작                 |
-| **`border-default-…` 오타 수정**   | 상단 테두리 색이 바뀐다. `broken-styles.md`에서 이미 **수정 확정**             |
-| **`SkeletonBase` 색**              | shadcn 기본값을 쓰면 회색 톤이 달라진다                                        |
-| **MF2 ApexCharts** (`MF-Q1` = B)   | 옵션 250줄 + gradient colorStops + annotation 말풍선 + `:deep()` 선택자 재현   |
-| **응답 필드명**                    | `imposeYearmonths`·`prevMonthComparedIncreOrDecreAmount` 등 비관습적 이름 다수 |
+| 지점                                 | 위험                                                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| **`startDateTIme` 오타**             | 정상 표기로 "고치면" **관리비 조회가 전부 실패한다.** 가장 위험한 한 글자                   |
+| **`DrawerMonth` 자동 선택**          | `immediate` watch + emit 조합. 놓치면 진입 시 아무 달도 선택되지 않는다                     |
+| **`DrawerMonth` 재emit** (`MF-Q8`)   | 고치면 **refetch 후에도 선택이 유지**된다 — 레거시와 다른 동작                              |
+| **`border-default-…` 오타 수정**     | 상단 테두리 색이 바뀐다. `broken-styles.md`에서 이미 **수정 확정**                          |
+| **`SkeletonBase` 색**                | shadcn 기본값을 쓰면 회색 톤이 달라진다                                                     |
+| **MF2 ApexCharts → recharts** (확정) | 옵션 약 250줄. **annotation 말풍선은 recharts에 대응 개념이 없어 커스텀 SVG로 그려야 한다** |
+| **MF2 `:deep(.apexcharts-*)`**       | 라이브러리 내부 DOM 선택자. recharts에서는 `dx`/커스텀 렌더러로 재현                        |
+| **MF2 그라데이션 방향**              | ① 가로(좌→우) `#0037BE`→`#0082FE` / ② 세로(아래→위) `#0082FE`→`#0037BE` — **반대다**        |
+| **응답 필드명**                      | `imposeYearmonths`·`prevMonthComparedIncreOrDecreAmount` 등 비관습적 이름 다수              |

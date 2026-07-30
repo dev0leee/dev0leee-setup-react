@@ -386,7 +386,7 @@ zod 3→4 변환은 `zod-migration.md`. 폼 컴포넌트(`InputBase`·`InputPass
 | Vite 멀티 엔트리                                         | `main.tsx` / `main-opinion.tsx` (`decisions/tech-choices.md`) |
 | 별칭 `@views`·`@components`                              | **폐기** — 타깃은 `@/`만 (`docs/09-imports.md`)               |
 | `manualChunks` (패키지별 vendor 분리 + Sentry 단일 청크) | 이관 검토. Sentry 초기화 순서 이슈 때문이었음                 |
-| `sentryVitePlugin`                                       | **추가 필요** (타깃 미설정)                                   |
+| `sentryVitePlugin`                                       | 🚫 **제외** (2026-07-30 결정 — §12). 소스맵 업로드 안 함      |
 | `jsconfig.json`                                          | `tsconfig.json`으로 대체 (이미 있음)                          |
 | `postcss.config.js`                                      | Tailwind 4 `@tailwindcss/vite`로 대체 (이미 있음)             |
 | `.env.*`                                                 | `env-vars.md` §4 — 변수 8개 추가, 스키마 2개 분리             |
@@ -399,20 +399,60 @@ zod 3→4 변환은 `zod-migration.md`. 폼 컴포넌트(`InputBase`·`InputPass
 
 `decisions/tech-choices.md` 요약 + 프레임워크 무관 이식분.
 
-### 추가
+### 추가 — ✅ **2026-07-30 승인 (8개)**
 
-| 패키지                                 | 용도                                            |
-| -------------------------------------- | ----------------------------------------------- |
-| `react-day-picker` (shadcn `calendar`) | 날짜 선택기 4화면                               |
-| `dompurify`                            | `v-dompurify-html` 31곳 대체                    |
-| `swiper`                               | 메인 스와이퍼 2곳 (React 바인딩 `swiper/react`) |
-| `qrcode`                               | 로비폰 QR                                       |
-| `html2canvas`                          | 이미지 캡처                                     |
-| `quill-delta-to-html`                  | 게시판 본문 렌더                                |
-| `he`                                   | HTML 엔티티 디코딩                              |
-| `posthog-js`                           | 분석                                            |
-| `@sentry/vite-plugin`                  | 소스맵 업로드                                   |
-| `lodash-es`                            | 사용처 확인 후 — 대부분 네이티브로 대체 가능    |
+| 패키지                                 | 용도                                            | 상태          |
+| -------------------------------------- | ----------------------------------------------- | ------------- |
+| `react-day-picker` (shadcn `calendar`) | 날짜 선택기 **5 인스턴스 / 4화면**              | ✅ 승인       |
+| `dompurify`                            | `v-dompurify-html` 31곳 대체                    | ✅ 승인       |
+| `swiper`                               | 메인 스와이퍼 2곳 (React 바인딩 `swiper/react`) | ✅ 승인       |
+| `qrcode`                               | 로비폰 QR                                       | ✅ 승인       |
+| `html2canvas`                          | 이미지 캡처                                     | ✅ 승인       |
+| `quill-delta-to-html`                  | 게시판 본문 렌더                                | ✅ 승인       |
+| `he`                                   | HTML 엔티티 디코딩                              | ✅ 승인       |
+| `posthog-js`                           | 분석                                            | ✅ 승인       |
+| ~~`@sentry/vite-plugin`~~              | ~~소스맵 업로드~~                               | 🚫 **제외**   |
+| ~~`lodash-es`~~                        | ~~lodash 대체~~                                 | 🚫 **불필요** |
+
+### 🚫 `@sentry/vite-plugin` — 제외 (2026-07-30 사용자 결정)
+
+> **"일단 sentry는 빼고 하자"**
+
+**빠지는 것**
+
+| 항목                                        | 결과                                                                   |
+| ------------------------------------------- | ---------------------------------------------------------------------- |
+| `sentryVitePlugin` (`vite.config.ts`)       | 설정하지 않는다                                                        |
+| 소스맵 Sentry 업로드                        | 하지 않는다 → **Sentry 스택트레이스가 난독화 상태로 남는다**           |
+| `filesToDeleteAfterUpload` (업로드 후 삭제) | 불필요                                                                 |
+| `SENTRY_AUTH_TOKEN` GitHub Secret           | 불필요 (Phase 7 이전 목록에서 제외)                                    |
+| `build.sourcemap: 'hidden'`                 | ⚠️ **소스맵 자체를 만들지 않는다** — 안 만들면 S3 노출 위험도 사라진다 |
+| `opinion.md` `O-Q3` (Sentry project 이름)   | **소멸**                                                               |
+
+**빠지지 않는 것 — 에러 리포팅 자체는 유지된다**
+
+타깃 템플릿에 **`@sentry/react`가 이미 설치·배선돼 있다** (`package.json:28` ·
+`src/main.tsx` · `src/shared/components/errors/QueryErrorBoundary.tsx`).
+**이것은 승인 목록에 없던 기설치 항목이므로 이번 결정과 무관하게 그대로 둔다.**
+
+| 항목                                | 처리                                            |
+| ----------------------------------- | ----------------------------------------------- |
+| `@sentry/react` (기설치)            | **유지** — 초기화·에러 바운더리 연동 그대로     |
+| `lib/sentry/sentryApiError.js` 이식 | **유지** — import만 `@sentry/react`로 (§2 참조) |
+| `VITE_SENTRY_DSN` 환경변수          | **유지** (`env-vars.md`)                        |
+
+> ⚠️ **Sentry 통합 자체를 걷어내는 결정이 아니다.**
+> 이번 결정은 **소스맵 업로드 플러그인 1개를 미루는 것**으로 해석했다.
+> `@sentry/react`까지 제거해야 하면 알려주면 `env` 스키마·`main.tsx`·`QueryErrorBoundary`·
+> `sentryApiError` 4곳을 함께 정리한다.
+
+### 🚫 `lodash-es` — 불필요 확정
+
+레거시 `lodash` 사용처를 전수 확인한 결과 **소방 자가점검에 집중**돼 있고
+(`every` `filter` `forEach` `get` `isEmpty` `size` `sumBy` `find`),
+**8개 함수 전부 표준 JS로 대체 가능**하다 (옵셔널 체이닝 · `Object.keys().length` · `Array.prototype.*`).
+`DrawerMonth`·관리비 목업의 `times`도 `Array.from({length: n}, …)`로 대체된다.
+→ `fire-inspection.md` 「이관 순서」
 
 ### 추가 없음 (타깃 기설치 활용)
 
@@ -425,7 +465,8 @@ zod 3→4 변환은 `zod-migration.md`. 폼 컴포넌트(`InputBase`·`InputPass
 `@vee-validate/zod`·`@vuepic/vue-datepicker`·**`v-calendar`(미사용)**·`vue-dompurify-html`·
 `apexcharts`·`sweetalert2`·`mitt`·`eruda`·`slides-grab`
 
-> **라이브러리 추가는 Phase 4 착수 시 한 번에 승인받는다** (타깃 CLAUDE.md 규칙).
+> ✅ **2026-07-30 승인 완료.** 8개 추가 · `@sentry/vite-plugin` 제외 · `lodash-es` 불필요.
+> **Phase 4 1번 단계(의존성 승인)의 블로커가 해소됐다.**
 
 ---
 
