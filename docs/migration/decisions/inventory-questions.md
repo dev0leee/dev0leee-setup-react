@@ -129,8 +129,13 @@ queryFn: () => getAptMallMyOrderDetail({ mealUuid: getParams().aptMallOrderUuid,
 
 라우트 파라미터 `:aptMallOrderUuid`를 그대로 API의 `mealUuid`로 넘긴다. 이름만 다르다.
 
-**이관 시**: 서버 계약(`mealUuid`)은 유지하고, 라우트 파라미터명도 유지한다.
-매핑 지점을 `queries/`에 두면 레거시와 동일한 구조가 된다.
+**이관 시**: 라우트 파라미터명(`:aptMallOrderUuid`)은 유지한다.
+
+> ⚠️ **2026-07-30 정정** — `mealUuid`는 **서버 계약이 아니다.** `api/aptMall.js`가
+> `` `${apiApartmant}/${aptResidentUuid}/apt-mall/order/${mealUuid}` ``로 값만 보간하므로
+> **이름은 서버에 전달되지 않는다.** 즉 프론트 함수 인자명일 뿐이고, 바꿔도 요청은 동일하다.
+> 통일 여부는 `features/apt-mall.md` `AM-Q22`에서 결정한다.
+> 매핑 지점을 `queries/`에 두면 레거시와 동일한 구조가 된다.
 
 > ⚠️ **부수 발견 (동작 영향 없음)**: `useDeleteAptMallMyOrder.js:20`의
 > `mealUuid: mealUuid || getParams()?.mealUuid` — 폴백이 `getParams()?.mealUuid`를 읽지만
