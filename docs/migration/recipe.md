@@ -345,7 +345,28 @@ text-brand-primary-50   → 렌더값(#111927) 유지         🔴 brand 에 pri
 마지막 줄이 Phase 5에서 실제로 틀린 자리다. `#0037BE`를 골라 **마이페이지 메뉴 제목이
 검정 → 파랑**으로 바뀌었고 되돌렸다 (`ee6409b` → `3387f32`).
 
-렌더값 판정: `text-*` → 상속색 `#111927` · `border-*` → 기본 `#E5E7EB` · `bg-*` → 없음(제거).
+### 렌더값은 **추정하지 말고 실측한다** (MUST)
+
+`text-*`는 상속색, `border-*`는 기본색, `bg-*`는 투명 — 규칙은 알지만 **상속 체인에 뭐가
+끼어 있는지는 코드로 확신할 수 없다.** `<a>`는 UA 링크색이 있고, preflight가 그걸 지우는지도
+빌드 설정에 달렸다.
+
+레거시 dev 서버에 붙어 **조상 체인을 그대로 재현하고 `getComputedStyle`로 잰다.**
+로그인이 필요 없는 화면(`/intro`)에서도 색 상속은 같으므로 계정 없이 측정할 수 있다.
+
+```ts
+await page.goto('http://localhost:3000/intro')
+const color = await page.evaluate(() => {
+  const host = document.createElement('div')
+  host.innerHTML = `<li class="...조상 클래스..."><h2 class="text-brand-primary-50">x</h2></li>`
+  document.body.appendChild(host)
+  return getComputedStyle(host.querySelector('h2')!).color
+})
+```
+
+이 방법으로 `text-brand-primary-50`이 `#111927`(순수 상속), 라디오 선택 배경이
+`rgba(0,0,0,0)`(투명)임을 확인했다 — **앵커가 파랗게 보일 가능성도 실측으로 배제했다.**
+조사용 spec은 확인 후 삭제한다.
 
 ### 검증 — 빌드 CSS와 대조한다
 

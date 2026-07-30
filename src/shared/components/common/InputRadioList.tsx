@@ -10,10 +10,13 @@ import { cn } from '@/shared/utils/cn'
  * 렌더 결과는 같다.
  *
  * ⚠️ 선택 상태의 배경이 `bg-brand-default-background-brand-secondary`인데
- * **config에 없는 클래스다.** 배경이 칠해지지 않던 상태였다.
- * B-Q2 결정에 따라 `bg-primary-pc-indigo-50`(#E6EBF9)으로 매핑했다 —
- * 소방 점검표 라디오(21×2)·이사예약 라디오에 **연파랑 배경이 새로 생긴다**
- * (`broken-styles.md` §5).
+ * **config에 없는 클래스라 배경이 칠해지지 않는다.** `brand.default`에는 `background-brand`만
+ * 있고 `-secondary` 접미사가 없어 **대체할 토큰이 없다** → 클래스를 두지 않는다
+ * (`broken-styles.md` §0 D그룹).
+ *
+ * 레거시 실측(`rgba(0,0,0,0)`)으로 확인했고, **선택 표시는 배경 없이도 보인다** —
+ * 테두리 `#0037BE` + 글자 `#0037BE` + `14SemiBold`가 함께 걸려 있다.
+ * SignUp의 세대주 라디오와 다른 점이 이것이다(그쪽은 배경이 유일한 표시였다).
  *
  * `showCheckbox`면 체크박스 SVG를 왼쪽에 붙이고 좌측 정렬로 바뀐다
  * (소방 자가점검표가 쓴다).
@@ -55,7 +58,7 @@ export const InputRadioList = ({
               showCheckbox ? 'justify-start' : 'justify-center text-center',
               isItemDisabled ? 'cursor-not-allowed bg-[#e7e7e7] opacity-50' : 'cursor-pointer',
               isSelected
-                ? 'border-brand-default-border-brand bg-primary-pc-indigo-50 pretendard-14SemiBold text-brand-default-text-brand'
+                ? 'border-brand-default-border-brand pretendard-14SemiBold text-brand-default-text-brand'
                 : cn(
                     'border-defaults-tertiary-border-tertiary bg-defaults-secondary-background-mono pretendard-14Regular text-defaults-secondary-text-secondary',
                     textColor,

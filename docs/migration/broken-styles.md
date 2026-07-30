@@ -22,7 +22,7 @@ Tailwind는 알 수 없는 클래스를 조용히 무시하므로, 해당 선언
 | **효과 없는 죽은 선언** (덮이거나 애초에 무의미)              |    3 | **삭제**                        |
 | **미생성 클래스** (config에 없는 이름)                        |    6 | **Tailwind 토큰으로 확정** (§5) |
 
-영향 파일 **33개**. **26건 전부 조치 방침이 정해졌다** — 미해결 0건.
+영향 파일 **33개**. **26건 전부 조치 확정** — 미해결 0건. D그룹 6건은 브라우저 실측으로 결정했다(§5).
 
 > ✅ **2026-07-30 — `B-Q2` 확정.** §5 6건을 **`globalColor.scss`의 이전 팔레트가 아니라
 > 현 Tailwind 토큰으로** 표현한다 (사용자 결정). `@theme`에 새 색을 추가하지 않는다.
@@ -250,16 +250,59 @@ Tailwind 3.4의 기본 스케일에 없는 숫자를 썼다. **디자인 확인 
 >
 > **따라서 `@theme`에 새 색을 추가하지 않는다.** 아래 표의 토큰만 쓴다.
 
-### 확정 매핑
+### ✅ 확정 (2026-07-30) — **브라우저 실측 후 결정**
 
-| 현재 (깨짐)                                   | **확정 토큰**                                    | 값        | 화면 변화                                        |
-| --------------------------------------------- | ------------------------------------------------ | --------- | ------------------------------------------------ |
-| `border-deep-glue-20`                         | **`border-defaults-secondary-border-secondary`** | `#E5E7EB` | 회색 기본 테두리 → **연회색**. 미세 변화         |
-| `border-bg-gray`                              | **`border-defaults-tertiary-border-tertiary`**   | `#F3F4F6` | 회색 기본 → **같은 폼의 입력칸과 동일한 테두리** |
-| `text-brand-primary-50`                       | **`text-brand-default-text-brand`**              | `#0037BE` | 🔴 상속색(검정) → **브랜드 파랑**                |
-| `text-brand-primary-100`                      | **`text-brand-default-text-brand`**              | `#0037BE` | 🔴 〃                                            |
-| `border-defaults-secondary-border-primary`    | **`border-defaults-primary-border-primary`**     | `#D2D6DB` | **없음** (죽은 variant — 아래)                   |
-| `bg-brand-default-background-brand-secondary` | **`bg-primary-pc-indigo-50`**                    | `#E6EBF9` | 🔴 배경 없음 → **연한 브랜드 파랑**              |
+레거시 dev 서버(`:3000`)에서 각 사용처의 조상 체인을 그대로 재현해 `getComputedStyle`로 쟀다.
+추정이 아니라 실측값이다.
+
+| 현재 (깨짐)                                   | **실측 렌더값**      | **확정 조치**             | 화면 변화                      |
+| --------------------------------------------- | -------------------- | ------------------------- | ------------------------------ |
+| `text-brand-primary-50`                       | `#111927` (상속)     | `text-neutral-b-gray-900` | **없음** — 같은 값의 토큰 존재 |
+| `text-brand-primary-100`                      | `#111927` (상속)     | 〃                        | **없음**                       |
+| `border-deep-glue-20`                         | `#E5E7EB` (기본)     | **`border-[#e6e6ec]`**    | 미세 (의도값 복원)             |
+| `border-bg-gray`                              | `#E5E7EB` (기본)     | **`border-[#f8f8f8]`**    | 미세 (의도값 복원)             |
+| `bg-brand-default-background-brand-secondary` | `rgba(0,0,0,0)` 투명 | **클래스를 두지 않는다**  | **없음**                       |
+| `border-defaults-secondary-border-primary`    | — (사용처 0곳)       | 무관                      | **없음**                       |
+
+#### `text-brand-primary-50` · `-100` — 임의값이 필요 없다
+
+실측 결과 **`rgb(17, 25, 39)` = `#111927`**. 같은 화면의 기준 `<span>`·`body`·`text-neutral-90`이
+전부 같은 값이었고, 살아 있는 `text-brand-default-text-brand`는 `rgb(0, 55, 190)`로 명확히 달랐다.
+즉 **아무 색도 적용되지 않은 순수 상속색**이다.
+
+`#111927`을 값으로 갖는 토큰이 이미 있다(`neutral-b-gray-900` · `defaults-primary-text-primary`)
+→ **대체 가능하므로 임의값을 쓰지 않는다.** 현재 이관본이 쓰는 `text-neutral-b-gray-900`이 맞다.
+
+> `<a href="tel:">`도 같은 값이었다 — Tailwind preflight의 `a { color: inherit }`이 UA 기본
+> 링크색을 지운다. 앵커라서 파랗게 보일 가능성을 실측으로 배제했다.
+
+#### `border-deep-glue-20` · `border-bg-gray` — 의도값을 임의값으로 (사용자 결정)
+
+둘 다 실측 `#E5E7EB`(기본 테두리)로, 지정색이 적용되지 않았다. 삭제된
+`src/styles/globalColor.scss`에 **의도값이 남아 있다** — `$deep-blue-20: #e6e6ec` ·
+`$bg-gray: #f8f8f8`.
+
+`@theme`에 새 토큰을 추가하지 않는다는 B-Q2 결정은 유지하되, **임의값 문법으로 의도값을 쓴다**
+(사용자 결정: _"그냥 arbitrary 값으로 변경해서 쓰도록"_).
+
+| 사용처                                                                           | 쓸 것              |
+| -------------------------------------------------------------------------------- | ------------------ |
+| 주차 카드 4종 (`CarManagementList`·`InOutCarHistory`·`Mileage`·`ReservationCar`) | `border-[#e6e6ec]` |
+| 하자보수 상세 textarea ×2 · 이사예약 등록 textarea                               | `border-[#f8f8f8]` |
+
+#### `bg-brand-default-background-brand-secondary` — 대체할 색이 없다
+
+실측 `rgba(0, 0, 0, 0)`. **배경이 없는 것이 렌더 결과**이므로 대체할 색도, 임의값으로 넣을
+값도 없다 → 클래스를 두지 않는다.
+
+`brand.default`에는 `background-brand`만 있고 `-secondary` 접미사가 없다. Phase 4에서
+`bg-primary-pc-indigo-50`(`#E6EBF9`)로 매핑해뒀던 것은 근거 없는 추측이었고 **되돌렸다**
+(`InputRadioList.tsx`).
+
+> **선택 표시는 배경 없이도 보인다** — 같은 요소에 `border-brand-default-border-brand`(`#0037BE`) ·
+> `text-brand-default-text-brand`(`#0037BE`) · `pretendard-14SemiBold`가 함께 걸려 있다.
+> 실측으로 확인했다. **SignUp 세대주 라디오와 결정적으로 다른 점이다** — 그쪽은 배경이 유일한
+> 선택 표시였고 `text-white`까지 걸려 있어 글자가 사라졌다.
 
 ### 항목별 근거
 
