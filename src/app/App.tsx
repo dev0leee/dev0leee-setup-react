@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from '@/app/router'
 import { env } from '@/config/env'
 import { AuthProvider } from '@/features/auth'
+import { ErrorModal } from '@/shared/components/common/ErrorModal'
 import { RootErrorFallback } from '@/shared/components/errors/fallbacks'
 import { QueryErrorBoundary } from '@/shared/components/errors/QueryErrorBoundary'
 import { Toaster } from '@/shared/components/ui/sonner'
@@ -21,6 +22,8 @@ export const App = () => {
         </AuthProvider>
       </QueryErrorBoundary>
       <Toaster />
+      {/* 전역 오버레이는 App이 소유한다. 띄우는 쪽은 showErrorModal()만 부른다. */}
+      <ErrorModal />
       {env.VITE_ENV !== 'production' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )

@@ -9,3 +9,6 @@ export const NETWORK_ERROR_MESSAGE = '네트워크 상태를 확인해주세요'
 
 /** 자동 로그인 실패로 대기 요청을 거부할 때의 에러 메시지. 레거시 문구 그대로. */
 export const AUTO_LOGIN_FAILED_MESSAGE = '자동 로그인 실패'
+
+/** 에러 모달의 기본 본문. 레거시 `swalErrorModal`의 `text` 기본값 그대로. */
+export const DEFAULT_ERROR_MODAL_TEXT = '에러가 발생했습니다. 잠시 후 다시 시도해주세요.'
