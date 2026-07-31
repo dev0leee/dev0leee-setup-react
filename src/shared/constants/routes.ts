@@ -61,8 +61,6 @@ export const ROUTE_PATH = {
   // 이동 대상으로 참조하기 때문에 먼저 상수로 둔다. 지금 누르면 404다.
   // 해당 도메인을 이관할 때 라우트를 붙이고 이 구획에서 뺀다.
 
-  /** 소방 자가점검 완료. 뒤로가기 차단 목록(`app/navigationBlocking.ts`)이 참조한다 */
-  FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
   /** A-PASS (메인 A-PASS 카드) */
   APASS: '/apass',
   /** 관리비 상세 (메인 관리비 카드) */
@@ -114,6 +112,19 @@ export const ROUTE_PATH = {
   MOVING_HOUSE_DETAIL: '/movingHouse/detail/:movingUuid',
   MOVING_HOUSE_WRITE: '/movingHouse/write',
   MOVING_HOUSE_WRITE_CONFIRM: '/movingHouse/write/confirm',
+  /**
+   * 소방 자가점검 (F2~F4). 목록(`FIRE_INSPECTION`)은 메인 메뉴가 먼저 참조해 아래에 있다.
+   *
+   * ⚠️ **경로만 kebab-case다** — 다른 도메인은 `/movingHouse`처럼 camelCase다.
+   * 외부 링크 가능성이 있어 그대로 둔다 (`deferred.md` D-7).
+   *
+   * ⚠️ **완료 화면은 뒤로가기가 이중으로 막힌다** — AppBar에 버튼이 없고
+   * `app/navigationBlocking.ts`가 popstate까지 차단한다.
+   */
+  FIRE_INSPECTION_PROCESS: '/fire-inspection/process/:householdFireInspectionUuid',
+  FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
+  FIRE_INSPECTION_DETAIL:
+    '/fire-inspection/detail/:fireInspectionUuid/:householdFireInspectionUuid',
 
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
@@ -246,6 +257,26 @@ export const voteDetailPath = ({
 /** 하자보수 상세(RP4) */
 export const repairDetailPath = ({ repairUuid }: { repairUuid: string }): string => {
   return `/repair/detail/${repairUuid}`
+}
+
+/** 소방 자가점검 진행(F2) */
+export const fireInspectionProcessPath = ({
+  householdFireInspectionUuid,
+}: {
+  householdFireInspectionUuid: string
+}): string => {
+  return `/fire-inspection/process/${householdFireInspectionUuid}`
+}
+
+/** 소방 자가점검 상세(F4). **uuid 두 개를 다 요구한다** */
+export const fireInspectionDetailPath = ({
+  fireInspectionUuid,
+  householdFireInspectionUuid,
+}: {
+  fireInspectionUuid: string
+  householdFireInspectionUuid: string
+}): string => {
+  return `/fire-inspection/detail/${fireInspectionUuid}/${householdFireInspectionUuid}`
 }
 
 /** 이사예약 상세(MH2) */

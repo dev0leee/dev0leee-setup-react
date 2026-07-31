@@ -725,6 +725,46 @@ export const routes = [
                     },
                   },
 
+                  // ── 소방 자가점검 (F1~F4) ─────────────────────────────────
+                  {
+                    // ⚠️ **이 도메인에서 유일하게 바텀네비가 보인다.** 메인 메뉴에서
+                    // 들어오는 화면이라 레거시 meta도 `showBottomNav: true`다
+                    path: ROUTE_PATH.FIRE_INSPECTION,
+                    handle: layout({ appBarTitle: '소방 자가 점검', showBottomNav: true }),
+                    lazy: async () => {
+                      const { FireInspectionPage } = await import('@/features/fireInspection')
+                      return { Component: FireInspectionPage }
+                    },
+                  },
+                  {
+                    // 화면이 AppBar를 직접 든다 — 뒤로가기가 서명 단계를 되돌려야 한다
+                    path: ROUTE_PATH.FIRE_INSPECTION_PROCESS,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { FireInspectionProcessPage } =
+                        await import('@/features/fireInspection')
+                      return { Component: FireInspectionProcessPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.FIRE_INSPECTION_COMPLETE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { FireInspectionCompletePage } =
+                        await import('@/features/fireInspection')
+                      return { Component: FireInspectionCompletePage }
+                    },
+                  },
+                  {
+                    // AppBar 제목이 제출일에 따라 바뀌어 라우트 meta로는 만들 수 없다
+                    path: ROUTE_PATH.FIRE_INSPECTION_DETAIL,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { FireInspectionDetailPage } = await import('@/features/fireInspection')
+                      return { Component: FireInspectionDetailPage }
+                    },
+                  },
+
                   // ── A-PASS (AP1) ──────────────────────────────────────────
                   {
                     // ⚠️ 화면이 자기 AppBar를 든다 — 헤더 그라데이션 위에 투명하게 얹는다.

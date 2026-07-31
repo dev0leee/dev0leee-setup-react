@@ -7,6 +7,11 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // 같은 네트워크의 다른 기기(모바일 실기기 등)에서 접속할 수 있게 전 인터페이스에 바인딩한다.
+  server: {
+    host: true,
+    port: 3000,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
