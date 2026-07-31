@@ -472,6 +472,51 @@ export const routes = [
                       return { Component: RegularCarListPage }
                     },
                   },
+
+                  // ── 주차 — 차량관리 (PK3~PK7) ──────────────────────────────
+                  // 목록 2개와 폼 3개가 각각 **한 컴포넌트**다. 어느 화면인지는
+                  // 경로 문자열(`bookmark`/`alwaysAllow`, `add`/`edit`)로 갈린다.
+                  {
+                    path: ROUTE_PATH.PARKING_CAR_BOOKMARK_LIST,
+                    handle: layout({ appBarTitle: '즐겨찾기 차량' }),
+                    lazy: async () => {
+                      const { CarManagementListPage } = await import('@/features/parking')
+                      return { Component: CarManagementListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.PARKING_CAR_ALWAYS_ALLOW_LIST,
+                    handle: layout({ appBarTitle: '항상허용 차량' }),
+                    lazy: async () => {
+                      const { CarManagementListPage } = await import('@/features/parking')
+                      return { Component: CarManagementListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.PARKING_CAR_BOOKMARK_ADD,
+                    handle: layout({ appBarTitle: '즐겨찾기 차량 등록' }),
+                    lazy: async () => {
+                      const { CarManagementFormPage } = await import('@/features/parking')
+                      return { Component: CarManagementFormPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.PARKING_CAR_ALWAYS_ALLOW_ADD,
+                    handle: layout({ appBarTitle: '항상허용 차량 등록' }),
+                    lazy: async () => {
+                      const { CarManagementFormPage } = await import('@/features/parking')
+                      return { Component: CarManagementFormPage }
+                    },
+                  },
+                  {
+                    // ⚠️ 항상허용 수정 라우트는 **만들지 않는다** (R-1)
+                    path: ROUTE_PATH.PARKING_CAR_BOOKMARK_EDIT,
+                    handle: layout({ appBarTitle: '즐겨찾기 차량 수정' }),
+                    lazy: async () => {
+                      const { CarManagementFormPage } = await import('@/features/parking')
+                      return { Component: CarManagementFormPage }
+                    },
+                  },
                 ],
               },
 

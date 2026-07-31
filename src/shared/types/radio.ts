@@ -31,11 +31,23 @@ export interface InputRadioListProps {
   onBlur?: () => void
 }
 
-export interface InputRadioDualProps {
+/**
+ * 세그먼트 라디오 항목.
+ *
+ * ⚠️ **`key`가 불리언일 수 있다.** 주차 월패드 알림이 `예`/`아니오`를 `true`/`false`로
+ * 쓰고 그 값이 그대로 서버에 간다 (`parking.md` §PK5). 레거시는 타입이 없어 문자열·
+ * 불리언을 섞어 썼다 — 제네릭으로 호출부마다 좁힌다.
+ */
+export interface RadioDualItem<TKey extends string | boolean = string> {
+  key: TKey
+  label: string
+}
+
+export interface InputRadioDualProps<TKey extends string | boolean = string> {
   /** 라디오 그룹 이름. `id`도 `${name}-${key}`로 만든다 */
   name: string
-  list: RadioItem[]
-  value: string | undefined
-  onChange: (key: string) => void
+  list: readonly RadioDualItem<TKey>[]
+  value: TKey | undefined
+  onChange: (key: TKey) => void
   onBlur?: () => void
 }

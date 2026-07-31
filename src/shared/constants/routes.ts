@@ -71,10 +71,6 @@ export const ROUTE_PATH = {
   PARKING_RESERVATION: '/parking/reservation',
   /** 입출차 내역 (주차 메뉴 · **네이티브 푸시 딥링크의 상세가 여기 하위다**). PR2 */
   PARKING_INOUT_HISTORY: '/parking/inoutHistory',
-  /** 즐겨찾기 차량 (주차 메뉴). PR2 */
-  PARKING_CAR_BOOKMARK_LIST: '/parking/carManagement/bookmark/list',
-  /** 항상허용 차량 (주차 메뉴). PR2 */
-  PARKING_CAR_ALWAYS_ALLOW_LIST: '/parking/carManagement/alwaysAllow/list',
   /** 관리비 상세 (메인 관리비 카드) */
   MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
 
@@ -85,6 +81,15 @@ export const ROUTE_PATH = {
   PARKING_MILEAGE_HISTORY: '/parking/mileage/history',
   /** 정기권 차량. **PK1에 임베드되기도 한다** — 화면이 경로로 자기 모습을 정한다 */
   PARKING_REGULAR_CAR: '/parking/regular-car',
+
+  // 차량관리 5화면(PK3~PK7). **경로 문자열에 `bookmark`/`alwaysAllow`가 들어 있는지로
+  // 화면이 갈린다** — 라우트 파라미터가 아니라서 경로를 바꾸면 동작이 바뀐다.
+  PARKING_CAR_BOOKMARK_LIST: '/parking/carManagement/bookmark/list',
+  PARKING_CAR_ALWAYS_ALLOW_LIST: '/parking/carManagement/alwaysAllow/list',
+  PARKING_CAR_BOOKMARK_ADD: '/parking/carManagement/bookmark/add',
+  PARKING_CAR_ALWAYS_ALLOW_ADD: '/parking/carManagement/alwaysAllow/add',
+  /** ⚠️ **즐겨찾기 수정만 있다.** 항상허용 수정은 라우트도 API도 없다 (R-1) */
+  PARKING_CAR_BOOKMARK_EDIT: '/parking/carManagement/bookmark/edit/:uuid',
 
   // 메인 메뉴 스와이퍼가 참조하는 경로 (`features/main/constants/swiperMenu.ts`)
   /** 소통공간 게시판 */
@@ -139,6 +144,12 @@ export const ROUTE_PATH = {
   BOARD_GLOBAL_NOTICE: '/board/global-notice',
   BOARD_GLOBAL_NOTICE_DETAIL: '/board/global-notice/detail/:globalNoticeUuid',
 } as const
+
+/**
+ * 차량관리 경로의 공통 앞부분. 화면이 `{base}/{종류}/add|edit/{uuid}`를 조립한다 —
+ * 종류가 런타임에 정해져서 상수 하나로는 표현할 수 없다.
+ */
+export const PARKING_CAR_MANAGEMENT_BASE = '/parking/carManagement'
 
 /** 공지 상세. `uuid`가 경로에 박히므로 함수로 만든다 */
 export const boardNoticeDetailPath = ({ uuid }: { uuid: string }): string => {

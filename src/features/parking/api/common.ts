@@ -1,4 +1,4 @@
-import type { ParkingPolicy } from '@/features/parking/types/parking'
+import type { ParkingPolicy, VisitPurpose } from '@/features/parking/types/parking'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api } from '@/shared/lib/apiClient'
 import type { ServerSuccessBody } from '@/shared/types/api'
@@ -22,4 +22,22 @@ export const getParkingPolicy = async ({
   )
 
   return response.data.success
+}
+
+/**
+ * 방문목적 목록 (PK6·PK12·PK13).
+ *
+ * ⚠️ **입주민이 아니라 `aptUuid`(단지)로 조회한다.** 주차 엔드포인트 중 유일하다 —
+ * 방문목적은 단지가 정하는 값이라서다.
+ */
+export const getVisitPurposeList = async ({
+  aptUuid,
+}: {
+  aptUuid: string
+}): Promise<VisitPurpose[]> => {
+  const response = await api.get<ServerSuccessBody<VisitPurpose[]>>(
+    `${API_PREFIX.PARKING}/visit-purpose/${aptUuid}`,
+  )
+
+  return response.data.success ?? []
 }

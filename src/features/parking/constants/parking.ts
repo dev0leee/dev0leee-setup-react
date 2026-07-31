@@ -10,6 +10,16 @@ export const CARD_ITEM_FIELD = {
     { key: 'name', label: '차주 이름' },
     { key: 'phone', label: '연락처' },
   ],
+  /** PK3 즐겨찾기 차량 */
+  bookmark: [
+    { key: 'nickName', label: '별칭' },
+    { key: 'phone', label: '연락처' },
+  ],
+  /** PK4 항상허용 차량. **즐겨찾기와 필드가 겹치지 않는다** */
+  alwaysAllow: [
+    { key: 'phone', label: '연락처' },
+    { key: 'memo', label: '메모' },
+  ],
   /** PK2 마일리지 내역 */
   mileageHistory: [
     { key: 'inParkingTime', label: '입차시간' },
@@ -110,3 +120,110 @@ export const PARKING_POLICY_ERROR_TEXT = [
   '정보를 불러올 수 없습니다',
   '잠시 후 다시 시도해주세요',
 ] as const
+
+// ── 차량관리 (PK3~PK7) ──────────────────────────────────────────────────────
+
+/**
+ * 즐겨찾기/항상허용 구분. **경로 문자열로 판정한다**(라우트 파라미터가 아니다).
+ * `label`이 화면 문구이자 레거시의 분기 조건이라 함께 둔다.
+ */
+export const CAR_MANAGEMENT_TYPE = {
+  BOOKMARK: { key: 'bookmark', label: '즐겨찾기' },
+  ALWAYS_ALLOW: { key: 'alwaysAllow', label: '항상허용' },
+} as const
+
+export type CarManagementTypeKey = 'bookmark' | 'alwaysAllow'
+
+/** 차량 삭제 확인 모달. **`title`이 없다** — 본문만 있는 모달이다 */
+export const CAR_INFO_DELETE_MODAL_DATA = {
+  description: '차량정보를 삭제하시겠어요?',
+  firstButton: '취소',
+  secondButton: '삭제',
+}
+
+/** 카드 클릭 드로어의 버튼. `수정`은 즐겨찾기에만 있다 (R-1) */
+export const CAR_MANAGEMENT_DRAWER_LABEL = {
+  EDIT: '수정',
+  DELETE: '삭제',
+} as const
+
+/** 월패드 알림 라디오 (PK6 전용) */
+export const PARKING_WALL_PAD_ALARM_INPUT = [
+  { label: '예', key: true },
+  { label: '아니오', key: false },
+] as const
+
+export const PARKING_WALL_PAD_ALARM_DESCRIPTION = [
+  '예 선택 시, 해당 차량 입출차 시 세대 내 월패드로 알림이 옵니다.',
+  '마이페이지 > 알림 설정 > 입출차알림이 켜져있어야 알림이 수신됩니다.',
+] as const
+
+/**
+ * 폼 placeholder.
+ *
+ * ⚠️ **차량번호 문구가 방문예약(PK12)과 다르다** — 여기는 `예)10서1234`,
+ * 방문예약은 `차량번호 예)123가1234, 서울12가1234`다. 같은 필드인데 갈린다
+ * (`deferred.md` 「오타·표기」).
+ */
+export const CAR_FORM_PLACEHOLDER = {
+  carNum: '차량번호를 입력하세요. 예)10서1234',
+  nickName: '별칭을 입력하세요',
+  phone: '연락처를 입력하세요',
+  /** 드로어 제목으로도 쓰인다. 방문예약은 `방문 목적을 선택하세요`(해요체가 아니다) */
+  visitPurpose: '방문 목적을 선택해주세요',
+  memo: '메모를 입력하세요\n(최대 공백 포함 50자 이내)',
+} as const
+
+/** 입력 길이 제한. 스키마가 아니라 `maxlength`로 막는 값들이다 */
+export const CAR_FORM_MAX_LENGTH = {
+  /** 스키마에는 `.max(10)`이 없다 — UI로만 막는다 (`deferred.md`) */
+  nickName: 10,
+  phone: 13,
+  memo: 50,
+} as const
+
+/** 방문목적 드로어 문구 */
+export const VISIT_PURPOSE_MESSAGE = {
+  error: ['방문 목적을 불러올 수 없습니다', '잠시 후 다시 시도해주세요'],
+  empty: ['방문목적 목록이 비어있습니다', '관리사무소에 문의해주세요'],
+} as const
+
+/** 차량관리 토스트. **문구가 제각각이다** — 항상허용 등록만 대상까지 밝힌다 */
+export const CAR_TOAST_MESSAGE = {
+  bookmarkCreated: '등록되었습니다',
+  alwaysAllowCreated: '항상허용 차량이 등록되었습니다',
+  updated: '수정되었습니다',
+  deleted: '삭제되었습니다',
+} as const
+
+/**
+ * 🔴 **mutation마다 전용 문구로 바꿔주는 코드 집합이 다르다.**
+ * 목록에 없는 코드는 **서버 원문 `message`가 그대로 보인다** — 레거시가 훅마다
+ * `switch`를 따로 써서 생긴 차이다. 한 표로 합치면 수정·삭제 화면의 문구가 바뀐다.
+ */
+export const CAR_HANDLED_ERROR_CODES = {
+  postBookmark: ['BOOKMARK_DUPLICATED'],
+  postAlwaysAllow: [
+    'REGULAR_EXISTS',
+    'ALWAYS_ALLOW_EXISTS',
+    'RESERVATION_EXISTS',
+    'BLACK_LIST_EXISTS',
+    'REJECT_EXISTS',
+    'GUARD_NETWORK_ERROR',
+  ],
+  /** 수정·즐겨찾기 삭제는 전용 분기가 **없다** */
+  none: [],
+  deleteAlwaysAllow: ['ALWAYS_ALLOW_NOT_FOUND', 'GUARD_NETWORK_ERROR'],
+} as const
+
+/** 위 코드에 대응하는 문구 */
+export const CAR_ERROR_MESSAGE: Record<string, string> = {
+  BOOKMARK_DUPLICATED: '이미 등록된 즐겨찾기 차량입니다.',
+  REGULAR_EXISTS: '해당 단지에 이미 등록된 정기권 차량입니다.',
+  ALWAYS_ALLOW_EXISTS: '해당 단지에 이미 등록된 항상허용 차량입니다.',
+  RESERVATION_EXISTS: '해당 단지에 이미 방문예약된 차량입니다.',
+  BLACK_LIST_EXISTS: '블랙리스트로 등록된 차량입니다.',
+  REJECT_EXISTS: '거절된 차량입니다.',
+  ALWAYS_ALLOW_NOT_FOUND: '항상허용 차량을 찾을 수 없습니다.',
+  GUARD_NETWORK_ERROR: '단지 네트워크 장애입니다. 관리사무소에 문의해주세요.',
+}

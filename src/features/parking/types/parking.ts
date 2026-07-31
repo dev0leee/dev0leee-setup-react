@@ -52,6 +52,42 @@ export interface MileageHistoryItem {
   useMileage?: number | null
 }
 
+/** 즐겨찾기 차량 1건 (PK3) */
+export interface BookmarkCar {
+  uuid: string
+  carNum?: string
+  /** 별칭 */
+  nickName?: string | null
+  phone?: string | null
+}
+
+/**
+ * 항상허용 차량 1건 (PK4).
+ *
+ * ⚠️ **삭제할 때 `uuid`만 보낸다** — 즐겨찾기는 `{residentUuid, bookmarkUuid}` 두 개다.
+ * 서버 경로 설계가 비대칭이다.
+ */
+export interface AlwaysAllowCar {
+  uuid: string
+  carNum?: string
+  phone?: string | null
+  memo?: string | null
+  /** 월패드 알림 대상인지 */
+  notificationFlag?: boolean
+}
+
+/**
+ * 목록 카드 1건. 즐겨찾기와 항상허용을 **한 컴포넌트가 그리므로** 두 모양을 합쳐 둔다.
+ * 어느 필드를 보여줄지는 `CARD_ITEM_FIELD`가 정한다.
+ */
+export type CarListItem = BookmarkCar & Omit<AlwaysAllowCar, 'uuid' | 'carNum' | 'phone'>
+
+/** 방문목적 1건. 폼은 **객체 통째로** 값에 담고 전송 직전에 `uuid`만 꺼낸다 */
+export interface VisitPurpose {
+  uuid: string
+  name: string
+}
+
 /** 정기권 차량 1건 (PK15) */
 export interface RegularCar {
   uuid: string
