@@ -59,3 +59,33 @@ export interface SurveyDetailInfoData {
   dong?: string
   ho?: string
 }
+
+/**
+ * 참여 폼의 선택지 1개 (SV3).
+ *
+ * ⚠️ **`type === 'SUBJECTIVE'`이면 기타 옵션**이다 — 선택하면 인라인 입력이 열린다.
+ * 투표에는 없는 개념이다.
+ */
+export interface SurveyFormOption {
+  uuid: string
+  content?: string | null
+  type?: string
+}
+
+/**
+ * 참여 폼의 질문 1개 (SV3).
+ *
+ * ⚠️ **서버 필드가 `type`이고 폼 필드는 `questionType`이다.** 초기값을 만들 때 옮겨 담는다.
+ * ⚠️ **`requiredFlag`로 질문마다 필수 여부가 갈린다** — 투표는 전 질문 필수다.
+ */
+export interface SurveyFormQuestionData {
+  uuid: string
+  content?: string | null
+  type?: string
+  requiredFlag?: boolean
+  /** 이 질문에 기타 옵션이 있는지 */
+  etcFlag?: boolean
+  minChoice?: number
+  maxChoice?: number
+  optionList?: SurveyFormOption[]
+}

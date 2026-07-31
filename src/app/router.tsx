@@ -667,6 +667,43 @@ export const routes = [
                     },
                   },
 
+                  {
+                    // ⚠️ 화면도 AppBar를 그린다 — 투표(VT3)와 같은 중첩이다 (SV-Q1)
+                    path: ROUTE_PATH.SURVEY_FORM,
+                    handle: layout({
+                      appBarTitle: '설문조사 참여',
+                      backPath: ROUTE_PATH.SURVEY_LIST,
+                    }),
+                    lazy: async () => {
+                      const { SurveyFormPage } = await import('@/features/survey')
+                      return { Component: SurveyFormPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.SURVEY_CERT_PASS_RESPONSE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { SurveyCertPassResponsePage } = await import('@/features/survey')
+                      return { Component: SurveyCertPassResponsePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.SURVEY_CERT_NAME_PHONE,
+                    handle: layout({ appBarTitle: '본인인증' }),
+                    lazy: async () => {
+                      const { SurveyCertNamePhonePage } = await import('@/features/survey')
+                      return { Component: SurveyCertNamePhonePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.SURVEY_COMPLETED,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { SurveyCompletedPage } = await import('@/features/survey')
+                      return { Component: SurveyCompletedPage }
+                    },
+                  },
+
                   // ── 전자투표 (VT1·VT2) ────────────────────────────────────
                   {
                     // ⚠️ **레거시에서 유일하게 eager로 등록된 화면**이다. 메인 메뉴와

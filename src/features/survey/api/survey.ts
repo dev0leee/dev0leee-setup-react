@@ -1,4 +1,8 @@
-import type { SurveyDetailInfoData, SurveyListItemData } from '@/features/survey/types/survey'
+import type {
+  SurveyDetailInfoData,
+  SurveyFormQuestionData,
+  SurveyListItemData,
+} from '@/features/survey/types/survey'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api, publicApi } from '@/shared/lib/apiClient'
 import type { ServerSuccessBody } from '@/shared/types/api'
@@ -45,4 +49,65 @@ export const getSurveyDetail = async ({
   )
 
   return response.data.success
+}
+
+/** 참여 폼 (SV3). **응답이 질문 배열 그 자체**다 — 투표처럼 감싸는 객체가 없다 */
+export const getSurveyForm = async ({
+  participantUuid,
+}: {
+  participantUuid: string
+}): Promise<SurveyFormQuestionData[]> => {
+  const response = await publicApi.get<ServerSuccessBody<SurveyFormQuestionData[]>>(
+    `${NON_RESIDENT_PREFIX}/${participantUuid}/question`,
+  )
+
+  return response.data.success ?? []
+}
+
+/**
+ * 설문 제출 (SV3). **JSON이다** — 투표는 서명 파일이 있어 multipart였다.
+ *
+ * ⚠️ **최상위가 배열 그 자체다** (`{ questionList: [...] }`가 아니다). 서버 계약이다 (SV-Q10).
+ * 레거시 인자 이름이 `formData`인데 실제로는 JSON이라 혼동하기 쉽다 — 이름을 바꿔 옮겼다.
+ */
+export const postSurveyForm = async ({
+  participantUuid,
+  answerList,
+}: {
+  participantUuid: string
+  answerList: unknown[]
+}): Promise<void> => {
+  await publicApi.post(`${NON_RESIDENT_PREFIX}/${participantUuid}/answer`, answerList)
+}
+
+/** PASS(KMC) 본인인증 결과 전달 (SV5) */
+export const patchSurveyCertPass = async ({
+  participantUuid,
+  apiToken,
+  certNum,
+}: {
+  participantUuid: string
+  apiToken: string
+  certNum: string
+}): Promise<void> => {
+  await publicApi.patch(`${NON_RESIDENT_PREFIX}/${participantUuid}/auth/pass`, {
+    apiToken,
+    certNum,
+  })
+}
+
+/** 이름·휴대폰 본인인증 (SV6). **하이픈을 떼고 보낸다** */
+export const patchSurveyCertNamePhone = async ({
+  participantUuid,
+  name,
+  phone,
+}: {
+  participantUuid: string
+  name: string
+  phone: string
+}): Promise<void> => {
+  await publicApi.patch(`${NON_RESIDENT_PREFIX}/${participantUuid}/auth/name-phone`, {
+    name,
+    phone: phone.replaceAll('-', ''),
+  })
 }
