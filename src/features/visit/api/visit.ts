@@ -1,4 +1,4 @@
-import type { VisitorPassPassword } from '@/features/visit/types/visit'
+import type { TempPassword, VisitorPassPassword } from '@/features/visit/types/visit'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api } from '@/shared/lib/apiClient'
 import type { ServerSuccessBody } from '@/shared/types/api'
@@ -51,4 +51,71 @@ export const putLobbyPhonePassword = async ({
   password: string
 }): Promise<void> => {
   await api.put(`${API_PREFIX.APARTMANT}/${aptResidentUuid}/lobby-phone/password`, { password })
+}
+
+/**
+ * 임시 비밀번호 목록 (V4).
+ *
+ * ⚠️ **레거시 API 함수들이 인자를 객체가 아니라 **위치 인자**로 받는다** — 이 구획만
+ * 그렇다(`getLobbyPhoneTempPasswordList(uuid)` · `postCreate...(data, uuid)`).
+ * 타깃은 전부 객체로 통일한다 — 호출 결과는 같다.
+ */
+export const getTempPasswordList = async ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string
+}): Promise<TempPassword[]> => {
+  const response = await api.get<ServerSuccessBody<TempPassword[]>>(
+    `${API_PREFIX.APARTMANT}/${aptResidentUuid}/lobby-phone/temp-password`,
+  )
+
+  return response.data.success ?? []
+}
+
+/** 임시 비밀번호 생성 (V5) */
+export const postTempPassword = async ({
+  aptResidentUuid,
+  tempPasswordType,
+  startDate,
+  endDate,
+  description,
+}: {
+  aptResidentUuid: string
+  tempPasswordType: string
+  startDate: string
+  endDate: string
+  description?: string
+}): Promise<void> => {
+  await api.post(`${API_PREFIX.APARTMANT}/${aptResidentUuid}/lobby-phone/temp-password`, {
+    tempPasswordType,
+    startDate,
+    endDate,
+    description,
+  })
+}
+
+export const deleteTempPassword = async ({
+  aptResidentUuid,
+  uuid,
+}: {
+  aptResidentUuid: string
+  uuid: string
+}): Promise<void> => {
+  await api.delete(`${API_PREFIX.APARTMANT}/${aptResidentUuid}/lobby-phone/temp-password/${uuid}`)
+}
+
+/**
+ * 1회용 출입 QR의 암호화 문자열 (V6). 이 값이 그대로 QR로 그려진다.
+ * 응답은 문자열 하나다.
+ */
+export const getLobbyPhoneQrData = async ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string
+}): Promise<string | undefined> => {
+  const response = await api.get<ServerSuccessBody<string>>(
+    `${API_PREFIX.APARTMANT}/${aptResidentUuid}/lobby-phone/qr`,
+  )
+
+  return response.data.success
 }

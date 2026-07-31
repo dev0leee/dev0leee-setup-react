@@ -612,6 +612,37 @@ export const routes = [
                       return { Component: LobbyPhonePage }
                     },
                   },
+                  {
+                    // ⚠️ 라우트 name은 `임시비밀번호 리스트`인데 **AppBar는 `임시 비밀번호`**다
+                    path: ROUTE_PATH.VISIT_TEMP_PASSWORD_LIST,
+                    handle: layout({
+                      appBarTitle: '임시 비밀번호',
+                      appBarBackgroundColor: '#f9fafb',
+                    }),
+                    lazy: async () => {
+                      const { TempPasswordListPage } = await import('@/features/visit')
+                      return { Component: TempPasswordListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_TEMP_PASSWORD_CREATE,
+                    handle: layout({ appBarTitle: '임시 비밀번호 생성' }),
+                    lazy: async () => {
+                      const { TempPasswordCreatePage } = await import('@/features/visit')
+                      return { Component: TempPasswordCreatePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_QR,
+                    handle: layout({
+                      appBarTitle: '로비 QR 코드',
+                      appBarBackgroundColor: '#f9fafb',
+                    }),
+                    lazy: async () => {
+                      const { LobbyPhoneQrPage } = await import('@/features/visit')
+                      return { Component: LobbyPhoneQrPage }
+                    },
+                  },
                 ],
               },
 

@@ -10,3 +10,21 @@ export const visitorPassPasswordQueryKey = ({
 }) => {
   return ['visitorPassPassword', aptUuid, aptResidentUuid] as const
 }
+
+/** V4 임시 비밀번호 목록 */
+export const tempPasswordListQueryKey = ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string | undefined
+}) => {
+  return ['lobbyPhoneTempPasswordList', aptResidentUuid] as const
+}
+
+/** V6 로비 QR. **키 이름이 `...QrServiceCode`다** — 레거시 그대로 유지한다 */
+export const lobbyPhoneQrQueryKey = ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string | undefined
+}) => {
+  return ['lobbyPhoneQrServiceCode', aptResidentUuid] as const
+}
