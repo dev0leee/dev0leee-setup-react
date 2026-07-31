@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { useApassLoadingStore } from '@/features/apass'
 import { useNativeSubscription } from '@/shared/hooks/useNativeSubscription'
 import { nativeExitApp, subscribeToGoBack } from '@/shared/lib/native/common'
 import { checkDeviceOs } from '@/shared/lib/native/device'
+import { useApassLoadingStore } from '@/shared/stores/apassLoadingStore'
 import { useSurveyCertStore } from '@/shared/stores/surveyCertStore'
 import { useVoteCertStore } from '@/shared/stores/voteCertStore'
 

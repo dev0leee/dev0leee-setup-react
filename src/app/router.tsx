@@ -644,6 +644,19 @@ export const routes = [
                     },
                   },
 
+                  // ── A-PASS (AP1) ──────────────────────────────────────────
+                  {
+                    // ⚠️ 화면이 자기 AppBar를 든다 — 헤더 그라데이션 위에 투명하게 얹는다.
+                    // 레거시 meta의 `appBarTitle`·`hasBackButton`은 `showAppBar:false`라
+                    // 무시되는 값이었다 (`deferred.md` D-8) — 옮기지 않았다
+                    path: ROUTE_PATH.APASS,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ApassPage } = await import('@/features/apass')
+                      return { Component: ApassPage }
+                    },
+                  },
+
                   // ── 설문조사 (SV1·SV2) ────────────────────────────────────
                   {
                     // 레거시에서 eager로 등록된 두 화면 중 하나다(투표 목록과 함께).
