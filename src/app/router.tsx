@@ -307,6 +307,42 @@ export const routes = [
                       return { Component: GlobalNoticeDetailPage }
                     },
                   },
+
+                  // ── 게시판 — 소통공간·민원공간 ─────────────────────────────
+                  {
+                    // AppBar를 화면 안에서 그린다 (우측 슬롯에 내 활동 버튼)
+                    path: ROUTE_PATH.BOARD_COMMUNITY,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { CommunityBoardPage } = await import('@/features/board')
+                      return { Component: CommunityBoardPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_COMPLAINTS,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ComplaintsBoardPage } = await import('@/features/board')
+                      return { Component: ComplaintsBoardPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_COMMUNITY_ACTIVITIES,
+                    handle: layout({ appBarTitle: '소통공간 내 활동' }),
+                    lazy: async () => {
+                      const { CommunityMyActivitiesPage } = await import('@/features/board')
+                      return { Component: CommunityMyActivitiesPage }
+                    },
+                  },
+                  {
+                    // ⚠️ 여기는 `민원공간`(붙임)이다. 게시판 AppBar는 `민원 공간`(공백)
+                    path: ROUTE_PATH.BOARD_COMPLAINTS_ACTIVITIES,
+                    handle: layout({ appBarTitle: '민원공간 내 활동' }),
+                    lazy: async () => {
+                      const { ComplaintsMyActivitiesPage } = await import('@/features/board')
+                      return { Component: ComplaintsMyActivitiesPage }
+                    },
+                  },
                 ],
               },
 

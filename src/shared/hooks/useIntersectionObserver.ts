@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 /**
  * 센티널이 화면에 들어왔는지 알려준다. vueuse `useIntersectionObserver` 대체물.
@@ -15,17 +15,22 @@ import { useEffect, useRef, useState } from 'react'
  * <div ref={targetRef} className="w-full pt-4" />
  * ```
  *
+ * ⚠️ **`useRef`가 아니라 콜백 ref다.** 센티널은 목록이 비어 있는 동안 렌더되지 않으므로
+ * 마운트 시점에는 아직 없다. `useRef` + 빈 deps로 관찰을 걸면 **그 순간 ref가 `null`이라
+ * 아무것도 관찰하지 않고 끝난다** — 데이터가 도착해 센티널이 생겨도 다시 걸지 않아
+ * 다음 페이지를 영영 부르지 않는다. 콜백 ref는 엘리먼트가 붙는 순간 상태를 바꿔
+ * effect를 다시 돌린다.
+ *
  * ⚠️ **`isIntersecting`을 상태로 노출한다**(콜백이 아니다). 레거시가 `targetIsVisible`
  * ref에 담고 `watchEffect`로 반응하는 구조라 그대로 옮기려면 상태여야 한다.
  * 콜백으로 만들면 "보이는 동안 계속"이 아니라 "보이기 시작한 순간"만 잡혀
  * 페이지 로드 후 센티널이 계속 보일 때 다음 장을 부르지 않는다.
  */
 export const useIntersectionObserver = <TElement extends HTMLElement>() => {
-  const targetRef = useRef<TElement>(null)
+  const [target, setTarget] = useState<TElement | null>(null)
   const [isIntersecting, setIsIntersecting] = useState(false)
 
   useEffect(() => {
-    const target = targetRef.current
     if (!target) return
 
     const observer = new IntersectionObserver((entries) => {
@@ -38,7 +43,7 @@ export const useIntersectionObserver = <TElement extends HTMLElement>() => {
     return () => {
       observer.disconnect()
     }
-  }, [])
+  }, [target])
 
-  return { targetRef, isIntersecting }
+  return { targetRef: setTarget, isIntersecting }
 }

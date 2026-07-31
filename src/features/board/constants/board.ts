@@ -10,7 +10,31 @@ export const BOARD_EMPTY_TEXT = {
   NOTICE: '공지사항이 존재하지 않습니다.',
   /** B3 — 화면 이름은 `아파트먼트 공지사항`인데 문구는 `전체 공지사항`이다 */
   GLOBAL_NOTICE: '전체 공지사항이 존재하지 않습니다.',
+  /** B5·B12·B11·B18 — **마침표가 없다** (공지 쪽에는 있다) */
+  POST: '게시글이 존재하지 않습니다',
 } as const
+
+/**
+ * AppBar 제목. ⚠️ **`민원 공간`(공백)과 `민원공간`(붙임)이 섞여 있다** —
+ * AppBar만 공백이 있고 폼 제목·내 활동은 붙어 있다. 표시 문구라 그대로 옮긴다
+ * (`board.md` §4 #3·#4·#15).
+ */
+export const BOARD_APP_BAR_TITLE = {
+  community: '소통공간',
+  complaints: '민원 공간',
+} as const
+
+/** 내 활동 화면 제목. 여기는 **둘 다 붙임**이다 (§4 #17) */
+export const MY_ACTIVITY_APP_BAR_TITLE = {
+  community: '소통공간 내 활동',
+  complaints: '민원공간 내 활동',
+} as const
+
+/** 내 활동 탭. `key`가 어떤 목록을 조회할지 정한다 */
+export const MY_ACTIVITY_TABS = [
+  { label: '작성한 글', value: 'posts' },
+  { label: '댓글 쓴 글', value: 'comments' },
+] as const
 
 /** 본문·제목이 비었을 때 표시. **띄어쓰기가 없다** */
 export const EMPTY_CONTENT_TEXT = '정보없음'

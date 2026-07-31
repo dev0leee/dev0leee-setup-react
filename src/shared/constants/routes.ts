@@ -77,10 +77,14 @@ export const ROUTE_PATH = {
   // 메인 메뉴 스와이퍼가 참조하는 경로 (`features/main/constants/swiperMenu.ts`)
   /** 주차관리 */
   PARKING: '/parking',
-  /** 소통공간 */
+  /** 소통공간 게시판 */
   BOARD_COMMUNITY: '/board/community',
-  /** 민원공간 */
+  /** 민원공간 게시판 */
   BOARD_COMPLAINTS: '/board/complaints',
+  /** 소통공간 내 활동 */
+  BOARD_COMMUNITY_ACTIVITIES: '/board/community/activities',
+  /** 민원공간 내 활동 */
+  BOARD_COMPLAINTS_ACTIVITIES: '/board/complaints/activities',
   /** 하자보수 */
   REPAIR_LIST: '/repair/list',
   /** 이사예약 */

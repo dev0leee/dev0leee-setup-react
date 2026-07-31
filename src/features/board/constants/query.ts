@@ -29,6 +29,34 @@ export const noticePopupThumbnailQueryKey = ({ aptUuid }: { aptUuid: string | un
   return ['noticePopupThumbnail', aptUuid] as const
 }
 
+/** B5·B12 게시글 목록. 팩토리가 `[이 값, aptResidentUuid, ...파라미터값]`으로 만든다 */
+export const BOARD_POST_LIST_QUERY_KEY = {
+  community: 'communityPostList',
+  complaints: 'complaintsPostList',
+} as const
+
+/** B11·B18 내 활동. 게시판 × 탭 = 4종 */
+export const MY_ACTIVITY_QUERY_KEY = {
+  community: {
+    posts: 'communityMyActivityPostList',
+    comments: 'communityMyActivityCommentList',
+  },
+  complaints: {
+    posts: 'complaintsMyActivityPostList',
+    comments: 'complaintsMyActivityCommentList',
+  },
+} as const
+
+export const boardCategoryListQueryKey = ({
+  boardType,
+  aptResidentUuid,
+}: {
+  boardType: 'community' | 'complaints'
+  aptResidentUuid: string | undefined
+}) => {
+  return [`${boardType}CategoryList`, aptResidentUuid] as const
+}
+
 export const globalNoticeDetailQueryKey = ({
   aptResidentUuid,
   globalNoticeUuid,
