@@ -2,7 +2,6 @@ import type {
   ImposeYearMonthsResponse,
   ManagementFeeBill,
   NoticeTopThreeItem,
-  ParkingMileage,
   ShoppingToken,
 } from '@/features/main/types/main'
 import { API_PREFIX } from '@/shared/constants/api'
@@ -54,28 +53,7 @@ export const getManagementFeeBill = async ({
   return response.data.success
 }
 
-/**
- * 주차 마일리지. 응답의 `useMileage`·`remainingMileage`를 더해 `totalMileage`를 만든다 —
- * 서버가 총량을 주지 않아 클라이언트가 계산한다(레거시 `select` 동일).
- */
-export const getParkingRemainingMileage = async ({
-  aptResidentUuid,
-  startDate,
-  endDate,
-}: {
-  aptResidentUuid: string
-  startDate: string
-  endDate: string
-}): Promise<ParkingMileage> => {
-  const response = await api.get<
-    ServerSuccessBody<{ useMileage: number; remainingMileage: number }>
-  >(`${API_PREFIX.PARKING}/${aptResidentUuid}/mileage`, { params: { startDate, endDate } })
-
-  const useMileage = response.data.success?.useMileage ?? 0
-  const remainingMileage = response.data.success?.remainingMileage ?? 0
-
-  return { useMileage, remainingMileage, totalMileage: useMileage + remainingMileage }
-}
+// 주차 마일리지는 **주차 도메인과 공유**하므로 `shared/lib/parkingMileage.ts`에 있다.
 
 /** 최근 공지 3건. 단지 단위라 `aptUuid`로 조회한다 (다른 요약 API와 달리 입주민 uuid가 아니다) */
 export const getNoticeTopThree = async ({

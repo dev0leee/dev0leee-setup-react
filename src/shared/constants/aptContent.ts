@@ -23,6 +23,8 @@ export const APT_CONTENT_NAME = {
   MOVING_HOUSE: '이사예약',
   VOTE: '전자투표',
   SHOPPING: '쇼핑몰',
+  /** 주차 메뉴에서 `항상허용 차량`을 감추고 방문예약 타일을 키운다 (`parking.md` PK1) */
+  MILEAGE_LIMIT: '마일리지 한도 제한',
   /** 월패드 — 샘물 연동 */
   WALL_PAD: '차량세대통보',
   /** 월패드 — 외부 업체 연동 */

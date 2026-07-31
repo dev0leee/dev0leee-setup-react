@@ -23,24 +23,7 @@ export const managementFeeBillQueryKey = ({
   return ['managementFeeBill', aptResidentUuid, year, month] as const
 }
 
-/**
- * 주차 마일리지.
- *
- * ⚠️ 레거시 키는 `['parkingRemainingMileage', dateRange]`로 **uuid가 없다.**
- * 단지를 바꿔도 키가 같아 이전 단지 값이 캐시에서 나온다 — `aptResidentUuid`를 넣어
- * 고쳤다 (`deferred.md` D-217).
- */
-export const parkingMileageQueryKey = ({
-  aptResidentUuid,
-  startDate,
-  endDate,
-}: {
-  aptResidentUuid: string | undefined
-  startDate: string
-  endDate: string
-}) => {
-  return ['parkingRemainingMileage', aptResidentUuid, startDate, endDate] as const
-}
+// 주차 마일리지 키는 주차 도메인과 캐시를 공유하므로 `shared/constants/query.ts`에 있다.
 
 /** 공지 Top3. 단지 단위라 `aptUuid`가 키에 들어간다 */
 export const noticeTopThreeQueryKey = ({ aptUuid }: { aptUuid: string | undefined }) => {

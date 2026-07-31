@@ -442,6 +442,36 @@ export const routes = [
                       return { Component: UserBlockSettingPage }
                     },
                   },
+
+                  // ── 주차 (PK1 · PK2 · PK15) ────────────────────────────────
+                  // 레거시는 PK1·PK15만 정적 import(eager)였다. 여기서는 셋 다 `lazy`다 —
+                  // 주차는 메인/마이페이지에서 들어가는 별도 화면이라 초기 번들에 있을
+                  // 이유가 없고, 레거시의 eager/lazy 구분은 화면 동작에 드러나지 않는다.
+                  {
+                    path: ROUTE_PATH.PARKING,
+                    handle: layout({ appBarTitle: '주차 관리' }),
+                    lazy: async () => {
+                      const { ParkingManagementPage } = await import('@/features/parking')
+                      return { Component: ParkingManagementPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.PARKING_MILEAGE_HISTORY,
+                    handle: layout({ appBarTitle: '마일리지 내역' }),
+                    lazy: async () => {
+                      const { MileageHistoryPage } = await import('@/features/parking')
+                      return { Component: MileageHistoryPage }
+                    },
+                  },
+                  {
+                    // PK1에 임베드되는 것과 **같은 컴포넌트**다. 경로로 자기 모습을 정한다
+                    path: ROUTE_PATH.PARKING_REGULAR_CAR,
+                    handle: layout({ appBarTitle: '정기권 차량' }),
+                    lazy: async () => {
+                      const { RegularCarListPage } = await import('@/features/parking')
+                      return { Component: RegularCarListPage }
+                    },
+                  },
                 ],
               },
 

@@ -30,12 +30,7 @@ export interface ManagementFeeBill {
   }
 }
 
-/** 주차 마일리지(분 단위). `totalMileage`는 클라이언트가 더해 만든 값이다 */
-export interface ParkingMileage {
-  useMileage: number
-  remainingMileage: number
-  totalMileage: number
-}
+// 주차 마일리지 타입은 주차 도메인과 공유하므로 `shared/types/parking.ts`에 있다.
 
 /** 공지 Top3 한 건. 목록은 카테고리·제목만 쓰고 `uuid`로 상세로 간다 */
 export interface NoticeTopThreeItem {

@@ -27,3 +27,22 @@ export const residentDetailInfoQueryKey = ({
 }) => {
   return [...RESIDENT_DETAIL_INFO_QUERY_KEY, aptResidentUuid] as const
 }
+
+/**
+ * 주차 마일리지. 메인 카드와 주차 화면(PK1·PK2)이 **같은 캐시를 쓴다** — 레거시도 그랬다.
+ *
+ * ⚠️ 레거시 키는 `['parkingRemainingMileage', dateRange]`로 **uuid가 없다.**
+ * 단지를 바꿔도 키가 같아 이전 단지 값이 캐시에서 나온다 — `aptResidentUuid`를 넣어
+ * 고쳤다 (`deferred.md` D-217).
+ */
+export const parkingRemainingMileageQueryKey = ({
+  aptResidentUuid,
+  startDate,
+  endDate,
+}: {
+  aptResidentUuid: string | undefined
+  startDate: string
+  endDate: string
+}) => {
+  return ['parkingRemainingMileage', aptResidentUuid, startDate, endDate] as const
+}

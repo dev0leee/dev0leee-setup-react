@@ -67,16 +67,26 @@ export const ROUTE_PATH = {
   APASS: '/apass',
   /** 방문자 출입관리 (메인 방문 출입관리 카드) */
   VISIT: '/visit',
-  /** 주차 방문예약 (메인 주차 방문예약 카드) */
+  /** 주차 방문예약 (메인 주차 방문예약 카드 · 주차 메뉴). PR3에서 이관한다 */
   PARKING_RESERVATION: '/parking/reservation',
-  /** 주차 마일리지 내역 (메인 마일리지 카드) */
-  PARKING_MILEAGE_HISTORY: '/parking/mileage/history',
+  /** 입출차 내역 (주차 메뉴 · **네이티브 푸시 딥링크의 상세가 여기 하위다**). PR2 */
+  PARKING_INOUT_HISTORY: '/parking/inoutHistory',
+  /** 즐겨찾기 차량 (주차 메뉴). PR2 */
+  PARKING_CAR_BOOKMARK_LIST: '/parking/carManagement/bookmark/list',
+  /** 항상허용 차량 (주차 메뉴). PR2 */
+  PARKING_CAR_ALWAYS_ALLOW_LIST: '/parking/carManagement/alwaysAllow/list',
   /** 관리비 상세 (메인 관리비 카드) */
   MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
 
-  // 메인 메뉴 스와이퍼가 참조하는 경로 (`features/main/constants/swiperMenu.ts`)
-  /** 주차관리 */
+  // ── 주차 (PK1·PK2·PK15) ───────────────────────────────────────────────────
+  /** 주차 관리. 메인 메뉴 스와이퍼·마이페이지에서 들어온다 */
   PARKING: '/parking',
+  /** 마일리지 내역. PK1 헤더·메인 마일리지 카드·마이페이지에서 들어온다 */
+  PARKING_MILEAGE_HISTORY: '/parking/mileage/history',
+  /** 정기권 차량. **PK1에 임베드되기도 한다** — 화면이 경로로 자기 모습을 정한다 */
+  PARKING_REGULAR_CAR: '/parking/regular-car',
+
+  // 메인 메뉴 스와이퍼가 참조하는 경로 (`features/main/constants/swiperMenu.ts`)
   /** 소통공간 게시판 */
   BOARD_COMMUNITY: '/board/community',
   /** 민원공간 게시판 */
