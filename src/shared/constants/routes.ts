@@ -65,6 +65,9 @@ export const ROUTE_PATH = {
   FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
   /** A-PASS (메인 A-PASS 카드) */
   APASS: '/apass',
+  /** 관리비 상세 (메인 관리비 카드) */
+  MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
+
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
   VISIT: '/visit',
@@ -72,14 +75,19 @@ export const ROUTE_PATH = {
   VISIT_KIOSK_PASSWORD: '/visit/kiosk/password',
   /** 로비폰 세대호출. ⚠️ **뒤로가기가 히스토리가 아니라 항상 `/visit`다** */
   VISIT_LOBBY_PHONE: '/visit/lobbyPhone',
-
-  // 아래 4개는 아직 화면이 없다 — V3 메뉴가 참조해 먼저 상수로 둔다 (PR2·PR3)
   VISIT_TEMP_PASSWORD_LIST: '/visit/lobbyPhone/tempPassword/list',
   VISIT_TEMP_PASSWORD_CREATE: '/visit/lobbyPhone/tempPassword/create',
   VISIT_QR: '/visit/lobbyPhone/qr',
+
+  // 안면인식 7화면(V7~V13). ⚠️ **관리 화면만 `faceRegisterManagement`이고
+  // 나머지는 `faceRegister/...`다** — 경로 규칙이 하나 어긋나 있다. 레거시 그대로다.
   VISIT_FACE_REGISTER_MANAGEMENT: '/visit/lobbyPhone/faceRegisterManagement',
-  /** 관리비 상세 (메인 관리비 카드) */
-  MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
+  VISIT_FACE_REGISTER_DETAIL: '/visit/lobbyPhone/faceRegister/detail/:id',
+  VISIT_FACE_REGISTER_EDIT: '/visit/lobbyPhone/faceRegister/edit/:id',
+  VISIT_FACE_REGISTER_FORM: '/visit/lobbyPhone/faceRegister/form',
+  VISIT_FACE_REGISTER_GUIDE: '/visit/lobbyPhone/faceRegister/guide',
+  VISIT_FACE_REGISTER_FAIL: '/visit/lobbyPhone/faceRegister/fail',
+  VISIT_FACE_REGISTER_COMPLETE: '/visit/lobbyPhone/faceRegister/complete',
 
   // ── 주차 (PK1·PK2·PK15) ───────────────────────────────────────────────────
   /** 주차 관리. 메인 메뉴 스와이퍼·마이페이지에서 들어온다 */
@@ -176,6 +184,16 @@ export const PARKING_REJECT_BASE = '/parking/reject'
 
 /** 방문예약 경로의 앞부분. 뒤에 `/add`·`/add/{uuid}`·`/detail/{uuid}`가 붙는다 */
 export const PARKING_RESERVATION_BASE = '/parking/reservation'
+
+/** 안면인식 등록정보 상세(V8). 경로에 `faceRecogGuid`가 박힌다 */
+export const faceRegisterDetailPath = ({ guid }: { guid: string }): string => {
+  return `/visit/lobbyPhone/faceRegister/detail/${guid}`
+}
+
+/** 안면인식 등록정보 수정(V9) */
+export const faceRegisterEditPath = ({ guid }: { guid: string }): string => {
+  return `/visit/lobbyPhone/faceRegister/edit/${guid}`
+}
 
 /** 공지 상세. `uuid`가 경로에 박히므로 함수로 만든다 */
 export const boardNoticeDetailPath = ({ uuid }: { uuid: string }): string => {

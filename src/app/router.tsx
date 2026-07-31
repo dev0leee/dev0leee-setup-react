@@ -643,6 +643,73 @@ export const routes = [
                       return { Component: LobbyPhoneQrPage }
                     },
                   },
+
+                  // ── 안면인식 위저드 (V7~V13) ──────────────────────────────
+                  // ⚠️ **V10~V13은 AppBar 제목이 `얼굴 신규 등록`으로 전부 같다.**
+                  // 위저드 단계가 제목으로 드러나지 않는다 — 레거시 그대로다.
+                  {
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_MANAGEMENT,
+                    handle: layout({
+                      appBarTitle: '안면인식 얼굴 등록',
+                      backPath: ROUTE_PATH.VISIT_LOBBY_PHONE,
+                    }),
+                    lazy: async () => {
+                      const { FaceRegisterManagementPage } = await import('@/features/visit')
+                      return { Component: FaceRegisterManagementPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_DETAIL,
+                    handle: layout({
+                      appBarTitle: '등록정보 상세',
+                      backPath: ROUTE_PATH.VISIT_FACE_REGISTER_MANAGEMENT,
+                    }),
+                    lazy: async () => {
+                      const { FaceRegisterDetailPage } = await import('@/features/visit')
+                      return { Component: FaceRegisterDetailPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_EDIT,
+                    handle: layout({ appBarTitle: '등록정보 수정' }),
+                    lazy: async () => {
+                      const { FaceRegisterEditPage } = await import('@/features/visit')
+                      return { Component: FaceRegisterEditPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_FORM,
+                    handle: layout({ appBarTitle: '얼굴 신규 등록' }),
+                    lazy: async () => {
+                      const { FaceRegisterFormPage } = await import('@/features/visit')
+                      return { Component: FaceRegisterFormPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_GUIDE,
+                    handle: layout({ appBarTitle: '얼굴 신규 등록' }),
+                    lazy: async () => {
+                      const { FaceRegisterGuidePage } = await import('@/features/visit')
+                      return { Component: FaceRegisterGuidePage }
+                    },
+                  },
+                  {
+                    // 뒤로가기 버튼이 없다. 네이티브 뒤로가기는 막지 않는다(레거시 그대로)
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_FAIL,
+                    handle: layout({ appBarTitle: '얼굴 신규 등록', hasBackButton: false }),
+                    lazy: async () => {
+                      const { FaceRegisterFailPage } = await import('@/features/visit')
+                      return { Component: FaceRegisterFailPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_FACE_REGISTER_COMPLETE,
+                    handle: layout({ appBarTitle: '얼굴 신규 등록', hasBackButton: false }),
+                    lazy: async () => {
+                      const { FaceRegisterCompletePage } = await import('@/features/visit')
+                      return { Component: FaceRegisterCompletePage }
+                    },
+                  },
                 ],
               },
 

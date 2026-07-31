@@ -20,6 +20,26 @@ export const tempPasswordListQueryKey = ({
   return ['lobbyPhoneTempPasswordList', aptResidentUuid] as const
 }
 
+/** V7 안면인식 목록 */
+export const faceRecogListQueryKey = ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string | undefined
+}) => {
+  return ['lobbyPhoneFaceRecogList', aptResidentUuid] as const
+}
+
+/** V8·V9 안면인식 단건 */
+export const faceRecogDetailQueryKey = ({
+  aptResidentUuid,
+  faceRecogGuid,
+}: {
+  aptResidentUuid: string | undefined
+  faceRecogGuid: string
+}) => {
+  return ['lobbyPhoneFaceRecogDetail', aptResidentUuid, faceRecogGuid] as const
+}
+
 /** V6 로비 QR. **키 이름이 `...QrServiceCode`다** — 레거시 그대로 유지한다 */
 export const lobbyPhoneQrQueryKey = ({
   aptResidentUuid,

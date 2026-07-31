@@ -1,7 +1,11 @@
-/**
- * 방문자 출입관리 공개 API. **V1~V6(PR1·PR2)까지 이관됐다.**
- * 안면인식 7화면(V7~V13, PR3)이 남았다.
- */
+/** 방문자 출입관리 공개 API. **V1~V13 전 화면이 이관됐다.** */
+export { FaceRegisterCompletePage } from '@/features/visit/pages/FaceRegisterCompletePage'
+export { FaceRegisterDetailPage } from '@/features/visit/pages/FaceRegisterDetailPage'
+export { FaceRegisterEditPage } from '@/features/visit/pages/FaceRegisterEditPage'
+export { FaceRegisterFailPage } from '@/features/visit/pages/FaceRegisterFailPage'
+export { FaceRegisterFormPage } from '@/features/visit/pages/FaceRegisterFormPage'
+export { FaceRegisterGuidePage } from '@/features/visit/pages/FaceRegisterGuidePage'
+export { FaceRegisterManagementPage } from '@/features/visit/pages/FaceRegisterManagementPage'
 export { KioskPasswordPage } from '@/features/visit/pages/KioskPasswordPage'
 export { LobbyPhonePage } from '@/features/visit/pages/LobbyPhonePage'
 export { LobbyPhoneQrPage } from '@/features/visit/pages/LobbyPhoneQrPage'

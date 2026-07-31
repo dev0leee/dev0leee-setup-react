@@ -38,3 +38,30 @@ export const TEMP_PASSWORD_TYPE = {
 } as const
 
 export type TempPasswordType = (typeof TEMP_PASSWORD_TYPE)[keyof typeof TEMP_PASSWORD_TYPE]
+
+/**
+ * 등록된 얼굴 1건 (V7·V8).
+ *
+ * ⚠️ **이름 필드가 `residentFaceName`인데 등록·수정 요청은 `faceRecogName`으로 보낸다.**
+ * 읽기와 쓰기의 필드명이 다르다 — 서버 계약이라 그대로 쓴다.
+ *
+ * ⚠️ **`faceRecogStatus`는 `COMPLETE`·`PENDING`·`REJECT` 셋이지만 타입을 좁히지 않는다.**
+ * 화면이 알 수 없는 값을 **빈 칩**으로 그리는 것까지 레거시 동작이라, 새 상태가 와도
+ * 타입 때문에 터지지 않아야 한다.
+ */
+export interface FaceRecog {
+  faceRecogGuid: string
+  residentFaceName?: string
+  faceRecogDescription?: string | null
+  faceRecogStatus?: string
+  /** `REJECT`일 때만 의미가 있다. 실패 사유 코드 */
+  registCause?: string
+  insertDate?: string
+}
+
+/** V12 실패 화면이 `location.state`로 받는 값 */
+export interface FaceRegisterFailState {
+  name?: string
+  memo?: string
+  reason?: string
+}
