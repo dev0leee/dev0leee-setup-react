@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 
 import {
+  getBoardBlockedUserList,
   getBoardCommentDetail,
   getBoardCommentList,
   getBoardPostDetail,
 } from '@/features/board/api/detail'
 import {
+  boardBlockedUserListQueryKey,
   boardCommentDetailQueryKey,
   boardCommentListQueryKey,
   boardPostDetailQueryKey,
@@ -104,4 +106,20 @@ export const useBoardCommentDetail = ({
   })
 
   return { commentDetail, isCommentDetailLoading }
+}
+
+/** 차단한 사용자 목록 (B19) */
+export const useBoardBlockedUserList = () => {
+  const aptResidentUuid = useAuthStore((state) => {
+    return state.aptInfo.aptResidentUuid
+  })
+
+  const { data: blockedUserList, isLoading: isBlockedUserListLoading } = useQuery({
+    queryKey: boardBlockedUserListQueryKey({ aptResidentUuid }),
+    queryFn: () => {
+      return getBoardBlockedUserList({ aptResidentUuid: aptResidentUuid ?? '' })
+    },
+  })
+
+  return { blockedUserList: blockedUserList ?? [], isBlockedUserListLoading }
 }

@@ -2,12 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  deleteBoardBlockUser,
   deleteBoardComment,
   deleteBoardPost,
   patchBoardComment,
+  patchBoardPost,
   patchBoardPostLike,
   postBoardBlockUser,
   postBoardComment,
+  postBoardPost,
+  postBoardPostReport,
   postBoardReply,
 } from '@/features/board/api/detail'
 import { BOARD_TOAST_MESSAGE } from '@/features/board/constants/board'
@@ -16,7 +20,7 @@ import {
   boardCommentListQueryKey,
 } from '@/features/board/constants/query'
 import { showBoardMutationError } from '@/features/board/queries/boardMutationError'
-import type { CommentSubmitPayload } from '@/features/board/types/detail'
+import type { BoardPostSubmitPayload, CommentSubmitPayload } from '@/features/board/types/detail'
 import { BOARD_TYPE, type BoardType } from '@/features/board/types/post'
 import { useUploadProgress } from '@/shared/hooks/useUploadProgress'
 import { showToast } from '@/shared/lib/toast'
@@ -126,6 +130,129 @@ export const useBlockBoardUser = () => {
   })
 
   return { blockUser, isBlockUserSuccess }
+}
+
+/**
+ * 게시글 등록 (B9·B16). 성공하면 뒤로 가고 `등록되었습니다` 토스트가 뜬다.
+ * ⚠️ 민원공간은 `BOARD_BLACK_LIST` 분기가 없다 (`board.md` §4 #10).
+ */
+export const usePostBoardPost = ({ boardType }: { boardType: BoardType }) => {
+  const navigate = useNavigate()
+  const aptResidentUuid = useAuthStore((state) => {
+    return state.aptInfo.aptResidentUuid
+  })
+  const { progressPercent, onUploadProgress, onUploadSuccess, onUploadError } = useUploadProgress()
+
+  const { mutate: createPost, isPending: isCreatePostPending } = useMutation({
+    mutationFn: (payload: BoardPostSubmitPayload) => {
+      return postBoardPost({
+        boardType,
+        aptResidentUuid: aptResidentUuid ?? '',
+        formData: convertFormDataFile({ ...payload }),
+        onUploadProgress,
+      })
+    },
+    onSuccess: () => {
+      onUploadSuccess()
+      void navigate(-1)
+      showToast({ message: BOARD_TOAST_MESSAGE.create })
+    },
+    onError: (error) => {
+      onUploadError()
+      showBoardMutationError({
+        error,
+        handlesBlackList: handlesBlackList(boardType),
+        handlesFileUploadFail: true,
+      })
+    },
+  })
+
+  return { createPost, isCreatePostPending, progressPercent }
+}
+
+/** 게시글 수정 (B10·B17). ⚠️ 민원공간은 `BOARD_BLACK_LIST` 분기가 없다 (§4 #11) */
+export const usePatchBoardPost = ({ boardType, postUuid }: PostRef) => {
+  const navigate = useNavigate()
+  const aptResidentUuid = useAuthStore((state) => {
+    return state.aptInfo.aptResidentUuid
+  })
+  const { progressPercent, onUploadProgress, onUploadSuccess, onUploadError } = useUploadProgress()
+
+  const { mutate: editPost, isPending: isEditPostPending } = useMutation({
+    mutationFn: (payload: BoardPostSubmitPayload) => {
+      return patchBoardPost({
+        boardType,
+        aptResidentUuid: aptResidentUuid ?? '',
+        postUuid: postUuid ?? '',
+        formData: convertFormDataFile({ ...payload }),
+        onUploadProgress,
+      })
+    },
+    onSuccess: () => {
+      onUploadSuccess()
+      void navigate(-1)
+      showToast({ message: BOARD_TOAST_MESSAGE.edit })
+    },
+    onError: (error) => {
+      onUploadError()
+      showBoardMutationError({
+        error,
+        handlesBlackList: handlesBlackList(boardType),
+        handlesFileUploadFail: true,
+      })
+    },
+  })
+
+  return { editPost, isEditPostPending, progressPercent }
+}
+
+/** 게시글 신고 (B20). 성공하면 해당 게시판 목록으로 간다 */
+export const useReportBoardPost = ({ boardType, postUuid }: PostRef) => {
+  const navigate = useNavigate()
+  const aptResidentUuid = useAuthStore((state) => {
+    return state.aptInfo.aptResidentUuid
+  })
+
+  const { mutate: reportPost } = useMutation({
+    mutationFn: ({ content }: { content: string }) => {
+      return postBoardPostReport({
+        boardType,
+        aptResidentUuid: aptResidentUuid ?? '',
+        postUuid: postUuid ?? '',
+        content,
+      })
+    },
+    onSuccess: () => {
+      void navigate(`/board/${boardType}`)
+      showToast({ message: BOARD_TOAST_MESSAGE.reported })
+    },
+    onError: (error) => {
+      showBoardMutationError({ error, handlesBlackList: false })
+    },
+  })
+
+  return { reportPost }
+}
+
+/** 차단 해제 (B19). ⚠️ 목록을 무효화하지 않는다 — 항목이 남고 버튼만 바뀐다 */
+export const useUnblockBoardUser = () => {
+  const aptResidentUuid = useAuthStore((state) => {
+    return state.aptInfo.aptResidentUuid
+  })
+
+  const { mutate: unblockUser, isSuccess: isUnblockUserSuccess } = useMutation({
+    mutationFn: ({ authorUuid }: { authorUuid: string }) => {
+      return deleteBoardBlockUser({ aptResidentUuid: aptResidentUuid ?? '', authorUuid })
+    },
+    onSuccess: () => {
+      showToast({ message: BOARD_TOAST_MESSAGE.unblocked })
+    },
+    onError: (error) => {
+      showBoardMutationError({ error, handlesBlackList: false })
+    },
+  })
+
+  return { unblockUser, isUnblockUserSuccess }
 }
 
 /** 댓글 등록. multipart + 업로드 진행률 */

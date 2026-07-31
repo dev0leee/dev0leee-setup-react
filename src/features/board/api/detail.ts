@@ -1,6 +1,6 @@
 import type { AxiosProgressEvent } from 'axios'
 
-import type { BoardComment, BoardPostDetail } from '@/features/board/types/detail'
+import type { BlockedUser, BoardComment, BoardPostDetail } from '@/features/board/types/detail'
 import { BOARD_TYPE, type BoardType } from '@/features/board/types/post'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api } from '@/shared/lib/apiClient'
@@ -138,6 +138,71 @@ export const deleteBoardComment = async ({
   ...ref
 }: PostRef & { commentUuid: string }): Promise<void> => {
   await api.delete(`${postBase(ref)}/comment/${commentUuid}`)
+}
+
+/** 게시글 등록 (multipart). 성공하면 뒤로 가고 `등록되었습니다` 토스트가 뜬다 */
+export const postBoardPost = async ({
+  boardType,
+  aptResidentUuid,
+  formData,
+  onUploadProgress,
+}: {
+  boardType: BoardType
+  aptResidentUuid: string
+  formData: FormData
+  onUploadProgress: (event: AxiosProgressEvent) => void
+}): Promise<void> => {
+  await api.post(`${API_PREFIX.BOARD}/${aptResidentUuid}/${SEGMENT[boardType]}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress,
+  })
+}
+
+/** 게시글 수정 (multipart) */
+export const patchBoardPost = async ({
+  formData,
+  onUploadProgress,
+  ...ref
+}: PostRef & {
+  formData: FormData
+  onUploadProgress: (event: AxiosProgressEvent) => void
+}): Promise<void> => {
+  await api.patch(postBase(ref), formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress,
+  })
+}
+
+/** 게시글 신고 (B20) */
+export const postBoardPostReport = async ({
+  content,
+  ...ref
+}: PostRef & { content: string }): Promise<void> => {
+  await api.post(`${postBase(ref)}/report`, { content })
+}
+
+/** 차단한 사용자 목록 (B19) */
+export const getBoardBlockedUserList = async ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string
+}): Promise<BlockedUser[]> => {
+  const response = await api.get<ServerSuccessBody<BlockedUser[]>>(
+    `${API_PREFIX.BOARD}/${aptResidentUuid}/block`,
+  )
+
+  return response.data.success ?? []
+}
+
+/** 차단 해제 (B19) */
+export const deleteBoardBlockUser = async ({
+  aptResidentUuid,
+  authorUuid,
+}: {
+  aptResidentUuid: string
+  authorUuid: string
+}): Promise<void> => {
+  await api.delete(`${API_PREFIX.BOARD}/${aptResidentUuid}/block/${authorUuid}`)
 }
 
 /**

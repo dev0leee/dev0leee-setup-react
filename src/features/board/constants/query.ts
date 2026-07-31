@@ -100,6 +100,15 @@ export const boardCommentDetailQueryKey = ({
   return [`${boardType}CommentDetail`, aptResidentUuid, postUuid, commentUuid] as const
 }
 
+/** B19 차단한 사용자 목록 */
+export const boardBlockedUserListQueryKey = ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string | undefined
+}) => {
+  return ['boardBlockedUserList', aptResidentUuid] as const
+}
+
 export const boardCategoryListQueryKey = ({
   boardType,
   aptResidentUuid,

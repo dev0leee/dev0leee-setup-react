@@ -78,3 +78,26 @@ export interface CommentSubmitPayload {
   content: string
   fileList: (File | BoardAttachedImage)[]
 }
+
+/**
+ * 차단한 사용자 한 건 (B19).
+ *
+ * ⚠️ **`residentBlockUuid`를 차단·해제 API의 `authorUuid`로 쓴다.** 상세 화면(B6)의
+ * 차단은 `authorAptResidentUuid`를 쓴다 — 서버가 두 값을 같게 취급하는지 확인 대상이다
+ * (`board.md` BD-Q14).
+ */
+export interface BlockedUser {
+  residentBlockUuid: string
+  /** 쉼표로 이어진 문자열. 표시할 때 쉼표를 지운다 */
+  residentBlockName: string
+}
+
+/** 게시글 등록·수정이 보내는 값 */
+export interface BoardPostSubmitPayload {
+  title: string | null
+  content: string | null
+  categoryUuid: string | null
+  fileList: (File | BoardAttachedImage)[]
+  /** ⚠️ 민원공간에만 있다. 소통공간에서는 아예 넣지 않는다 */
+  privateFlag?: boolean
+}

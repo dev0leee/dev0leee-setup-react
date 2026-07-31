@@ -141,6 +141,63 @@ export const EDIT_BACK_MODAL_DATA = {
 /** 댓글 입력창에 이미지를 붙여넣으려 할 때 */
 export const PASTE_BLOCKED_MESSAGE = '텍스트 이외에는 붙여넣을 수 없습니다.'
 
+// ── 글 등록·수정 폼 ─────────────────────────────────────────────────────────
+
+export const WRITE_BACK_MODAL_DATA = {
+  title: '작성 그만두기',
+  description: ['작성을 그만두시겠습니까?', '변경된 내용은 저장되지 않습니다'],
+  firstButton: '취소',
+  secondButton: '그만두기',
+}
+
+/** 민원공간 비밀글 안내. `확인`을 눌러야 체크된다 */
+export const WRITE_PRIVATE_MODAL_DATA = {
+  title: '비밀글 설정하기',
+  description: [
+    '민원공간에서 타인에게 노출되지 않으며,',
+    '관리사무소와 작성자만 확인할 수 있습니다',
+  ],
+  firstButton: '취소',
+  secondButton: '확인',
+}
+
+/**
+ * 폼 수동 검증 문구. **이것이 사용자가 보는 유일한 검증 메시지다** —
+ * 레거시 zod 스키마의 메시지는 어디에도 렌더되지 않는다 (`board.md` §5-11).
+ */
+export const BOARD_FORM_VALIDATION_MESSAGE = {
+  category: '게시글의 주제를 선택해주세요.',
+  title: '제목을 입력해주세요.',
+  content: '내용을 입력해주세요.',
+} as const
+
+export const BOARD_FORM_PLACEHOLDER = {
+  category: '게시글의 주제를 선택해주세요',
+  title: '제목을 입력해주세요',
+  content: '선택한 주제의 게시글 내용을 작성해주세요',
+} as const
+
+/**
+ * 게시글 첨부 제약. ⚠️ **댓글과 값이 다르다** (`board.md` §3-4):
+ * 크기 상한이 **10,000,000 B**(댓글은 10,485,760 B)이고 **gif를 받는다**(댓글은 안 받는다).
+ * 그래서 약 10.0~10.49MB 파일은 **댓글에는 올라가고 게시글에는 안 올라간다.**
+ */
+export const POST_IMAGE_LIMIT = {
+  MAX_COUNT: 5,
+  MAX_SIZE: 10000000,
+  ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
+} as const
+
+/** 신고 화면 (B20) */
+export const REPORT_TEXT_MAX_LENGTH = 300
+
+/** 미노출 사용자 관리 (B19) */
+export const USER_BLOCK_TEXT = {
+  EMPTY: '차단된 사용자가 없습니다.',
+  BLOCKED: '게시글 안보는 중',
+  UNBLOCKED: '게시글 안보기',
+} as const
+
 /** 댓글 첨부 제약. **게시글 폼과 값이 다르다** (`board.md` §3-4) */
 export const COMMENT_IMAGE_LIMIT = {
   MAX_COUNT: 5,

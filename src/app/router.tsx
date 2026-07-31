@@ -393,6 +393,55 @@ export const routes = [
                       return { Component: ComplaintsCommentEditPage }
                     },
                   },
+                  {
+                    // 글 폼 4개도 AppBar를 화면 안에서 그린다 (완료 버튼 · 뒤로가기 모달)
+                    path: ROUTE_PATH.BOARD_COMMUNITY_WRITE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { CommunityWritePage } = await import('@/features/board')
+                      return { Component: CommunityWritePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_COMMUNITY_EDIT,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { CommunityEditPage } = await import('@/features/board')
+                      return { Component: CommunityEditPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_COMPLAINTS_WRITE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ComplaintsWritePage } = await import('@/features/board')
+                      return { Component: ComplaintsWritePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_COMPLAINTS_EDIT,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ComplaintsEditPage } = await import('@/features/board')
+                      return { Component: ComplaintsEditPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.POST_REPORT,
+                    handle: layout({ appBarTitle: '게시글 신고' }),
+                    lazy: async () => {
+                      const { ReportPage } = await import('@/features/board')
+                      return { Component: ReportPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_SETTING_USER_BLOCK,
+                    handle: layout({ appBarTitle: '게시글 미노출 사용자 관리' }),
+                    lazy: async () => {
+                      const { UserBlockSettingPage } = await import('@/features/board')
+                      return { Component: UserBlockSettingPage }
+                    },
+                  },
                 ],
               },
 

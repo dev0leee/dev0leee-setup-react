@@ -96,6 +96,15 @@ export const ROUTE_PATH = {
     '/post/complaints/comment/reply/:postUuid/:commentUuid/:commentIndex',
   POST_COMMUNITY_COMMENT_EDIT: '/post/community/comment/edit/:postUuid/:commentUuid',
   POST_COMPLAINTS_COMMENT_EDIT: '/post/complaints/comment/edit/:postUuid/:commentUuid',
+  /** 게시글 신고. 어느 게시판인지는 **라우터 state**로 받는다 (`board.md` §5-13) */
+  POST_REPORT: '/post/report/:postUuid',
+
+  BOARD_COMMUNITY_WRITE: '/board/community/write',
+  BOARD_COMMUNITY_EDIT: '/board/community/edit/:postUuid',
+  BOARD_COMPLAINTS_WRITE: '/board/complaints/write',
+  BOARD_COMPLAINTS_EDIT: '/board/complaints/edit/:postUuid',
+  /** 게시글 미노출 사용자 관리. 마이페이지에서 들어온다 */
+  BOARD_SETTING_USER_BLOCK: '/board/setting/userBlock',
   /** 하자보수 */
   REPAIR_LIST: '/repair/list',
   /** 이사예약 */
