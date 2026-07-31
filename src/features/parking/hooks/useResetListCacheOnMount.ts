@@ -14,11 +14,21 @@ import { useRef } from 'react'
  * 그래서 즐겨찾기 목록에 들어가면 항상허용 캐시도 함께 날아간다 —
  * 한 컴포넌트가 두 훅을 다 호출하기 때문이다(PR2). 레거시 그대로다.
  */
-export const useResetListCacheOnMount = ({ queryKey }: { queryKey: string }) => {
+export const useResetListCacheOnMount = ({
+  queryKey,
+  enabled = true,
+}: {
+  queryKey: string
+  /**
+   * `false`면 캐시를 남긴다. 입출차·방문예약 목록이 **상세에서 돌아온 경우**에만
+   * 끄는데, 그때는 목록을 그대로 되살려야 하기 때문이다 (`useReturnFromDetail`).
+   */
+  enabled?: boolean
+}) => {
   const queryClient = useQueryClient()
   const hasResetRef = useRef(false)
 
-  if (!hasResetRef.current) {
+  if (enabled && !hasResetRef.current) {
     hasResetRef.current = true
     queryClient.removeQueries({ queryKey: [queryKey] })
   }

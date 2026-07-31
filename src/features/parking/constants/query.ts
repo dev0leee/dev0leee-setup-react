@@ -26,6 +26,20 @@ export const ALWAYS_ALLOW_CAR_LIST_QUERY_KEY = 'alwaysAllowCarList'
  */
 export const VISIT_PURPOSE_QUERY_KEY = ['visitPurpose'] as const
 
+/** PK8 입출차 내역 (무한 목록) */
+export const IN_OUT_CAR_LIST_QUERY_KEY = 'inOutCarList'
+
+/** PK9 입출차 상세. **키가 온전하다** — 방문목적(§3-6)과 달리 uuid가 둘 다 들어간다 */
+export const inOutCarDetailQueryKey = ({
+  aptResidentUuid,
+  parkingUuid,
+}: {
+  aptResidentUuid: string | undefined
+  parkingUuid: string | undefined
+}) => {
+  return ['inOutCarDetail', aptResidentUuid, parkingUuid] as const
+}
+
 /** PK1 주차 정책 드로어. 이번 달 1일로 고정 조회한다 */
 export const parkingPolicyQueryKey = ({
   aptResidentUuid,

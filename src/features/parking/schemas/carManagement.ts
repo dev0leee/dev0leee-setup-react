@@ -63,3 +63,18 @@ export type AlwaysAllowCarForm = z.infer<typeof alwaysAllowCarWithWallPadSchema>
 
 /** 두 폼을 한 컴포넌트가 그리므로 값 타입도 합집합으로 다룬다 */
 export type CarManagementForm = Partial<BookmarkCarForm> & Partial<AlwaysAllowCarForm>
+
+/**
+ * PK10 차량 거부 사유.
+ *
+ * ⚠️ **상한을 `maxlength`가 아니라 스키마가 막는다** — 100자를 넘겨 입력할 수 있고
+ * 제출할 때 에러가 뜬다. 게시글 신고(`board.md` B20)는 반대로 JS로 잘라낸다. **비대칭.**
+ */
+export const rejectCarSchema = z.object({
+  rejectReason: z
+    .string()
+    .min(1, '최소 1자 이상 입력해주세요')
+    .max(100, '최대 100자 이내로 입력해주세요'),
+})
+
+export type RejectCarForm = z.infer<typeof rejectCarSchema>

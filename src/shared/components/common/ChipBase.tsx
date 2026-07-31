@@ -41,7 +41,9 @@ const OUTLINE_COLOR: Partial<Record<ChipColor, string>> = {
 }
 
 export const ChipBase = ({ color, variant = 'fill', className, children }: ChipBaseProps) => {
-  const colorClass = variant === 'fill' ? FILL_COLOR[color] : (OUTLINE_COLOR[color] ?? '')
+  // 색이 없으면 색 클래스 없이 렌더한다 — 레거시가 그렇다 (`ChipBaseProps.color` 주석)
+  const colorClass =
+    color === undefined ? '' : variant === 'fill' ? FILL_COLOR[color] : (OUTLINE_COLOR[color] ?? '')
 
   return (
     <div

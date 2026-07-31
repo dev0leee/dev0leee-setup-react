@@ -1,4 +1,5 @@
 import { ROUTE_PATH } from '@/shared/constants/routes'
+import type { ChipColor } from '@/shared/types/chip'
 
 /**
  * 카드 1건이 보여줄 필드. 레거시 `constants/domain/parking.js`의 `CARD_ITEM_FIELD`.
@@ -19,6 +20,12 @@ export const CARD_ITEM_FIELD = {
   alwaysAllow: [
     { key: 'phone', label: '연락처' },
     { key: 'memo', label: '메모' },
+  ],
+  /** PK8 입출차 내역. 마일리지 내역에서 `사용한 마일리지`만 빠진 구성이다 */
+  inOutHistory: [
+    { key: 'inParkingTime', label: '입차시간' },
+    { key: 'outParkingTime', label: '출차시간' },
+    { key: 'parkingMinutes', label: '총 주차시간' },
   ],
   /** PK2 마일리지 내역 */
   mileageHistory: [
@@ -216,8 +223,76 @@ export const CAR_HANDLED_ERROR_CODES = {
   deleteAlwaysAllow: ['ALWAYS_ALLOW_NOT_FOUND', 'GUARD_NETWORK_ERROR'],
 } as const
 
+// ── 입출차·거부 (PK8~PK10) ──────────────────────────────────────────────────
+
+/**
+ * 차량 유형별 라벨과 칩 색. 레거시 `CAR_TYPE` 8종.
+ *
+ * ⚠️ **여기 없는 코드가 오면 라벨도 색도 `undefined`가 된다** — 칩이 글자 없이 색 없이
+ * 렌더된다. 레거시 `findCarType`이 그렇다. 서버가 새 유형을 추가하면 눈에 띈다.
+ */
+export const CAR_TYPE_INFO: Record<string, { label: string; chipColor: ChipColor }> = {
+  REGULAR: { label: '정기차량', chipColor: 'green' },
+  REGULAR_RESIDENT: { label: '입주민', chipColor: 'green' },
+  RESERVATION: { label: '방문예약', chipColor: 'gray' },
+  GENERAL: { label: '일반방문', chipColor: 'gray' },
+  ALWAYS_ALLOW: { label: '항상허용', chipColor: 'blue' },
+  UNKNOWN: { label: '미등록', chipColor: 'purple' },
+  REJECT: { label: '거부', chipColor: 'red' },
+  BLACKLIST: { label: '블랙리스트', chipColor: 'red' },
+}
+
+/** PK9 상세의 필드와 순서 */
+export const IN_OUT_HISTORY_DETAIL_FIELD = [
+  { key: 'carNum', label: '차량번호' },
+  { key: 'inParkingTime', label: '입차시간' },
+  { key: 'outParkingTime', label: '출차시간' },
+  { key: 'parkingMinutes', label: '총 주차시간' },
+  { key: 'phone', label: '연락처' },
+  { key: 'visitPurpose', label: '방문목적' },
+  { key: 'carType', label: '차량유형' },
+] as const
+
+export type InOutDetailFieldKey = (typeof IN_OUT_HISTORY_DETAIL_FIELD)[number]['key']
+
+/** PK9 거부 확인 모달 */
+export const PARKING_REJECT_MODAL_DATA = {
+  title: '주차를 거부하시겠습니까?',
+  description: '거부시, 마일리지 차감이 되지 않습니다.',
+  firstButton: '취소',
+  secondButton: '거부하기',
+}
+
+export const IN_OUT_LIST_MESSAGE = {
+  error: '입출차 내역을 불러올 수 없습니다',
+  empty: '입출차 내역이 없습니다',
+} as const
+
+export const IN_OUT_DETAIL_ERROR_TEXT = [
+  '입출차 상세 정보를 불러올 수 없습니다',
+  '잠시 후 다시 시도해주세요',
+] as const
+
+export const NO_CAR_IMAGE_TEXT = '차량 이미지 없음'
+
+/** PK10 거부 사유 상한. **`maxlength`가 아니라 zod가 막는다** — 넘겨 입력할 수 있다 */
+export const REJECT_REASON_MAX_LENGTH = 100
+
+export const REJECT_TOAST_MESSAGE = '거부되었습니다'
+
+/** PK10 거부 실패 시 전용 문구. **띄어쓰기 오류는 레거시 그대로다** */
+export const REJECT_ERROR_CODES = [
+  'REJECT_ALREADY_EXISTS',
+  'CAR_TYPE_NOT_ALLOWED',
+  'REJECT_HOUSE_HOLD_NOT_MATCH',
+  'GUARD_NETWORK_ERROR',
+] as const
+
 /** 위 코드에 대응하는 문구 */
 export const CAR_ERROR_MESSAGE: Record<string, string> = {
+  REJECT_ALREADY_EXISTS: '이미 거부된 차량이 존재합니다.',
+  CAR_TYPE_NOT_ALLOWED: '거부 할 수 없는 차량 종류 입니다.',
+  REJECT_HOUSE_HOLD_NOT_MATCH: '거부 요청한 세대 정보가 일치 하지 않습니다.',
   BOOKMARK_DUPLICATED: '이미 등록된 즐겨찾기 차량입니다.',
   REGULAR_EXISTS: '해당 단지에 이미 등록된 정기권 차량입니다.',
   ALWAYS_ALLOW_EXISTS: '해당 단지에 이미 등록된 항상허용 차량입니다.',

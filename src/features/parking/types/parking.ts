@@ -77,6 +77,51 @@ export interface AlwaysAllowCar {
 }
 
 /**
+ * 차량 유형. 입출차 목록·상세의 칩 색과 라벨을 정한다.
+ * **서버가 주는 코드**이므로 바꾸지 않는다.
+ */
+export const CAR_TYPE_KEY = {
+  REGULAR: 'REGULAR',
+  REGULAR_RESIDENT: 'REGULAR_RESIDENT',
+  RESERVATION: 'RESERVATION',
+  GENERAL: 'GENERAL',
+  ALWAYS_ALLOW: 'ALWAYS_ALLOW',
+  UNKNOWN: 'UNKNOWN',
+  REJECT: 'REJECT',
+  BLACKLIST: 'BLACKLIST',
+} as const
+
+/** 입출차 내역 1건 (PK8) */
+export interface InOutCar {
+  uuid: string
+  carNum?: string
+  /** `CAR_TYPE_KEY` 중 하나. 목록에 없는 값이 오면 칩이 **색 없이** 렌더된다 */
+  carType?: string
+  inParkingTime?: string | null
+  outParkingTime?: string | null
+  parkingMinutes?: number | null
+}
+
+/**
+ * 입출차 차량 상세 (PK9).
+ *
+ * ⚠️ 이미지 경로는 **S3 접두사를 붙여야** 쓸 수 있는 상대 경로다.
+ */
+export interface InOutCarDetail {
+  carNum?: string
+  carType?: string
+  inParkingTime?: string | null
+  outParkingTime?: string | null
+  parkingMinutes?: number | null
+  phone?: string | null
+  visitPurpose?: string | null
+  /** 이미 거부된 차량인지. 거부 영역 노출 조건에 들어간다 */
+  rejectFlag?: boolean
+  inParkingImageUrl?: string | null
+  outParkingImageUrl?: string | null
+}
+
+/**
  * 목록 카드 1건. 즐겨찾기와 항상허용을 **한 컴포넌트가 그리므로** 두 모양을 합쳐 둔다.
  * 어느 필드를 보여줄지는 `CARD_ITEM_FIELD`가 정한다.
  */

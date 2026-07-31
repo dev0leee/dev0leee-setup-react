@@ -517,6 +517,33 @@ export const routes = [
                       return { Component: CarManagementFormPage }
                     },
                   },
+
+                  // ── 주차 — 입출차·거부 (PK8~PK10) ─────────────────────────
+                  {
+                    path: ROUTE_PATH.PARKING_INOUT_HISTORY,
+                    handle: layout({ appBarTitle: '입출차 내역' }),
+                    lazy: async () => {
+                      const { InOutHistoryPage } = await import('@/features/parking')
+                      return { Component: InOutHistoryPage }
+                    },
+                  },
+                  {
+                    // 네이티브 푸시 딥링크가 여기로 들어온다. 경로를 바꾸지 않는다
+                    path: ROUTE_PATH.PARKING_INOUT_HISTORY_DETAIL,
+                    handle: layout({ appBarTitle: '입출차 차량 상세' }),
+                    lazy: async () => {
+                      const { InOutHistoryDetailPage } = await import('@/features/parking')
+                      return { Component: InOutHistoryDetailPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.PARKING_REJECT,
+                    handle: layout({ appBarTitle: '차량 거부' }),
+                    lazy: async () => {
+                      const { RejectReasonPage } = await import('@/features/parking')
+                      return { Component: RejectReasonPage }
+                    },
+                  },
                 ],
               },
 
