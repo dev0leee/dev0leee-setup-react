@@ -100,6 +100,12 @@ export const ROUTE_PATH = {
   SURVEY_BEFORE: '/survey/before',
   SURVEY_FINISH: '/survey/finish',
 
+  // ── 하자보수 (RP1~RP4) ────────────────────────────────────────────────────
+  // 목록(`REPAIR_LIST`)은 메인 메뉴가 먼저 참조해 아래 메뉴 구획에 있다.
+  REPAIR_CREATE: '/repair/create',
+  REPAIR_EDIT: '/repair/edit/:repairUuid',
+  REPAIR_DETAIL: '/repair/detail/:repairUuid',
+
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
   VISIT: '/visit',
@@ -226,6 +232,16 @@ export const voteDetailPath = ({
   voterUuid: string
 }): string => {
   return `/vote/detail/${voteUuid}/${voterUuid}`
+}
+
+/** 하자보수 상세(RP4) */
+export const repairDetailPath = ({ repairUuid }: { repairUuid: string }): string => {
+  return `/repair/detail/${repairUuid}`
+}
+
+/** 하자보수 수정(RP3) */
+export const repairEditPath = ({ repairUuid }: { repairUuid: string }): string => {
+  return `/repair/edit/${repairUuid}`
 }
 
 /** 회원 설문 상세(SV2). 비회원 경로는 `getSurveyDetailPath`가 만든다 */

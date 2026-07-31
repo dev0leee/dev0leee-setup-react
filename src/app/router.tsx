@@ -644,6 +644,51 @@ export const routes = [
                     },
                   },
 
+                  // ── 하자보수 (RP1~RP4) ────────────────────────────────────
+                  {
+                    path: ROUTE_PATH.REPAIR_LIST,
+                    handle: layout({ appBarTitle: '하자보수' }),
+                    lazy: async () => {
+                      const { RepairListPage } = await import('@/features/repair')
+                      return { Component: RepairListPage }
+                    },
+                  },
+                  {
+                    // ✅ **레이아웃 AppBar를 껐다** (RP-Q2). 레거시는 여기가 `true`라
+                    // 화면이 그린 AppBar와 **정확히 겹쳤다** — 제출 버튼과 뒤로가기
+                    // 모달이 화면 쪽에 붙어 있어 그쪽만 남겼다
+                    path: ROUTE_PATH.REPAIR_CREATE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { RepairFormPage } = await import('@/features/repair')
+                      return {
+                        Component: () => {
+                          return <RepairFormPage mode="create" />
+                        },
+                      }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.REPAIR_EDIT,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { RepairFormPage } = await import('@/features/repair')
+                      return {
+                        Component: () => {
+                          return <RepairFormPage mode="edit" />
+                        },
+                      }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.REPAIR_DETAIL,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { RepairDetailPage } = await import('@/features/repair')
+                      return { Component: RepairDetailPage }
+                    },
+                  },
+
                   // ── A-PASS (AP1) ──────────────────────────────────────────
                   {
                     // ⚠️ 화면이 자기 AppBar를 든다 — 헤더 그라데이션 위에 투명하게 얹는다.
