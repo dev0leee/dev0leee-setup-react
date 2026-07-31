@@ -580,6 +580,38 @@ export const routes = [
                       return { Component: ReservationDetailPage }
                     },
                   },
+
+                  // ── 방문자 출입관리 (V1~V3) ───────────────────────────────
+                  {
+                    // ⚠️ 이 도메인에만 있는 meta다 — AppBar 배경을 hex로 지정한다
+                    path: ROUTE_PATH.VISIT,
+                    handle: layout({
+                      appBarTitle: '방문자 출입관리',
+                      backPath: ROUTE_PATH.MAIN,
+                      appBarBackgroundColor: '#f9fafb',
+                    }),
+                    lazy: async () => {
+                      const { VisitListPage } = await import('@/features/visit')
+                      return { Component: VisitListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VISIT_KIOSK_PASSWORD,
+                    handle: layout({ appBarTitle: '방문증 키오스크 설정' }),
+                    lazy: async () => {
+                      const { KioskPasswordPage } = await import('@/features/visit')
+                      return { Component: KioskPasswordPage }
+                    },
+                  },
+                  {
+                    // AppBar를 화면 안에서 그린다 — 우측 설정 아이콘 + 뒤로가기를 `/visit` 고정
+                    path: ROUTE_PATH.VISIT_LOBBY_PHONE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { LobbyPhonePage } = await import('@/features/visit')
+                      return { Component: LobbyPhonePage }
+                    },
+                  },
                 ],
               },
 

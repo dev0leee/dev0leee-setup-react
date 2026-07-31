@@ -65,8 +65,19 @@ export const ROUTE_PATH = {
   FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
   /** A-PASS (메인 A-PASS 카드) */
   APASS: '/apass',
-  /** 방문자 출입관리 (메인 방문 출입관리 카드) */
+  // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
+  /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
   VISIT: '/visit',
+  /** 방문증 키오스크 비밀번호 확인·변경 */
+  VISIT_KIOSK_PASSWORD: '/visit/kiosk/password',
+  /** 로비폰 세대호출. ⚠️ **뒤로가기가 히스토리가 아니라 항상 `/visit`다** */
+  VISIT_LOBBY_PHONE: '/visit/lobbyPhone',
+
+  // 아래 4개는 아직 화면이 없다 — V3 메뉴가 참조해 먼저 상수로 둔다 (PR2·PR3)
+  VISIT_TEMP_PASSWORD_LIST: '/visit/lobbyPhone/tempPassword/list',
+  VISIT_TEMP_PASSWORD_CREATE: '/visit/lobbyPhone/tempPassword/create',
+  VISIT_QR: '/visit/lobbyPhone/qr',
+  VISIT_FACE_REGISTER_MANAGEMENT: '/visit/lobbyPhone/faceRegisterManagement',
   /** 관리비 상세 (메인 관리비 카드) */
   MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
 
@@ -141,8 +152,6 @@ export const ROUTE_PATH = {
   APT_MALL_MY_ORDER: '/aptMall/myOrder',
   /** 설문조사 */
   SURVEY_LIST: '/survey/list',
-  /** 공동 현관(로비폰) */
-  VISIT_LOBBY_PHONE: '/visit/lobbyPhone',
   /** 소방 자가점검 */
   FIRE_INSPECTION: '/fire-inspection',
 
