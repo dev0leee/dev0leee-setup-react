@@ -725,6 +725,40 @@ export const routes = [
                     },
                   },
 
+                  // ── 아파트몰 / 주말조식 (AM1~AM11) ────────────────────────
+                  {
+                    // 🔴 UI에서 도달할 수 없는 화면이다 — 메뉴도 카드도 나의 예약으로 간다
+                    path: ROUTE_PATH.APT_MALL_LIST,
+                    handle: layout({
+                      appBarTitle: '아파트몰',
+                      appBarBackgroundColor: '#f8f8f8',
+                    }),
+                    lazy: async () => {
+                      const { AptMallListPage } = await import('@/features/aptMall')
+                      return { Component: AptMallListPage }
+                    },
+                  },
+                  {
+                    // ⚠️ AM1과 배경색이 다르다(`#f8f8f8` vs `#f3f4f6`). 레거시 meta 그대로다
+                    path: ROUTE_PATH.APT_MALL_MY_ORDER,
+                    handle: layout({
+                      appBarTitle: '주말조식 예약',
+                      appBarBackgroundColor: '#f3f4f6',
+                    }),
+                    lazy: async () => {
+                      const { AptMallMyOrderPage } = await import('@/features/aptMall')
+                      return { Component: AptMallMyOrderPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.APT_MALL_MY_ORDER_DETAIL,
+                    handle: layout({ appBarTitle: '주말조식 예약 상세' }),
+                    lazy: async () => {
+                      const { AptMallMyOrderDetailPage } = await import('@/features/aptMall')
+                      return { Component: AptMallMyOrderDetailPage }
+                    },
+                  },
+
                   // ── 소방 자가점검 (F1~F4) ─────────────────────────────────
                   {
                     // ⚠️ **이 도메인에서 유일하게 바텀네비가 보인다.** 메인 메뉴에서

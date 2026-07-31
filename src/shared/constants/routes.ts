@@ -125,6 +125,14 @@ export const ROUTE_PATH = {
   FIRE_INSPECTION_COMPLETE: '/fire-inspection/complete',
   FIRE_INSPECTION_DETAIL:
     '/fire-inspection/detail/:fireInspectionUuid/:householdFireInspectionUuid',
+  /**
+   * 아파트몰 (AM1·AM3). 나의 예약(`APT_MALL_MY_ORDER`)은 메인 메뉴가 먼저 참조해 아래에 있다.
+   *
+   * 🔴 **`APT_MALL_LIST`는 UI에서 도달할 수 없다** — 메뉴도 딥링크도 나의 예약으로 직행한다
+   * (`apt-mall.md` AM-Q2). 라우트가 있으므로 URL로는 열린다.
+   */
+  APT_MALL_LIST: '/aptMall/list',
+  APT_MALL_MY_ORDER_DETAIL: '/aptMall/myOrder/detail/:aptMallOrderUuid',
 
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
@@ -257,6 +265,15 @@ export const voteDetailPath = ({
 /** 하자보수 상세(RP4) */
 export const repairDetailPath = ({ repairUuid }: { repairUuid: string }): string => {
   return `/repair/detail/${repairUuid}`
+}
+
+/** 아파트몰 예약 상세(AM3) */
+export const aptMallMyOrderDetailPath = ({
+  aptMallOrderUuid,
+}: {
+  aptMallOrderUuid: string
+}): string => {
+  return `/aptMall/myOrder/detail/${aptMallOrderUuid}`
 }
 
 /** 소방 자가점검 진행(F2) */
