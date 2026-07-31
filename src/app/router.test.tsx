@@ -74,7 +74,10 @@ describe('로그인 → 메인 진입', () => {
     // ⚠️ 아파트명은 어절마다 `<span>`으로 쪼개지고 사이에 `&nbsp;`가 들어간다.
     // `getByRole(name)`은 nbsp를 일반 공백으로 정규화하지 않아 매칭되지 않는다 →
     // `toHaveTextContent`로 본다 (`recipe.md` §10).
-    expect(await screen.findByAltText('토글 아이콘')).toBeInTheDocument()
+    // ⚠️ **기본 1초로는 모자란다.** 이 경로는 lazy 청크 여러 개(로그인→메인→카드)를 받고
+    // 요청도 연달아 나가서, 전체 스위트를 병렬로 돌리면 간헐적으로 시간을 넘겼다.
+    // 단독 실행에서는 늘 통과했다 — 화면 문제가 아니라 대기 시간 문제다.
+    expect(await screen.findByAltText('토글 아이콘', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('아파트먼트 1단지')
 
     // 헤더로 온 토큰이 레거시 키에 raw로 저장됐는지
@@ -167,7 +170,10 @@ describe('로그인 → 메인 진입', () => {
 
     await renderApp({ initialPath: '/intro' })
 
-    expect(await screen.findByAltText('토글 아이콘')).toBeInTheDocument()
+    // ⚠️ **기본 1초로는 모자란다.** 이 경로는 lazy 청크 여러 개(로그인→메인→카드)를 받고
+    // 요청도 연달아 나가서, 전체 스위트를 병렬로 돌리면 간헐적으로 시간을 넘겼다.
+    // 단독 실행에서는 늘 통과했다 — 화면 문제가 아니라 대기 시간 문제다.
+    expect(await screen.findByAltText('토글 아이콘', {}, { timeout: 5000 })).toBeInTheDocument()
     // 인트로가 한 번도 그려지지 않았으므로 토큰이 살아 있다
     expect(localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN)).toBe('stored-token')
   })
