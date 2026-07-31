@@ -689,6 +689,42 @@ export const routes = [
                     },
                   },
 
+                  // ── 이사예약 (MH1~MH4) ────────────────────────────────────
+                  {
+                    path: ROUTE_PATH.MOVING_HOUSE_LIST,
+                    handle: layout({ appBarTitle: '이사예약' }),
+                    lazy: async () => {
+                      const { MovingHouseListPage } = await import('@/features/movingHouse')
+                      return { Component: MovingHouseListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MOVING_HOUSE_DETAIL,
+                    handle: layout({ appBarTitle: '이사예약 상세' }),
+                    lazy: async () => {
+                      const { MovingHouseDetailPage } = await import('@/features/movingHouse')
+                      return { Component: MovingHouseDetailPage }
+                    },
+                  },
+                  {
+                    // ⚠️ 작성 중 뒤로가기에 "그만두시겠습니까?" 모달을 띄워야 해서
+                    // **화면이 AppBar를 직접 든다** — 레거시 meta도 `showAppBar: false`다
+                    path: ROUTE_PATH.MOVING_HOUSE_WRITE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { MovingHouseWritePage } = await import('@/features/movingHouse')
+                      return { Component: MovingHouseWritePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.MOVING_HOUSE_WRITE_CONFIRM,
+                    handle: layout({ appBarTitle: '이사예약 등록 확인' }),
+                    lazy: async () => {
+                      const { MovingHouseConfirmPage } = await import('@/features/movingHouse')
+                      return { Component: MovingHouseConfirmPage }
+                    },
+                  },
+
                   // ── A-PASS (AP1) ──────────────────────────────────────────
                   {
                     // ⚠️ 화면이 자기 AppBar를 든다 — 헤더 그라데이션 위에 투명하게 얹는다.

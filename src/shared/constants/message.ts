@@ -1,3 +1,5 @@
+import type { ModalData } from '@/shared/types/overlay'
+
 /**
  * 네트워크 단절 안내. apiErrors의 isNetworkError(status 0)와 짝이다.
  *
@@ -18,6 +20,20 @@ export const MOVED_OUT_MESSAGE = '세대에서 전출되었습니다.'
 
 /** 에러 모달의 기본 본문. 레거시 `swalErrorModal`의 `text` 기본값 그대로. */
 export const DEFAULT_ERROR_MODAL_TEXT = '에러가 발생했습니다. 잠시 후 다시 시도해주세요.'
+
+/**
+ * 작성 중 뒤로가기 확인. **게시판과 이사예약이 함께 쓴다.**
+ *
+ * 레거시는 `constants/domain/board.js`에 있는 것을 이사예약이 직접 가져다 썼다 —
+ * feature 간 직접 참조라 `import/no-restricted-paths`가 막는다. 두 도메인이 문구까지
+ * 같으니 여기로 올렸다 (`moving-house.md` MH3).
+ */
+export const WRITE_BACK_MODAL_DATA: ModalData = {
+  title: '작성 그만두기',
+  description: ['작성을 그만두시겠습니까?', '변경된 내용은 저장되지 않습니다'],
+  firstButton: '취소',
+  secondButton: '그만두기',
+}
 
 /** 본인인증 콜백에 쿼리스트링이 없을 때. 레거시 `ACCESS_DENIED_MODAL_DATA` 그대로 */
 export const ACCESS_DENIED_MODAL_DATA = {

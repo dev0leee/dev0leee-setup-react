@@ -143,12 +143,11 @@ export const PASTE_BLOCKED_MESSAGE = '텍스트 이외에는 붙여넣을 수 �
 
 // ── 글 등록·수정 폼 ─────────────────────────────────────────────────────────
 
-export const WRITE_BACK_MODAL_DATA = {
-  title: '작성 그만두기',
-  description: ['작성을 그만두시겠습니까?', '변경된 내용은 저장되지 않습니다'],
-  firstButton: '취소',
-  secondButton: '그만두기',
-}
+/**
+ * 작성 중 뒤로가기 확인. **이사예약(MH3)과 문구가 같아 `shared/constants/message.ts`로
+ * 올렸다** — feature 간 직접 참조를 만들지 않으려는 조치다. 여기서는 재수출만 한다.
+ */
+export { WRITE_BACK_MODAL_DATA } from '@/shared/constants/message'
 
 /** 민원공간 비밀글 안내. `확인`을 눌러야 체크된다 */
 export const WRITE_PRIVATE_MODAL_DATA = {

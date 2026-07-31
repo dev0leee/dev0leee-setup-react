@@ -105,6 +105,15 @@ export const ROUTE_PATH = {
   REPAIR_CREATE: '/repair/create',
   REPAIR_EDIT: '/repair/edit/:repairUuid',
   REPAIR_DETAIL: '/repair/detail/:repairUuid',
+  /**
+   * 이사예약 (MH2~MH4). 목록(`MOVING_HOUSE_LIST`)은 메인 메뉴가 먼저 참조해 아래에 있다.
+   *
+   * ⚠️ **작성 화면만 `showAppBar: false`다** — 뒤로가기에 그만두기 모달을 띄워야 해서
+   * 화면이 AppBar를 직접 든다.
+   */
+  MOVING_HOUSE_DETAIL: '/movingHouse/detail/:movingUuid',
+  MOVING_HOUSE_WRITE: '/movingHouse/write',
+  MOVING_HOUSE_WRITE_CONFIRM: '/movingHouse/write/confirm',
 
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
@@ -237,6 +246,11 @@ export const voteDetailPath = ({
 /** 하자보수 상세(RP4) */
 export const repairDetailPath = ({ repairUuid }: { repairUuid: string }): string => {
   return `/repair/detail/${repairUuid}`
+}
+
+/** 이사예약 상세(MH2) */
+export const movingHouseDetailPath = ({ movingUuid }: { movingUuid: string }): string => {
+  return `/movingHouse/detail/${movingUuid}`
 }
 
 /** 하자보수 수정(RP3) */
