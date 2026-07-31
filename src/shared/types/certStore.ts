@@ -29,6 +29,8 @@ export interface VoteCertState {
 export interface SurveyCertInfo {
   surveyUuid?: string
   participantUuid?: string
+  /** 상세에 들어갈 때마다 `undefined`로 지운다 — 투표와 같다 */
+  isTriedVerification?: boolean
 }
 
 export interface SurveyCertState {

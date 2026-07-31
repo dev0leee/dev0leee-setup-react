@@ -88,6 +88,18 @@ export const ROUTE_PATH = {
   VOTE_BEFORE: '/vote/before',
   VOTE_FINISH: '/vote/finish',
 
+  // ── 설문조사 (SV1~SV9) ────────────────────────────────────────────────────
+  // 목록(`SURVEY_LIST`)은 메인 메뉴가 먼저 참조해 아래 메뉴 구획에 있다.
+  /** 회원 상세. 비회원은 `/survey/{participantUuid}`로 들어온다 */
+  SURVEY_DETAIL: '/survey/detail/:surveyUuid/:participantUuid',
+  SURVEY_FORM: '/survey/form/:participantUuid',
+  SURVEY_COMPLETED: '/survey/completed',
+  SURVEY_CERT_PASS_RESPONSE: '/survey/certification/pass/response',
+  SURVEY_CERT_NAME_PHONE: '/survey/certification/namePhone',
+  /** 시작전·종료 안내. **opinion 앱에만 있는 화면**이다 (투표와 같다) */
+  SURVEY_BEFORE: '/survey/before',
+  SURVEY_FINISH: '/survey/finish',
+
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
   VISIT: '/visit',
@@ -214,6 +226,22 @@ export const voteDetailPath = ({
   voterUuid: string
 }): string => {
   return `/vote/detail/${voteUuid}/${voterUuid}`
+}
+
+/** 회원 설문 상세(SV2). 비회원 경로는 `getSurveyDetailPath`가 만든다 */
+export const surveyDetailPath = ({
+  surveyUuid,
+  participantUuid,
+}: {
+  surveyUuid: string
+  participantUuid: string
+}): string => {
+  return `/survey/detail/${surveyUuid}/${participantUuid}`
+}
+
+/** 설문 참여 폼(SV3) */
+export const surveyFormPath = ({ participantUuid }: { participantUuid: string }): string => {
+  return `/survey/form/${participantUuid}`
 }
 
 /** 투표 참여 폼(VT3). 회원·비회원이 같은 경로를 쓴다 */

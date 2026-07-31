@@ -644,6 +644,29 @@ export const routes = [
                     },
                   },
 
+                  // ── 설문조사 (SV1·SV2) ────────────────────────────────────
+                  {
+                    // 레거시에서 eager로 등록된 두 화면 중 하나다(투표 목록과 함께).
+                    // 타깃은 전 라우트 lazy 원칙을 따른다 — 화면은 같다
+                    path: ROUTE_PATH.SURVEY_LIST,
+                    handle: layout({ appBarTitle: '설문조사', backPath: ROUTE_PATH.MAIN }),
+                    lazy: async () => {
+                      const { SurveyListPage } = await import('@/features/survey')
+                      return { Component: SurveyListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.SURVEY_DETAIL,
+                    handle: layout({
+                      appBarTitle: '설문조사 개요',
+                      backPath: ROUTE_PATH.SURVEY_LIST,
+                    }),
+                    lazy: async () => {
+                      const { SurveyDetailPage } = await import('@/features/survey')
+                      return { Component: SurveyDetailPage }
+                    },
+                  },
+
                   // ── 전자투표 (VT1·VT2) ────────────────────────────────────
                   {
                     // ⚠️ **레거시에서 유일하게 eager로 등록된 화면**이다. 메인 메뉴와
