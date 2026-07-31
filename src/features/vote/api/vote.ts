@@ -61,3 +61,41 @@ export const getVoteDetailStatus = async ({
 
   return response.data.success
 }
+
+/**
+ * PASS(KMC) 본인인증 결과 전달 (VT5). **비인증 API**다.
+ * KMC가 돌려준 `apiToken`·`certNum`을 그대로 넘긴다.
+ */
+export const patchVoteCertPass = async ({
+  voterUuid,
+  apiToken,
+  certNum,
+}: {
+  voterUuid: string
+  apiToken: string
+  certNum: string
+}): Promise<void> => {
+  await publicApi.patch(`${NON_RESIDENT_PREFIX}/voter/${voterUuid}/auth/pass`, {
+    apiToken,
+    certNum,
+  })
+}
+
+/**
+ * 이름·휴대폰 본인인증 (VT6). **비인증 API**다.
+ * ⚠️ **하이픈을 떼고 보낸다** — 입력창은 하이픈을 넣어 보여준다.
+ */
+export const patchVoteCertNamePhone = async ({
+  voterUuid,
+  name,
+  phone,
+}: {
+  voterUuid: string
+  name: string
+  phone: string
+}): Promise<void> => {
+  await publicApi.patch(`${NON_RESIDENT_PREFIX}/voter/${voterUuid}/auth/name-phone`, {
+    name,
+    phone: phone.replaceAll('-', ''),
+  })
+}

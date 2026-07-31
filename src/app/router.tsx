@@ -670,6 +670,32 @@ export const routes = [
                     },
                   },
 
+                  {
+                    // KMC가 POST 리다이렉트로 도착시키는 자리다. 화면은 모달뿐이다
+                    path: ROUTE_PATH.VOTE_CERT_PASS_RESPONSE,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { VoteCertPassResponsePage } = await import('@/features/vote')
+                      return { Component: VoteCertPassResponsePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VOTE_CERT_NAME_PHONE,
+                    handle: layout({ appBarTitle: '본인인증' }),
+                    lazy: async () => {
+                      const { VoteCertNamePhonePage } = await import('@/features/vote')
+                      return { Component: VoteCertNamePhonePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.VOTE_COMPLETED,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { VoteCompletedPage } = await import('@/features/vote')
+                      return { Component: VoteCompletedPage }
+                    },
+                  },
+
                   // ── 안면인식 위저드 (V7~V13) ──────────────────────────────
                   // ⚠️ **V10~V13은 AppBar 제목이 `얼굴 신규 등록`으로 전부 같다.**
                   // 위저드 단계가 제목으로 드러나지 않는다 — 레거시 그대로다.

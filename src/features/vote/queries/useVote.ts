@@ -1,15 +1,23 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { env } from '@/config/env'
-import { getVoteDetailInfo, getVoteDetailStatus, getVoteList } from '@/features/vote/api/vote'
+import {
+  getVoteDetailInfo,
+  getVoteDetailStatus,
+  getVoteList,
+  patchVoteCertNamePhone,
+  patchVoteCertPass,
+} from '@/features/vote/api/vote'
+import { getVoteDetailPath, useIsVoteUser } from '@/features/vote/lib/voteRoute'
 import type { VoteListItemData } from '@/features/vote/types/vote'
-import { ROUTE_PATH } from '@/shared/constants/routes'
+import { ROUTE_PATH, voteFormPath } from '@/shared/constants/routes'
 import { useInfiniteList } from '@/shared/hooks/useInfiniteList'
 import type { ApiError } from '@/shared/lib/apiErrors'
 import { showErrorModal } from '@/shared/lib/errorModal'
 import { useAuthStore } from '@/shared/stores/authStore'
+import { useVoteCertStore } from '@/shared/stores/voteCertStore'
 
 /**
  * 전자투표 쿼리. 레거시 `lib/queries/vote/*` 이식.
@@ -149,4 +157,85 @@ export const useVoteDetailStatus = () => {
   }, [isVoteDetailStatusError, voteDetailStatusError])
 
   return { voteDetailStatus, isVoteDetailStatusLoading }
+}
+
+/**
+ * 본인인증 성공 후 갈 곳과 실패 후 돌아갈 곳을 함께 만든다 (VT5·VT6 공용).
+ *
+ * **레거시는 두 훅에 같은 코드를 복사해 뒀다.** 성공하면 참여 폼으로 `state: { auth: true }`를
+ * 실어 보내고(폼이 그 값 없이는 "잘못된 접근입니다"를 띄운다), 실패하면 상세로 되돌린다.
+ *
+ * ⚠️ **voterUuid를 라우트가 아니라 저장된 인증 정보에서 읽는다.** KMC 외부 사이트를
+ * 다녀오면 URL이 우리 것이 아니게 되므로 localStorage가 유일한 복원 수단이다.
+ */
+export const useVoteCertNavigation = () => {
+  const navigate = useNavigate()
+  const isUser = useIsVoteUser()
+  const voteCertInfo = useVoteCertStore((state) => {
+    return state.voteCertInfo
+  })
+
+  return {
+    voterUuid: voteCertInfo.voterUuid ?? '',
+    goToForm: () => {
+      void navigate(voteFormPath({ voterUuid: voteCertInfo.voterUuid ?? '' }), {
+        state: { auth: true },
+      })
+    },
+    goToDetail: () => {
+      void navigate(
+        getVoteDetailPath({
+          voteUuid: voteCertInfo.voteUuid,
+          voterUuid: voteCertInfo.voterUuid,
+          isUser,
+        }),
+      )
+    },
+  }
+}
+
+/** PASS 본인인증 (VT5). 실패하면 **서버 원문**을 띄우고 상세로 되돌린다 */
+export const usePatchVoteCertPass = () => {
+  const { voterUuid, goToForm, goToDetail } = useVoteCertNavigation()
+
+  const { mutate: patchVoteCertPassMutation, isPending: isPatchVoteCertPassPending } = useMutation({
+    mutationFn: ({ apiToken, certNum }: { apiToken: string; certNum: string }) => {
+      return patchVoteCertPass({ voterUuid, apiToken, certNum })
+    },
+    onSuccess: goToForm,
+    onError: (error: ApiError) => {
+      showErrorModal({ text: error.message, callback: goToDetail })
+    },
+  })
+
+  return { patchVoteCertPassMutation, isPatchVoteCertPassPending }
+}
+
+/**
+ * 이름·휴대폰 본인인증 (VT6).
+ *
+ * ⚠️ **`VOTER_MISS_MATCH`만 화면에 남는다** — 이름이나 번호를 잘못 넣은 경우라 다시
+ * 입력할 수 있어야 한다. 나머지 에러는 상세로 되돌린다.
+ * 코드의 `MISS_MATCH`는 오타지만 **서버 계약이라 그대로 쓴다** (`domain-codes.md`).
+ */
+export const usePatchVoteCertNamePhone = () => {
+  const { voterUuid, goToForm, goToDetail } = useVoteCertNavigation()
+
+  const { mutate: patchVoteCertNamePhoneMutation, isPending: isPatchVoteCertNamePhonePending } =
+    useMutation({
+      mutationFn: ({ name, phone }: { name: string; phone: string }) => {
+        return patchVoteCertNamePhone({ voterUuid, name, phone })
+      },
+      onSuccess: goToForm,
+      onError: (error: ApiError) => {
+        if (error.code === 'VOTER_MISS_MATCH') {
+          showErrorModal({ text: error.message })
+          return
+        }
+
+        showErrorModal({ text: error.message, callback: goToDetail })
+      },
+    })
+
+  return { patchVoteCertNamePhoneMutation, isPatchVoteCertNamePhonePending }
 }
