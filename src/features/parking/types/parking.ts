@@ -122,6 +122,36 @@ export interface InOutCarDetail {
 }
 
 /**
+ * 방문예약 1건 (PK11).
+ *
+ * ⚠️ **예약 기간을 `.slice(5)`로 잘라 보여준다** — 서버가 시각까지 주면 화면에
+ * `07/29 00:00:00`처럼 남는다 (`parking.md` PK-Q9).
+ */
+export interface ReservationCar {
+  uuid: string
+  carNum?: string
+  inParkingScheduledDate?: string | null
+  outParkingScheduledDate?: string | null
+  /** 이미 입차했는지. 상태 칩을 정한다 */
+  inParkingFlag?: boolean
+  notificationFlag?: boolean
+}
+
+/** 방문예약 상세 (PK14). 재등록(PK13)의 초기값 출처이기도 하다 */
+export interface ReservationCarDetail {
+  uuid?: string
+  carNum?: string
+  inParkingScheduledDate?: string | null
+  outParkingScheduledDate?: string | null
+  inParkingFlag?: boolean
+  phone?: string | null
+  /** ⚠️ **이름 문자열이다.** uuid가 아니라서 재등록 시 목록에서 되찾아야 한다 */
+  visitPurpose?: string | null
+  memo?: string | null
+  notificationFlag?: boolean
+}
+
+/**
  * 목록 카드 1건. 즐겨찾기와 항상허용을 **한 컴포넌트가 그리므로** 두 모양을 합쳐 둔다.
  * 어느 필드를 보여줄지는 `CARD_ITEM_FIELD`가 정한다.
  */

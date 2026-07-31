@@ -544,6 +544,42 @@ export const routes = [
                       return { Component: RejectReasonPage }
                     },
                   },
+
+                  // ── 주차 — 방문예약 (PK11~PK14) ───────────────────────────
+                  {
+                    path: ROUTE_PATH.PARKING_RESERVATION,
+                    handle: layout({ appBarTitle: '방문예약 관리' }),
+                    lazy: async () => {
+                      const { ReservationListPage } = await import('@/features/parking')
+                      return { Component: ReservationListPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.PARKING_RESERVATION_ADD,
+                    handle: layout({ appBarTitle: '방문예약 등록' }),
+                    lazy: async () => {
+                      const { ReservationFormPage } = await import('@/features/parking')
+                      return { Component: ReservationFormPage }
+                    },
+                  },
+                  {
+                    // 같은 컴포넌트다. `uuid`가 있으면 기존 예약에서 초기값을 가져온다
+                    path: ROUTE_PATH.PARKING_RESERVATION_AGAIN,
+                    handle: layout({ appBarTitle: '방문예약 재등록' }),
+                    lazy: async () => {
+                      const { ReservationFormPage } = await import('@/features/parking')
+                      return { Component: ReservationFormPage }
+                    },
+                  },
+                  {
+                    // AppBar를 화면 안에서 그린다 — 우측 `삭제` 버튼 때문이다
+                    path: ROUTE_PATH.PARKING_RESERVATION_DETAIL,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ReservationDetailPage } = await import('@/features/parking')
+                      return { Component: ReservationDetailPage }
+                    },
+                  },
                 ],
               },
 

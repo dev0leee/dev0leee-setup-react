@@ -40,6 +40,20 @@ export const inOutCarDetailQueryKey = ({
   return ['inOutCarDetail', aptResidentUuid, parkingUuid] as const
 }
 
+/** PK11 방문예약 (무한 목록) */
+export const RESERVATION_CAR_LIST_QUERY_KEY = 'reservationCarList'
+
+/** PK13 재등록 초기값 · PK14 상세 */
+export const reservationCarDetailQueryKey = ({
+  aptResidentUuid,
+  parkingUuid,
+}: {
+  aptResidentUuid: string | undefined
+  parkingUuid: string | undefined
+}) => {
+  return ['reservationCarDetail', aptResidentUuid, parkingUuid] as const
+}
+
 /** PK1 주차 정책 드로어. 이번 달 1일로 고정 조회한다 */
 export const parkingPolicyQueryKey = ({
   aptResidentUuid,

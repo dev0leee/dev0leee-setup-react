@@ -288,8 +288,102 @@ export const REJECT_ERROR_CODES = [
   'GUARD_NETWORK_ERROR',
 ] as const
 
+// ── 방문예약 (PK11~PK14) ────────────────────────────────────────────────────
+
+/** 입차 상태 라벨과 칩 색. 라벨 문자열이 그대로 화면에 보인다 */
+export const IN_PARKING_STATUS = {
+  IN: { label: '입차', chipColor: 'blue' },
+  NOT_IN: { label: '미입차', chipColor: 'deepPurple' },
+  SCHEDULED: { label: '입차예정', chipColor: 'orange' },
+} as const satisfies Record<string, { label: string; chipColor: ChipColor }>
+
+/** PK14 상세의 필드와 순서. 월패드 행은 구독 단지에서만 뒤에 덧붙는다 */
+export const RESERVATION_CAR_DETAIL_FIELD = [
+  { key: 'carNum', label: '차량번호' },
+  { key: 'inOutParkingScheduledDate', label: '입출차 예약 기간' },
+  { key: 'inParkingFlag', label: '입차여부' },
+  { key: 'phone', label: '연락처' },
+  { key: 'visitPurpose', label: '방문목적' },
+  { key: 'memo', label: '메모' },
+] as const
+
+export type ReservationDetailFieldKey = (typeof RESERVATION_CAR_DETAIL_FIELD)[number]['key']
+
+export const RESERVATION_LIST_MESSAGE = {
+  error: '예약 내역을 불러올 수 없습니다',
+  empty: '예약 내역이 없습니다',
+} as const
+
+export const RESERVATION_DETAIL_ERROR_TEXT = [
+  '예약 상세 정보를 불러올 수 없습니다',
+  '잠시 후 다시 시도해주세요',
+] as const
+
+/** 예약 기간 상한. 오늘부터 **오늘+6일**까지 고를 수 있다(합쳐서 7일) */
+export const RESERVATION_MAX_DAYS = 7
+
+export const RESERVATION_PERIOD_GUIDE = '방문예약 기간 설정은 최대 7일입니다'
+export const RESERVATION_PERIOD_PLACEHOLDER = '예약 기간을 선택해주세요'
+export const RESERVATION_PERIOD_REQUIRED = '날짜를 선택해주세요.'
+
+/** 방문예약 폼의 차량번호 placeholder. **차량관리 폼과 문구가 다르다** */
+export const RESERVATION_FORM_PLACEHOLDER = {
+  carNum: '차량번호 예)123가1234, 서울12가1234',
+  /** ⚠️ 차량관리는 `선택해주세요`, 여기는 `선택하세요`다 */
+  visitPurpose: '방문 목적을 선택하세요',
+} as const
+
+export const RESERVATION_TOAST_MESSAGE = {
+  created: '예약되었습니다',
+  deleted: '예약이 취소되었습니다',
+} as const
+
+/** 제출 전 사전 검증 문구. 서버에 가기 전에 화면이 먼저 막는다 */
+export const RESERVATION_PRECHECK_MESSAGE = {
+  noDate: '기간을 선택해주세요.',
+  pastDate: '오늘 이후의 날짜만 선택 가능합니다.',
+  tooLong: '방문예약 기간 설정은 최대 7일입니다.',
+} as const
+
+export const RESERVATION_POST_ERROR_CODES = [
+  'RESERVATION_DATE_INVALID',
+  'RESERVATION_EXISTS',
+  'ALWAYS_ALLOW_EXISTS',
+  'REGULAR_EXISTS',
+  'BLACK_LIST_EXISTS',
+  'REJECT_EXISTS',
+  'GUARD_NETWORK_ERROR',
+  'RESERVATION_MILEAGE_LIMIT',
+] as const
+
+/**
+ * 예약 **삭제** 실패 시 다루는 코드.
+ *
+ * ✅ **`RESERVATION_DATE_INVALID`의 괄호 오타를 고쳤다** (PK-Q11 확정). 레거시는
+ * `case 'RESERVATION_DATE_INVALID('`라 이 분기가 절대 매치되지 않아 서버 원문이 떴다.
+ *
+ * ⚠️ 문구는 등록 쪽과 다르다 — 삭제는 `예약일자는 7일 이내로 선택가능합니다.`다.
+ * 그래서 문구 표를 따로 둔다.
+ */
+export const RESERVATION_DELETE_ERROR_CODES = [
+  'VISIT_PURPOSE_NOT_FOUND',
+  'RESERVATION_DATE_INVALID',
+  'RESERVATION_NOT_FOUND',
+  'GUARD_NETWORK_ERROR',
+] as const
+
+/** 삭제 전용 문구. 같은 코드라도 등록과 문구가 다르다 */
+export const RESERVATION_DELETE_ERROR_MESSAGE: Record<string, string> = {
+  VISIT_PURPOSE_NOT_FOUND: '방문목적을 다시 선택해주세요.',
+  RESERVATION_DATE_INVALID: '예약일자는 7일 이내로 선택가능합니다.',
+  RESERVATION_NOT_FOUND: '등록된 방문예약 차량이 아닙니다.',
+  GUARD_NETWORK_ERROR: '단지 네트워크 장애입니다. 관리사무소에 문의해주세요.',
+}
+
 /** 위 코드에 대응하는 문구 */
 export const CAR_ERROR_MESSAGE: Record<string, string> = {
+  RESERVATION_DATE_INVALID: '방문예약 기간 설정은 최대 7일입니다.',
+  RESERVATION_MILEAGE_LIMIT: '마일리지가 모두 소진 되어 예약 할 수 없습니다.',
   REJECT_ALREADY_EXISTS: '이미 거부된 차량이 존재합니다.',
   CAR_TYPE_NOT_ALLOWED: '거부 할 수 없는 차량 종류 입니다.',
   REJECT_HOUSE_HOLD_NOT_MATCH: '거부 요청한 세대 정보가 일치 하지 않습니다.',

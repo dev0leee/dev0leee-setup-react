@@ -13,12 +13,19 @@ import { showErrorModal } from '@/shared/lib/errorModal'
 export const showCarMutationError = ({
   error,
   handledCodes,
+  messages = CAR_ERROR_MESSAGE,
 }: {
   error: ApiError
   handledCodes: readonly string[]
+  /**
+   * 기본 문구 표를 덮는다. **예약 삭제만 다른 표를 쓴다** — 같은
+   * `RESERVATION_DATE_INVALID`라도 등록은 `방문예약 기간 설정은 최대 7일입니다.`,
+   * 삭제는 `예약일자는 7일 이내로 선택가능합니다.`다.
+   */
+  messages?: Record<string, string>
 }): void => {
   if (error.code && handledCodes.includes(error.code)) {
-    showErrorModal({ text: CAR_ERROR_MESSAGE[error.code] })
+    showErrorModal({ text: messages[error.code] })
     return
   }
 

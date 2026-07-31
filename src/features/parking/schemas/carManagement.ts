@@ -65,6 +65,42 @@ export type AlwaysAllowCarForm = z.infer<typeof alwaysAllowCarWithWallPadSchema>
 export type CarManagementForm = Partial<BookmarkCarForm> & Partial<AlwaysAllowCarForm>
 
 /**
+ * 예약 기간. `[시작, 종료|null]` 튜플이다 — 하루짜리 예약이면 종료가 `null`이다.
+ *
+ * ⚠️ **`오늘 이후` 검사가 스키마에도 있고 제출 직전 사전 검증에도 있다.** 레거시가
+ * 둘 다 두었고, 실제로 사용자에게 보이는 것은 **사전 검증 모달** 쪽이다.
+ */
+const inOutParkingScheduledDate = z
+  // 레거시는 `nullish()`였지만 화면이 `null`만 넣는다 — 값 모양을 좁혀 타입을 단순화했다
+  .tuple([z.date({ error: '기간을 선택해주세요' }), z.date().nullable()], {
+    // 값 자체가 없을 때(고르지 않고 제출) 나오는 문구다. 튜플 레벨에도 붙여야 한다
+    error: '기간을 선택해주세요',
+  })
+  .refine(
+    (value) => {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      return value[0] >= today
+    },
+    { message: '오늘 이후의 날짜만 선택 가능합니다' },
+  )
+
+/** PK12 방문예약 등록 · PK13 재등록 */
+export const reservationSchema = z.object({
+  carNum,
+  inOutParkingScheduledDate,
+  phone,
+  visitPurpose,
+  memo,
+})
+
+/** 월패드 서비스 단지에서만 라디오가 붙는다 */
+export const reservationWithWallPadSchema = reservationSchema.extend({ parkingWallPadAlarm })
+
+export type ReservationForm = z.infer<typeof reservationWithWallPadSchema>
+
+/**
  * PK10 차량 거부 사유.
  *
  * ⚠️ **상한을 `maxlength`가 아니라 스키마가 막는다** — 100자를 넘겨 입력할 수 있고

@@ -67,8 +67,6 @@ export const ROUTE_PATH = {
   APASS: '/apass',
   /** 방문자 출입관리 (메인 방문 출입관리 카드) */
   VISIT: '/visit',
-  /** 주차 방문예약 (메인 주차 방문예약 카드 · 주차 메뉴). PR3에서 이관한다 */
-  PARKING_RESERVATION: '/parking/reservation',
   /** 관리비 상세 (메인 관리비 카드) */
   MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
 
@@ -95,6 +93,14 @@ export const ROUTE_PATH = {
   PARKING_INOUT_HISTORY_DETAIL: '/parking/inoutHistory/detail/:uuid',
   /** 차량 거부. 차량번호는 **라우터 state**로만 온다 (`parking.md` §PK10) */
   PARKING_REJECT: '/parking/reject/:uuid',
+
+  // 방문예약 4화면(PK11~PK14). 메인 카드·주차 메뉴에서 목록으로 들어온다
+  PARKING_RESERVATION: '/parking/reservation',
+  /** 등록. `/add/:uuid`면 **재등록**이 된다 — 파라미터 하나로 갈린다 */
+  PARKING_RESERVATION_ADD: '/parking/reservation/add',
+  PARKING_RESERVATION_AGAIN: '/parking/reservation/add/:uuid',
+  /** ⚠️ 여기만 `showAppBar:false`다 — 우측 `삭제` 버튼 때문에 화면이 직접 그린다 */
+  PARKING_RESERVATION_DETAIL: '/parking/reservation/detail/:uuid',
 
   // 메인 메뉴 스와이퍼가 참조하는 경로 (`features/main/constants/swiperMenu.ts`)
   /** 소통공간 게시판 */
@@ -158,6 +164,9 @@ export const PARKING_CAR_MANAGEMENT_BASE = '/parking/carManagement'
 
 /** 차량 거부 경로의 앞부분. 뒤에 입출차 건의 uuid가 붙는다 */
 export const PARKING_REJECT_BASE = '/parking/reject'
+
+/** 방문예약 경로의 앞부분. 뒤에 `/add`·`/add/{uuid}`·`/detail/{uuid}`가 붙는다 */
+export const PARKING_RESERVATION_BASE = '/parking/reservation'
 
 /** 공지 상세. `uuid`가 경로에 박히므로 함수로 만든다 */
 export const boardNoticeDetailPath = ({ uuid }: { uuid: string }): string => {
