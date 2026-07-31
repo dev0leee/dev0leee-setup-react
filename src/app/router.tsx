@@ -644,6 +644,32 @@ export const routes = [
                     },
                   },
 
+                  // ── 전자투표 (VT1·VT2) ────────────────────────────────────
+                  {
+                    // ⚠️ **레거시에서 유일하게 eager로 등록된 화면**이다. 메인 메뉴와
+                    // 미완료 투표 팝업이 곧바로 보내는 자리라 그렇게 뒀다.
+                    // 타깃은 전 라우트 lazy 원칙(`08-routing`)을 따른다 — 첫 진입에
+                    // 청크 하나를 더 받을 뿐 화면은 같다.
+                    path: ROUTE_PATH.VOTE_LIST,
+                    handle: layout({ appBarTitle: '전자투표', backPath: ROUTE_PATH.MAIN }),
+                    lazy: async () => {
+                      const { VoteListPage } = await import('@/features/vote')
+                      return { Component: VoteListPage }
+                    },
+                  },
+                  {
+                    // 비회원은 `/vote/{voterUuid}`로 같은 화면을 본다 — opinion 엔트리와 함께 붙인다
+                    path: ROUTE_PATH.VOTE_DETAIL,
+                    handle: layout({
+                      appBarTitle: '전자투표 개요',
+                      backPath: ROUTE_PATH.VOTE_LIST,
+                    }),
+                    lazy: async () => {
+                      const { VoteDetailPage } = await import('@/features/vote')
+                      return { Component: VoteDetailPage }
+                    },
+                  },
+
                   // ── 안면인식 위저드 (V7~V13) ──────────────────────────────
                   // ⚠️ **V10~V13은 AppBar 제목이 `얼굴 신규 등록`으로 전부 같다.**
                   // 위저드 단계가 제목으로 드러나지 않는다 — 레거시 그대로다.

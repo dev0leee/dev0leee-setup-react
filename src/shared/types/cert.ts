@@ -1,3 +1,5 @@
+import type { ButtonRoundType, ButtonSize } from '@/shared/types/button'
+
 export interface CertResponseProps {
   /** 쿼리스트링이 있을 때(정상 콜백) 호출된다 */
   onCertResponse: () => void
@@ -31,6 +33,13 @@ export interface CertButtonProps {
   type: KmcType
   disabled?: boolean
   className?: string
+  /**
+   * 버튼 모양. **화면마다 다르다** — 약관 동의는 둥근 버튼(`rounded`/`xl`),
+   * 전자투표 상세는 화면 하단에 붙는 각진 버튼(`square`/`2xl`)이다.
+   * 기본값은 먼저 쓰던 약관 쪽 값이다.
+   */
+  roundType?: ButtonRoundType
+  size?: ButtonSize
 }
 
 export interface TermsAgreeFormProps {

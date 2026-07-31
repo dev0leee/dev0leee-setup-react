@@ -2,11 +2,11 @@ import { useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useApassLoadingStore } from '@/features/apass'
-import { useSurveyCertStore } from '@/features/survey'
-import { useVoteCertStore } from '@/features/vote'
 import { useNativeSubscription } from '@/shared/hooks/useNativeSubscription'
 import { nativeExitApp, subscribeToGoBack } from '@/shared/lib/native/common'
 import { checkDeviceOs } from '@/shared/lib/native/device'
+import { useSurveyCertStore } from '@/shared/stores/surveyCertStore'
+import { useVoteCertStore } from '@/shared/stores/voteCertStore'
 
 /**
  * 네이티브 하드웨어 뒤로가기. 레거시 `lib/composables/useNativeBackButton.js`(105 LOC) 이식.

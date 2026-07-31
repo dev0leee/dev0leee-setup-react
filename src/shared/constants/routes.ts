@@ -68,6 +68,26 @@ export const ROUTE_PATH = {
   /** 관리비 상세 (메인 관리비 카드) */
   MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
 
+  // ── 전자투표 (VT1~VT10) ───────────────────────────────────────────────────
+  // 목록(`VOTE_LIST`)은 메인 메뉴가 먼저 참조해 아래 메뉴 구획에 있다.
+  /**
+   * 회원 상세. **비회원은 `/vote/{voterUuid}`로 들어온다** — 두 경로가 같은 화면을
+   * 그린다. 합치면 `/vote/detail`이 `/vote/:voterUuid`에 먼저 잡혀 충돌한다.
+   */
+  VOTE_DETAIL: '/vote/detail/:voteUuid/:voterUuid',
+
+  // 아래 화면들은 아직 없다 — VT2 하단 버튼이 참조해 먼저 상수로 둔다 (PR2·PR3)
+  VOTE_FORM: '/vote/form/:voterUuid',
+  VOTE_COMPLETED: '/vote/completed',
+  VOTE_CERT_PASS_RESPONSE: '/vote/certification/pass/response',
+  VOTE_CERT_NAME_PHONE: '/vote/certification/namePhone',
+  /**
+   * 시작전·종료 안내. **opinion 앱에만 있는 화면**이다 — 메인 앱은 상세에 머물며
+   * 비활성 버튼을 보여준다. 상세가 비회원일 때만 이 경로로 보낸다.
+   */
+  VOTE_BEFORE: '/vote/before',
+  VOTE_FINISH: '/vote/finish',
+
   // ── 방문자 출입관리 (V1~V13) ───────────────────────────────────────────────
   /** 허브. 메인 방문 출입관리 카드가 유일한 진입점이다 */
   VISIT: '/visit',
@@ -184,6 +204,22 @@ export const PARKING_REJECT_BASE = '/parking/reject'
 
 /** 방문예약 경로의 앞부분. 뒤에 `/add`·`/add/{uuid}`·`/detail/{uuid}`가 붙는다 */
 export const PARKING_RESERVATION_BASE = '/parking/reservation'
+
+/** 회원 투표 상세(VT2). 비회원 경로는 `getVoteDetailPath`가 만든다 */
+export const voteDetailPath = ({
+  voteUuid,
+  voterUuid,
+}: {
+  voteUuid: string
+  voterUuid: string
+}): string => {
+  return `/vote/detail/${voteUuid}/${voterUuid}`
+}
+
+/** 투표 참여 폼(VT3). 회원·비회원이 같은 경로를 쓴다 */
+export const voteFormPath = ({ voterUuid }: { voterUuid: string }): string => {
+  return `/vote/form/${voterUuid}`
+}
 
 /** 안면인식 등록정보 상세(V8). 경로에 `faceRecogGuid`가 박힌다 */
 export const faceRegisterDetailPath = ({ guid }: { guid: string }): string => {

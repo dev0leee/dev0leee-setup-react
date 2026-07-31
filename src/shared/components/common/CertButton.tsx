@@ -24,6 +24,8 @@ export const CertButton = ({
   type,
   disabled = false,
   className,
+  roundType = 'rounded',
+  size = 'xl',
 }: CertButtonProps) => {
   const [certificationField, setCertificationField] = useState<CertificationField>({})
 
@@ -49,10 +51,10 @@ export const CertButton = ({
       <input type="hidden" name="tr_url" value={responseUrl} />
       <ButtonBase
         type="submit"
-        roundType="rounded"
+        roundType={roundType}
         hasOutline={disabled}
         color="brand"
-        size="xl"
+        size={size}
         disabled={disabled}
       >
         {text}

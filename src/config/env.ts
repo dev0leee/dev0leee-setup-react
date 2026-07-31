@@ -117,6 +117,15 @@ const parse = <T extends z.ZodType>(schema: T, label: string): z.infer<T> => {
 export const env = {
   ...parse(sharedSchema, '공통'),
   APP_ENV: resolveAppEnv(),
+  /**
+   * opinion(비회원) 빌드인지. 모드가 `production.opinion`처럼 접미사를 갖는다.
+   *
+   * **화면 분기에 쓴다** — 같은 컴포넌트가 두 앱에 등록되고 앱에 따라 다르게 동작한다
+   * (전자투표 상세가 대표적이다. `docs/migration/features/vote.md` §1).
+   * 레거시가 `import.meta.env.MODE.includes('opinion')`을 코드 곳곳에서 읽던 것을
+   * 여기 한 곳으로 모았다.
+   */
+  IS_OPINION: import.meta.env.MODE.includes('opinion'),
 }
 
 let mainOnlyEnv: MainOnlyEnv | null = null
