@@ -285,10 +285,15 @@ Tailwind 3.4의 기본 스케일에 없는 숫자를 썼다. **디자인 확인 
 `@theme`에 새 토큰을 추가하지 않는다는 B-Q2 결정은 유지하되, **임의값 문법으로 의도값을 쓴다**
 (사용자 결정: _"그냥 arbitrary 값으로 변경해서 쓰도록"_).
 
-| 사용처                                                                           | 쓸 것              |
-| -------------------------------------------------------------------------------- | ------------------ |
-| 주차 카드 4종 (`CarManagementList`·`InOutCarHistory`·`Mileage`·`ReservationCar`) | `border-[#e6e6ec]` |
-| 하자보수 상세 textarea ×2 · 이사예약 등록 textarea                               | `border-[#f8f8f8]` |
+| 사용처                                                                           | 쓸 것                                      |
+| -------------------------------------------------------------------------------- | ------------------------------------------ |
+| 주차 카드 4종 (`CarManagementList`·`InOutCarHistory`·`Mileage`·`ReservationCar`) | `border-[#e6e6ec]`                         |
+| 하자보수 상세 textarea ×2 · 이사예약 등록 textarea                               | `border-defaults-tertiary-border-tertiary` |
+
+> ✅ **2026-07-31 사용자 결정 — `border-bg-gray`는 토큰(`#F3F4F6`)으로 통일한다.**
+> §5와 도메인 명세(`repair.md` RP-Q10 · `moving-house.md` MH-Q11)가 이미 그렇게 나갔고,
+> 같은 폼의 `<input>`들과 테두리가 맞는다. **이관본 3곳이 그대로 맞으므로 코드 변경은 없다**
+> (`deferred.md` D-347 해소).
 
 #### `bg-brand-default-background-brand-secondary` — 대체할 색이 없다
 

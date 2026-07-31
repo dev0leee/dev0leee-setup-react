@@ -725,6 +725,26 @@ export const routes = [
                     },
                   },
 
+                  // ── 관리비 (MF1·MF2) ──────────────────────────────────────
+                  {
+                    path: ROUTE_PATH.MANAGEMENT_FEE_DETAIL,
+                    handle: layout({ appBarTitle: '관리비 상세' }),
+                    lazy: async () => {
+                      const { ManagementFeeDetailPage } = await import('@/features/managementFee')
+                      return { Component: ManagementFeeDetailPage }
+                    },
+                  },
+                  {
+                    // ⚠️ 라우트 name(`관리비 정보`)과 AppBar 제목(`관리비 조회`)이 다르다.
+                    // 🔴 진입 경로가 없는 미완성 목업 화면이다 — URL로만 열린다
+                    path: ROUTE_PATH.MANAGEMENT_FEE_INFO,
+                    handle: layout({ appBarTitle: '관리비 조회' }),
+                    lazy: async () => {
+                      const { ManagementFeeInfoPage } = await import('@/features/managementFee')
+                      return { Component: ManagementFeeInfoPage }
+                    },
+                  },
+
                   // ── 아파트몰 / 주말조식 (AM1~AM11) ────────────────────────
                   {
                     // 🔴 UI에서 도달할 수 없는 화면이다 — 메뉴도 카드도 나의 예약으로 간다
