@@ -17,14 +17,14 @@ CI(`.github/workflows/ci.yml`)·husky가 한다. 이 문서는 그 나머지를 
 
 ## 커밋 메시지 (MUST)
 
-**Conventional Commits.** `type: 요약` 형식이다. type과 콜론은 붙이고(`feat:`), 뒤에 공백 하나.
+**`type : 요약`** 형식이다. **type과 콜론 사이에 공백을 하나 둔다.**
 
 ```
-feat: 대시보드 주문 테이블 추가
-fix: 장바구니 수량이 음수로 내려가는 버그 수정
-refactor: auth 인터셉터의 refresh 락 로직 정리
-chore: 린터를 oxlint에서 ESLint로 교체
-ci: 액션 최신 메이저로 올려 Node 20 deprecation 경고 제거
+feat : 대시보드 주문 테이블 추가
+fix : 장바구니 수량이 음수로 내려가는 버그 수정
+refactor : auth 인터셉터의 refresh 락 로직 정리
+chore : 린터를 oxlint에서 ESLint로 교체
+ci : 액션 최신 메이저로 올려 Node 20 deprecation 경고 제거
 ```
 
 - **type은 영어, 본문은 한국어.** 이 레포의 실제 히스토리가 그렇다.
@@ -34,7 +34,13 @@ ci: 액션 최신 메이저로 올려 Node 20 deprecation 경고 제거
 - **표준에 없는 type을 만들지 않는다.** `rename`·`remove`·`hotfix` 같은 건 쓰지 않는다 —
   파일 이동·삭제는 `refactor`나 `chore`, 급한 수정도 그냥 `fix`다.
   commitlint류 표준 도구가 인식하는 집합 안에 머문다.
-- `feat :`(콜론 앞 공백)처럼 쓰지 않는다. commitlint류 표준 도구가 인식하지 못한다.
+- **범위(scope)는 되도록 적지 않는다.** 요약 문장이 이미 어디를 건드렸는지 말해준다.
+  범위까지 붙이면 같은 말을 두 번 하게 된다.
+- 그래도 적어야 한다면 **요약 앞에 괄호로** 둔다 — `feat : (mypage) 마이페이지 8개 화면 이관`.
+  `feat(mypage):`처럼 type에 괄호를 붙이지 않는다. type과 범위가 한 덩어리로 보여 읽기 어렵다.
+- ⚠️ 이 형식은 **Conventional Commits 규격이 아니다.** 콜론 앞 공백 때문에 표준 파서는
+  type을 인식하지 못한다. 이 레포엔 commitlint이 없어서(`.husky`에 `commit-msg` 훅 없음)
+  문제가 되지 않지만, **commitlint을 도입하려면 이 규칙부터 바꿔야 한다.**
 
 ## PR (MUST)
 
