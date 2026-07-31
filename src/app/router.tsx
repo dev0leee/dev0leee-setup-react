@@ -180,8 +180,10 @@ export const routes = [
                     path: ROUTE_PATH.MAIN,
                     handle: layout({ showAppBar: false, showBottomNav: true }),
                     lazy: async () => {
-                      const { MainPage } = await import('@/features/main')
-                      return { Component: MainPage }
+                      // 메인 화면 + 공지/투표 팝업 조립. 팝업이 다른 도메인 소유라
+                      // app 레이어에서 합친다 (`MainScreen.tsx` 주석).
+                      const { MainScreen } = await import('@/app/MainScreen')
+                      return { Component: MainScreen }
                     },
                   },
                   {
@@ -269,6 +271,41 @@ export const routes = [
                     path: ROUTE_PATH.LOGOUT,
                     element: <LogoutPage />,
                     handle: layout({ showAppBar: false }),
+                  },
+
+                  // ── 게시판 — 공지 계보 ─────────────────────────────────────
+                  {
+                    path: ROUTE_PATH.BOARD_NOTICE,
+                    handle: layout({ appBarTitle: '공지사항' }),
+                    lazy: async () => {
+                      const { NoticeBoardPage } = await import('@/features/board')
+                      return { Component: NoticeBoardPage }
+                    },
+                  },
+                  {
+                    // 네이티브 푸시 딥링크가 여기로 들어온다. 경로를 바꾸지 않는다.
+                    path: ROUTE_PATH.BOARD_NOTICE_DETAIL,
+                    handle: layout({ appBarTitle: '공지사항 상세' }),
+                    lazy: async () => {
+                      const { NoticeDetailPage } = await import('@/features/board')
+                      return { Component: NoticeDetailPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_GLOBAL_NOTICE,
+                    handle: layout({ appBarTitle: '아파트먼트 공지사항' }),
+                    lazy: async () => {
+                      const { GlobalNoticeBoardPage } = await import('@/features/board')
+                      return { Component: GlobalNoticeBoardPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_GLOBAL_NOTICE_DETAIL,
+                    handle: layout({ appBarTitle: '아파트먼트 공지사항 상세' }),
+                    lazy: async () => {
+                      const { GlobalNoticeDetailPage } = await import('@/features/board')
+                      return { Component: GlobalNoticeDetailPage }
+                    },
                   },
                 ],
               },

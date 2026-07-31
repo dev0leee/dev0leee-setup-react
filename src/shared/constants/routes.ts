@@ -96,12 +96,22 @@ export const ROUTE_PATH = {
   /** 소방 자가점검 */
   FIRE_INSPECTION: '/fire-inspection',
 
-  // 메인 공지 Top3가 참조하는 경로
-  /** 공지사항 목록 */
+  // ── 게시판 — 공지 계보 (B1~B4) ─────────────────────────────────────────────
+  /** 공지사항 목록. 메인 공지 Top3·마이페이지에서 들어온다 */
   BOARD_NOTICE: '/board/notice',
+  /** 공지사항 상세. **네이티브 푸시 딥링크의 도착지다** */
+  BOARD_NOTICE_DETAIL: '/board/notice/detail/:noticeUuid',
+  /** 아파트먼트 공지사항 목록 */
+  BOARD_GLOBAL_NOTICE: '/board/global-notice',
+  BOARD_GLOBAL_NOTICE_DETAIL: '/board/global-notice/detail/:globalNoticeUuid',
 } as const
 
 /** 공지 상세. `uuid`가 경로에 박히므로 함수로 만든다 */
 export const boardNoticeDetailPath = ({ uuid }: { uuid: string }): string => {
   return `${ROUTE_PATH.BOARD_NOTICE}/detail/${uuid}`
+}
+
+/** 아파트먼트 공지 상세 */
+export const globalNoticeDetailPath = ({ uuid }: { uuid: string }): string => {
+  return `${ROUTE_PATH.BOARD_GLOBAL_NOTICE}/detail/${uuid}`
 }

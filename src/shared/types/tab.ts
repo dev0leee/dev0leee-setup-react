@@ -21,5 +21,7 @@ export interface TabCategoryProps {
   /** `hasTotalType`이면 '전체'가 0번을 차지한다 */
   selectedIndex: number
   hasTotalType?: boolean
+  /** 루트 `<ul>`에 얹힌다. Vue의 클래스 fallthrough 대신이다 (`board.md` B1의 `pb-6`) */
+  className?: string
   onSelect: (selected: { index: number; category: TabCategoryItem }) => void
 }

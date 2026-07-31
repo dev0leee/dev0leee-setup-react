@@ -17,10 +17,11 @@ export const TabCategory = ({
   categories,
   selectedIndex,
   hasTotalType = false,
+  className,
   onSelect,
 }: TabCategoryProps) => {
   return (
-    <ul className="relative flex gap-2 overflow-x-auto px-6">
+    <ul className={cn('relative flex gap-2 overflow-x-auto px-6', className)}>
       {hasTotalType && (
         <li
           className={cn(CATEGORY_BASE, selectedIndex === 0 ? CATEGORY_ACTIVE : CATEGORY_INACTIVE)}
