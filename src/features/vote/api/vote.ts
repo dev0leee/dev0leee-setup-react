@@ -1,4 +1,9 @@
-import type { VoteDetailInfo, VoteDetailStatus, VoteListItemData } from '@/features/vote/types/vote'
+import type {
+  VoteDetailInfo,
+  VoteDetailStatus,
+  VoteFormData,
+  VoteListItemData,
+} from '@/features/vote/types/vote'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api, publicApi } from '@/shared/lib/apiClient'
 import type { ServerSuccessBody } from '@/shared/types/api'
@@ -98,4 +103,63 @@ export const patchVoteCertNamePhone = async ({
     name,
     phone: phone.replaceAll('-', ''),
   })
+}
+
+/** 참여 폼 (VT3). 질문·선택지·최소/최대 선택 수가 온다. **비인증 API**다 */
+export const getVoteForm = async ({
+  voterUuid,
+}: {
+  voterUuid: string
+}): Promise<VoteFormData | undefined> => {
+  const response = await publicApi.get<ServerSuccessBody<VoteFormData>>(
+    `${NON_RESIDENT_PREFIX}/voter/${voterUuid}/select`,
+  )
+
+  return response.data.success
+}
+
+/**
+ * 투표 제출 (VT3). **multipart**다 — 서명 이미지가 함께 간다.
+ *
+ * ⚠️ **요청 필드명이 폼 필드명과 다르다** — 화면은 `optionList`, 요청은 `optionUuidList`다.
+ * 인덱스가 박힌 평평한 키(`questionList[0].optionUuidList[1]`)라 서버가 그대로 받는다.
+ */
+export const postVoteForm = async ({
+  voterUuid,
+  questionList,
+  signFile,
+}: {
+  voterUuid: string
+  questionList: { questionUuid: string; questionType: string; optionList: string[] }[]
+  signFile: File
+}): Promise<void> => {
+  const formData = new FormData()
+
+  questionList.forEach((question, questionIndex) => {
+    formData.append(`questionList[${questionIndex}].questionUuid`, question.questionUuid)
+    formData.append(`questionList[${questionIndex}].questionType`, question.questionType)
+    question.optionList.forEach((optionUuid, optionIndex) => {
+      formData.append(`questionList[${questionIndex}].optionUuidList[${optionIndex}]`, optionUuid)
+    })
+  })
+
+  formData.append('signFile', signFile)
+
+  await publicApi.post(`${NON_RESIDENT_PREFIX}/voter/${voterUuid}`, formData)
+}
+
+/**
+ * 진행중이면서 내가 아직 안 한 투표가 있는지 (VT10). **회원 전용**.
+ * 메인 화면의 미완료 투표 팝업이 이 값 하나로 뜬다.
+ */
+export const getVoteHasVoterPending = async ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string
+}): Promise<{ progressVoteFlag?: boolean } | undefined> => {
+  const response = await api.get<ServerSuccessBody<{ progressVoteFlag?: boolean }>>(
+    `${API_PREFIX.BOARD}/vote/${aptResidentUuid}/progress-vote`,
+  )
+
+  return response.data.success
 }

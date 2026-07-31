@@ -88,3 +88,30 @@ export interface VoteDetailStatus {
   notVotedCount?: number
   questionList?: VoteResultQuestion[]
 }
+
+/** 참여 폼의 선택지 1개 (VT3) */
+export interface VoteFormOption {
+  uuid: string
+  content?: string | null
+  fileList: { fileUuid: string; fileUrl: string; fileName: string }[]
+}
+
+/**
+ * 참여 폼의 질문 1개 (VT3).
+ *
+ * ⚠️ **`minChoice`/`maxChoice`가 없으면 검증이 통째로 건너뛴다** — 서버가 안 주면
+ * 복수응답에 제한이 없다. 레거시 `superRefine`의 `&& questionData` 가드가 그렇다.
+ */
+export interface VoteFormQuestionData {
+  uuid: string
+  content?: string | null
+  questionType?: string
+  minChoice?: number
+  maxChoice?: number
+  questionOptionList?: VoteFormOption[]
+}
+
+export interface VoteFormData {
+  voteType?: string
+  questionList?: VoteFormQuestionData[]
+}

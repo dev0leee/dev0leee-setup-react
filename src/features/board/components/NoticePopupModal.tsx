@@ -6,26 +6,7 @@ import { NOTICE_POPUP_HIDE_COOKIE } from '@/features/board/constants/board'
 import { useNoticePopupThumbnail } from '@/features/board/queries/useNoticeDetail'
 import { ModalBase } from '@/shared/components/common/ModalBase'
 import { boardNoticeDetailPath } from '@/shared/constants/routes'
-
-/**
- * 자정에 만료되는 쿠키를 쓴다. `localStorage`가 아닌 이유는 **날짜가 바뀌면 저절로
- * 사라져야** 하기 때문이다 — 만료 시각을 직접 관리할 필요가 없다.
- *
- * ⚠️ **웹뷰에서 쿠키가 유지되는지 미확인이다.** 유지되지 않으면 `오늘 하루 보지 않기`가
- * 동작하지 않고 팝업이 매번 뜬다 (`board.md` BD-Q7 · 실기기 확인 대상).
- */
-const setHideTodayCookie = () => {
-  const now = new Date()
-  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
-
-  document.cookie = `${NOTICE_POPUP_HIDE_COOKIE}=true;expires=${endOfDay.toUTCString()};path=/`
-}
-
-const getHideTodayCookie = (): boolean => {
-  const matched = document.cookie.match(`(^|;) ?${NOTICE_POPUP_HIDE_COOKIE}=([^;]*)(;|$)`)
-
-  return matched?.[2] === 'true'
-}
+import { getCookie, setCookieUntilMidnight } from '@/shared/utils/cookie'
 
 /**
  * 공지 팝업 (B21). 레거시 `NoticeBoard/NoticePopupModal.vue` 이식.
@@ -39,6 +20,10 @@ const getHideTodayCookie = (): boolean => {
  * ⚠️ 썸네일을 `object-fill`로 늘린다. 잘리지는 않지만 **원본 비율이 4:5가 아니면
  * 왜곡된다.** 레거시 주석에도 그렇게 적혀 있다.
  *
+ * ⚠️ **쿠키가 자정에 만료된다.** 날짜가 바뀌면 저절로 다시 보인다 —
+ * 만료 시각을 코드가 관리할 필요가 없다. 투표 팝업(VT10)과 **키가 다르다**
+ * (`noticePopupHideToday` vs `hidePopup`). 공용 유틸은 `shared/utils/cookie.ts`다.
+ *
  * 레거시는 `watch(..., { immediate: true })`로 열림 상태를 만들지만, 여기서는
  * **응답에서 바로 파생**한다 — 상태가 하나 줄고 첫 렌더에 어긋난 프레임이 없다.
  * `닫기`를 눌렀는지만 상태로 들고 있으면 된다.
@@ -48,7 +33,9 @@ export const NoticePopupModal = () => {
   const { noticePopupThumbnail } = useNoticePopupThumbnail()
 
   const [isClosed, setIsClosed] = useState(false)
-  const [isHideForToday, setIsHideForToday] = useState(getHideTodayCookie)
+  const [isHideForToday, setIsHideForToday] = useState(() => {
+    return getCookie({ name: NOTICE_POPUP_HIDE_COOKIE }) === 'true'
+  })
 
   const isOpen = Boolean(noticePopupThumbnail?.uuid) && !isClosed && !isHideForToday
   if (!isOpen) return null
@@ -84,7 +71,7 @@ export const NoticePopupModal = () => {
             type="button"
             className="h-12 flex-1 rounded-bl-md bg-defaults-secondary-background-secondary px-2 pretendard-14SemiBold whitespace-nowrap"
             onClick={() => {
-              setHideTodayCookie()
+              setCookieUntilMidnight({ name: NOTICE_POPUP_HIDE_COOKIE, value: 'true' })
               setIsHideForToday(true)
               setIsClosed(true)
             }}

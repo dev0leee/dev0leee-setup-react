@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { QUESTION_TYPE, type VoteFormQuestionData } from '@/features/vote/types/vote'
 import { NAME_REGEX, PHONE_REGEX } from '@/shared/constants/regex'
 
 /**
@@ -27,3 +28,58 @@ export const voteAuthNamePhoneSchema = z.object({
 })
 
 export type VoteAuthNamePhoneForm = z.infer<typeof voteAuthNamePhoneSchema>
+
+/**
+ * 참여 폼 (VT3). **서버가 준 질문 목록을 받아 스키마를 만든다** — 질문마다 최소/최대
+ * 선택 수가 달라서 정적으로 쓸 수 없다. 레거시 `voteFormSchema(questionList)` 그대로다.
+ *
+ * | 상황                | 문구                                       |
+ * | ------------------- | ------------------------------------------ |
+ * | 미선택(단일·복수)   | `옵션을 선택해주세요`                      |
+ * | 복수 최소 미달      | `최소 {minChoice}개를 선택해주세요`        |
+ * | 복수 최대 초과      | `최대 {maxChoice}개까지만 선택 가능합니다` |
+ *
+ * ⚠️ **단일 선택에는 `superRefine` 검증이 없다.** 값이 없으면 `z.string()`이 거부해
+ * 같은 문구가 나온다 — 의도대로 동작한다.
+ *
+ * ⚠️ **`minChoice`/`maxChoice`가 없는 질문은 검증을 건너뛴다** (레거시 `&& questionData`).
+ */
+export const createVoteFormSchema = (questionList: VoteFormQuestionData[]) => {
+  return z
+    .object({
+      questionList: z.array(
+        z.object({
+          questionType: z.string(),
+          questionUuid: z.string(),
+          optionList: z.union([z.string({ error: '옵션을 선택해주세요' }), z.array(z.string())]),
+        }),
+      ),
+    })
+    .superRefine(({ questionList: formQuestionList }, context) => {
+      formQuestionList.forEach((question, index) => {
+        const optionsLength = Array.isArray(question.optionList) ? question.optionList.length : 1
+        const questionData = questionList.find((item) => {
+          return item.uuid === question.questionUuid
+        })
+
+        if (question.questionType !== QUESTION_TYPE.MULTIPLE_CHOICE || !questionData) return
+
+        if (questionData.minChoice !== undefined && optionsLength < questionData.minChoice) {
+          context.addIssue({
+            code: 'custom',
+            message: `최소 ${questionData.minChoice}개를 선택해주세요`,
+            path: ['questionList', index, 'optionList'],
+          })
+        }
+        if (questionData.maxChoice !== undefined && optionsLength > questionData.maxChoice) {
+          context.addIssue({
+            code: 'custom',
+            message: `최대 ${questionData.maxChoice}개까지만 선택 가능합니다`,
+            path: ['questionList', index, 'optionList'],
+          })
+        }
+      })
+    })
+}
+
+export type VoteFormValues = z.infer<ReturnType<typeof createVoteFormSchema>>

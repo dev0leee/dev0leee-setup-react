@@ -671,6 +671,19 @@ export const routes = [
                   },
 
                   {
+                    // ⚠️ **화면도 AppBar를 그린다.** 여기 `showAppBar`를 끄면 뒤로가기
+                    // 동작이 바뀌므로 레거시대로 둘 다 켠 상태를 유지한다 (VT-Q1)
+                    path: ROUTE_PATH.VOTE_FORM,
+                    handle: layout({
+                      appBarTitle: '전자투표 참여',
+                      backPath: ROUTE_PATH.VOTE_LIST,
+                    }),
+                    lazy: async () => {
+                      const { VoteFormPage } = await import('@/features/vote')
+                      return { Component: VoteFormPage }
+                    },
+                  },
+                  {
                     // KMC가 POST 리다이렉트로 도착시키는 자리다. 화면은 모달뿐이다
                     path: ROUTE_PATH.VOTE_CERT_PASS_RESPONSE,
                     handle: layout({ showAppBar: false }),

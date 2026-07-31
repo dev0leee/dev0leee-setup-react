@@ -6,9 +6,12 @@ import { env } from '@/config/env'
 import {
   getVoteDetailInfo,
   getVoteDetailStatus,
+  getVoteForm,
+  getVoteHasVoterPending,
   getVoteList,
   patchVoteCertNamePhone,
   patchVoteCertPass,
+  postVoteForm,
 } from '@/features/vote/api/vote'
 import { getVoteDetailPath, useIsVoteUser } from '@/features/vote/lib/voteRoute'
 import type { VoteListItemData } from '@/features/vote/types/vote'
@@ -238,4 +241,98 @@ export const usePatchVoteCertNamePhone = () => {
     })
 
   return { patchVoteCertNamePhoneMutation, isPatchVoteCertNamePhonePending }
+}
+
+/**
+ * 참여 폼 조회 (VT3).
+ *
+ * ⚠️ **에러가 나면 모달을 띄우고 상세로 되돌린다.** 여기서도 목적지를 저장된 인증
+ * 정보에서 만든다 — 폼 화면의 라우트에는 `voteUuid`가 없기 때문이다.
+ */
+export const useVoteForm = ({ voterUuid }: { voterUuid: string }) => {
+  const { goToDetail } = useVoteCertNavigation()
+
+  const {
+    data: voteFormData,
+    isLoading: isVoteFormLoading,
+    isError: isVoteFormError,
+    error: voteFormError,
+  } = useQuery({
+    queryKey: ['voteDetailForm', voterUuid],
+    queryFn: () => {
+      return getVoteForm({ voterUuid })
+    },
+    enabled: Boolean(voterUuid),
+  })
+
+  const hasHandledErrorRef = useRef(false)
+
+  useEffect(() => {
+    if (!isVoteFormError || hasHandledErrorRef.current) return
+    hasHandledErrorRef.current = true
+
+    showErrorModal({ text: voteFormError?.message, callback: goToDetail })
+  }, [isVoteFormError, voteFormError, goToDetail])
+
+  return { voteFormData, isVoteFormLoading }
+}
+
+/**
+ * 투표 제출 (VT3).
+ *
+ * ✅ **제출 중 잠금을 살렸다.** 레거시는 `isPostVoteFormPending`을 반환하면서
+ * `isCreateVoteFormPending`이라는 **없는 이름으로 받아** `undefined`가 컨텍스트를 타고
+ * 퍼졌다 — 버튼이 안 잠기고 스피너도 안 뜨며 **연타로 중복 제출이 가능**했다
+ * (`vote.md` §3). 사용자 결정(VT-Q2)에 따라 고쳤다.
+ *
+ * ⚠️ **완료 화면으로 `replace` 이동한다.** 뒤로가기로 제출한 폼에 돌아가지 못하게 한다.
+ */
+export const usePostVoteForm = ({ voterUuid }: { voterUuid: string }) => {
+  const navigate = useNavigate()
+
+  const { mutate: postVoteFormMutation, isPending: isPostVoteFormPending } = useMutation({
+    mutationFn: ({
+      questionList,
+      signFile,
+    }: {
+      questionList: { questionUuid: string; questionType: string; optionList: string[] }[]
+      signFile: File
+    }) => {
+      return postVoteForm({ voterUuid, questionList, signFile })
+    },
+    onSuccess: () => {
+      void navigate(ROUTE_PATH.VOTE_COMPLETED, { replace: true, state: { auth: true } })
+    },
+    onError: (error: ApiError) => {
+      showErrorModal({ text: error.message })
+    },
+  })
+
+  return { postVoteFormMutation, isPostVoteFormPending }
+}
+
+/**
+ * 미완료 투표가 있는지 (VT10). 메인 화면의 팝업이 쓴다.
+ *
+ * 🔴 **쿼리 키에 입주민 식별자가 없다** — 단지를 바꿔도 같은 캐시를 본다.
+ * `staleTime: 0`이 가려주고 있다. 레거시 그대로 옮겼다 (`vote.md` §VT10).
+ *
+ * ⚠️ 레거시는 `enabled: hasVote.value`로 **`.value`를 벗겨** setup 시점 값을 고정했다.
+ * 입주민 정보가 아직 없으면 쿼리가 영영 돌지 않는다(VT-Q9). 여기서는 값이 도착하면
+ * 켜진다 — **팝업이 뜰 조건이 넓어지는 쪽**이라, 레거시가 캐시 히트일 때와 결과가 같다.
+ */
+export const useVoteHasVoterPending = ({ enabled }: { enabled: boolean }) => {
+  const aptResidentUuid = useAuthStore((state) => {
+    return state.aptInfo.aptResidentUuid
+  })
+
+  const { data: voteHasVoterPending } = useQuery({
+    queryKey: ['voteHasVoterPending'],
+    queryFn: () => {
+      return getVoteHasVoterPending({ aptResidentUuid: aptResidentUuid ?? '' })
+    },
+    enabled: enabled && Boolean(aptResidentUuid),
+  })
+
+  return { voteHasVoterPending }
 }

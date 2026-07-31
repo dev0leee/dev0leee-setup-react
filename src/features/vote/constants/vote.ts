@@ -81,3 +81,18 @@ export const VOTE_MESSAGE = {
   multipleChoice: '(복수응답)',
   detailMore: '자세히 보기',
 } as const
+
+/**
+ * 미완료 투표 팝업(VT10)의 구독 판정에 쓰는 이름.
+ *
+ * ⚠️ **`APT_CONTENT_NAME.VOTE`는 `'전자투표'`인데 서버가 실제로 주는 이름은 `'투표'`다.**
+ * 상수로 바꾸면 팝업이 영영 뜨지 않는다 — 메인 메뉴도 같은 이유로 리터럴을 쓴다
+ * (`main.md` M-Q3 확정).
+ */
+export const VOTE_CONTENT_NAME = '투표'
+
+/**
+ * `오늘하루 보지 않기` 쿠키 키. **공지 팝업(B21)의 `noticePopupHideToday`와 별개다** —
+ * 레거시 공지 팝업 주석에 "투표 팝업과 충돌 방지"라고 적혀 있는 그 상대다.
+ */
+export const VOTE_HIDE_POPUP_COOKIE = 'hidePopup'
