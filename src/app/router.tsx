@@ -343,6 +343,56 @@ export const routes = [
                       return { Component: ComplaintsMyActivitiesPage }
                     },
                   },
+                  {
+                    // 상세 4개는 AppBar를 화면 안에서 그린다 (우측 슬롯에 더보기)
+                    path: ROUTE_PATH.BOARD_COMMUNITY_DETAIL,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { CommunityDetailPage } = await import('@/features/board')
+                      return { Component: CommunityDetailPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.BOARD_COMPLAINTS_DETAIL,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ComplaintsDetailPage } = await import('@/features/board')
+                      return { Component: ComplaintsDetailPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.POST_COMMUNITY_COMMENT_REPLY,
+                    handle: layout({ appBarTitle: '소통공간 답글 작성' }),
+                    lazy: async () => {
+                      const { CommunityCommentReplyWritePage } = await import('@/features/board')
+                      return { Component: CommunityCommentReplyWritePage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.POST_COMPLAINTS_COMMENT_REPLY,
+                    handle: layout({ appBarTitle: '민원공간 답글 작성' }),
+                    lazy: async () => {
+                      const { ComplaintsCommentReplyWritePage } = await import('@/features/board')
+                      return { Component: ComplaintsCommentReplyWritePage }
+                    },
+                  },
+                  {
+                    // 댓글 수정도 화면 안에서 AppBar를 그린다 (완료 버튼 · 뒤로가기 모달)
+                    path: ROUTE_PATH.POST_COMMUNITY_COMMENT_EDIT,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { CommunityCommentEditPage } = await import('@/features/board')
+                      return { Component: CommunityCommentEditPage }
+                    },
+                  },
+                  {
+                    path: ROUTE_PATH.POST_COMPLAINTS_COMMENT_EDIT,
+                    handle: layout({ showAppBar: false }),
+                    lazy: async () => {
+                      const { ComplaintsCommentEditPage } = await import('@/features/board')
+                      return { Component: ComplaintsCommentEditPage }
+                    },
+                  },
                 ],
               },
 

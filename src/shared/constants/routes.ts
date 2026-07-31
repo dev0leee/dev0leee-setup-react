@@ -85,6 +85,17 @@ export const ROUTE_PATH = {
   BOARD_COMMUNITY_ACTIVITIES: '/board/community/activities',
   /** 민원공간 내 활동 */
   BOARD_COMPLAINTS_ACTIVITIES: '/board/complaints/activities',
+  BOARD_COMMUNITY_DETAIL: '/board/community/detail/:postUuid',
+  BOARD_COMPLAINTS_DETAIL: '/board/complaints/detail/:postUuid',
+
+  // ⚠️ 댓글 화면만 접두사가 **`/post`**다 (`/board`가 아니다). 레거시 그대로 유지한다
+  /** 소통공간 답글 작성. `commentIndex`는 쓰지 않지만 경로에 남아 있다 */
+  POST_COMMUNITY_COMMENT_REPLY:
+    '/post/community/comment/reply/:postUuid/:commentUuid/:commentIndex',
+  POST_COMPLAINTS_COMMENT_REPLY:
+    '/post/complaints/comment/reply/:postUuid/:commentUuid/:commentIndex',
+  POST_COMMUNITY_COMMENT_EDIT: '/post/community/comment/edit/:postUuid/:commentUuid',
+  POST_COMPLAINTS_COMMENT_EDIT: '/post/complaints/comment/edit/:postUuid/:commentUuid',
   /** 하자보수 */
   REPAIR_LIST: '/repair/list',
   /** 이사예약 */

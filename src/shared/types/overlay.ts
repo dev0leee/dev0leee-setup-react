@@ -47,8 +47,6 @@ export interface DrawerListItem {
   label: string
   /** Tailwind 텍스트 색 클래스. 없으면 기본 본문색 */
   color?: string
-  /** 명시적으로 false일 때만 숨는다 (레거시 `item.enabled ? item.enabled : true`) */
-  enabled?: boolean
   onClick: () => void
 }
 

@@ -47,6 +47,59 @@ export const MY_ACTIVITY_QUERY_KEY = {
   },
 } as const
 
+/**
+ * 게시글 상세 (B6·B13).
+ *
+ * 🔴 **레거시 키에는 `postUuid`가 없어 모든 글이 한 캐시 슬롯을 공유했다.**
+ * `staleTime: 0`이 유일한 방어막이라 값이 바뀌는 순간 다른 글이 보인다.
+ * **넣어서 고쳤다** — 수정 화면 초기값 주입도 함께 고쳐야 동작한다
+ * (2026-07-31 BD-Q11 확정 · `deferred.md` D-225·D-226).
+ */
+export const boardPostDetailQueryKey = ({
+  boardType,
+  aptResidentUuid,
+  postUuid,
+}: {
+  boardType: 'community' | 'complaints'
+  aptResidentUuid: string | undefined
+  postUuid: string | undefined
+}) => {
+  return [`${boardType}PostDetail`, aptResidentUuid, postUuid] as const
+}
+
+/**
+ * 댓글 목록.
+ *
+ * 🔴 **레거시 키의 세 번째 요소는 항상 `undefined`였다** — `getParams().uuid`를 읽는데
+ * 그런 라우트 파라미터가 없다. 상세 키와 같은 이유로 `postUuid`를 넣어 고쳤다 (D-225).
+ */
+export const boardCommentListQueryKey = ({
+  boardType,
+  aptResidentUuid,
+  postUuid,
+}: {
+  boardType: 'community' | 'complaints'
+  aptResidentUuid: string | undefined
+  postUuid: string | undefined
+}) => {
+  return [`${boardType}CommentList`, aptResidentUuid, postUuid] as const
+}
+
+/** 댓글 1건 상세 (B7 답글 작성 · B8 댓글 수정) */
+export const boardCommentDetailQueryKey = ({
+  boardType,
+  aptResidentUuid,
+  postUuid,
+  commentUuid,
+}: {
+  boardType: 'community' | 'complaints'
+  aptResidentUuid: string | undefined
+  postUuid: string | undefined
+  commentUuid: string | undefined
+}) => {
+  return [`${boardType}CommentDetail`, aptResidentUuid, postUuid, commentUuid] as const
+}
+
 export const boardCategoryListQueryKey = ({
   boardType,
   aptResidentUuid,
