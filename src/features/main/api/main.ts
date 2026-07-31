@@ -1,7 +1,9 @@
 import type {
   ImposeYearMonthsResponse,
   ManagementFeeBill,
+  NoticeTopThreeItem,
   ParkingMileage,
+  ShoppingToken,
 } from '@/features/main/types/main'
 import { API_PREFIX } from '@/shared/constants/api'
 import { api } from '@/shared/lib/apiClient'
@@ -73,4 +75,47 @@ export const getParkingRemainingMileage = async ({
   const remainingMileage = response.data.success?.remainingMileage ?? 0
 
   return { useMileage, remainingMileage, totalMileage: useMileage + remainingMileage }
+}
+
+/** 최근 공지 3건. 단지 단위라 `aptUuid`로 조회한다 (다른 요약 API와 달리 입주민 uuid가 아니다) */
+export const getNoticeTopThree = async ({
+  aptUuid,
+}: {
+  aptUuid: string
+}): Promise<NoticeTopThreeItem[]> => {
+  const response = await api.get<ServerSuccessBody<NoticeTopThreeItem[]>>(
+    `${API_PREFIX.BOARD}/notice/${aptUuid}/top-three`,
+  )
+
+  return response.data.success ?? []
+}
+
+/**
+ * 쇼핑몰 SSO 토큰. 자동 조회하지 않고 사용자가 쇼핑몰을 누를 때만 부른다.
+ *
+ * ⚠️ 받은 토큰 4개를 **외부 사이트 쿼리스트링에 그대로 실어 보낸다** — 레거시 그대로다
+ * (`deferred.md` D-39).
+ */
+export const getShoppingToken = async (): Promise<ShoppingToken | undefined> => {
+  const response = await api.get<ServerSuccessBody<ShoppingToken>>(
+    `${API_PREFIX.APARTMANT}/commerce/token`,
+  )
+
+  return response.data.success
+}
+
+/** 마케팅·광고성 수신 동의 저장. 쇼핑 약관 바텀시트가 동의·거절 모두에서 부른다 */
+export const putMarketingConsent = async ({
+  aptResidentUuid,
+  marketingDataConsentFlag,
+  receiveAdvertsConsentFlag,
+}: {
+  aptResidentUuid: string
+  marketingDataConsentFlag: boolean
+  receiveAdvertsConsentFlag: boolean
+}): Promise<void> => {
+  await api.put(
+    `${API_PREFIX.APARTMANT}/apt-resident/${aptResidentUuid}/notification-setting/marketing-consent`,
+    { marketingDataConsentFlag, receiveAdvertsConsentFlag },
+  )
 }

@@ -41,3 +41,17 @@ export const parkingMileageQueryKey = ({
 }) => {
   return ['parkingRemainingMileage', aptResidentUuid, startDate, endDate] as const
 }
+
+/** 공지 Top3. 단지 단위라 `aptUuid`가 키에 들어간다 */
+export const noticeTopThreeQueryKey = ({ aptUuid }: { aptUuid: string | undefined }) => {
+  return ['noticeTopThree', aptUuid] as const
+}
+
+/** 쇼핑몰 SSO 토큰. 자동 조회하지 않고 필요할 때만 부른다 */
+export const shoppingTokenQueryKey = ({
+  aptResidentUuid,
+}: {
+  aptResidentUuid: string | undefined
+}) => {
+  return ['shoppingToken', aptResidentUuid] as const
+}

@@ -20,12 +20,26 @@ import type { TermsItem } from '@/shared/types/terms'
  *
  * 아래 두 규칙은 **"마케팅 동의 없이는 광고 수신 불가"** 를 양방향으로 강제한다.
  * `watch`는 값의 **전이**에 반응하므로, 다음 상태와 이전 상태를 비교해 같은 조건을 만든다.
+ *
+ * `initialValue`는 전 항목의 초기 체크 상태다. 회원가입 약관은 `false`(기본),
+ * 메인의 쇼핑 마케팅 동의 바텀시트만 `true`로 시작한다 (`main.md` §11).
+ *
+ * ⚠️ 레거시는 `initialValue: true`여도 `isAllAgreed`가 **`false`로 시작한다** —
+ * 별도 `ref`를 `watch`가 갱신하는 구조라 값이 바뀌기 전까지 초기값이 남는다.
+ * 여기서는 파생값이라 처음부터 `true`다. `initialValue: true`로 쓰는 유일한 화면이
+ * `isAllAgreed`를 읽지 않으므로 화면 차이는 없다.
  */
-export const useTermsAgreement = ({ items }: { items: TermsItem[] }) => {
+export const useTermsAgreement = ({
+  items,
+  initialValue = false,
+}: {
+  items: TermsItem[]
+  initialValue?: boolean
+}) => {
   const [agreedState, setAgreedState] = useState<Record<string, boolean>>(() => {
     return Object.fromEntries(
       items.map((item) => {
-        return [item.id, false]
+        return [item.id, initialValue]
       }),
     )
   })

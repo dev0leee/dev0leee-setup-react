@@ -52,6 +52,14 @@ export const nativeOpenSystemBrowser = ({ targetUrl }: { targetUrl: string }): v
   sendToNative({ type: TO_NATIVE.OPEN_SYSTEM_BROWSER, data: { targetUrl } })
 }
 
+/**
+ * 앱 내부에 새 웹뷰를 띄운다.
+ *
+ * ⚠️ **`hasBackButton`이 선택값이다.** 쇼핑몰 호출부가 이 필드를 넘기지 않아
+ * 페이로드에서 통째로 빠진다(`JSON.stringify`가 `undefined` 키를 버린다).
+ * 필수로 바꾸면 앱에 없던 필드가 새로 가고, 앱의 기본 동작이 달라질 수 있다
+ * (`main.md` §11 · `native-protocol.md` N8).
+ */
 export const nativeOpenNewWebView = ({
   type,
   title,
@@ -61,7 +69,7 @@ export const nativeOpenNewWebView = ({
   type: string
   title: string
   url: string
-  hasBackButton: boolean
+  hasBackButton?: boolean
 }): void => {
   sendToNative({
     type: TO_NATIVE.OPEN_NEW_WEBVIEW,

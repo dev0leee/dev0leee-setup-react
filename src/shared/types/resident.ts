@@ -31,6 +31,15 @@ export interface ResidentDetailInfo {
   apassOnOffFlag?: boolean
   /** 단지 생성일. 주차 마일리지 조회 가능 시점을 판단한다 (`main.md` §7-3) */
   aptCreatedDate?: string
+  /**
+   * 마케팅 목적 개인정보 수집·이용 동의. 광고성 정보 수신 동의.
+   *
+   * ⚠️ **`null` 여부가 곧 "한 번이라도 선택했는가"다.** 메인 쇼핑몰 진입은 값이
+   * `true`인지가 아니라 **둘 다 `null`이 아닌지**로 동의 바텀시트를 띄울지 정한다
+   * (`main.md` §8·§11).
+   */
+  marketingDataConsentFlag?: boolean | null
+  receiveAdvertsConsentFlag?: boolean | null
 }
 
 /** 입주민 승인 상태. `APPROVED`만 진입할 수 있다 */

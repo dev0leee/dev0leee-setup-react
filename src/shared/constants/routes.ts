@@ -73,4 +73,35 @@ export const ROUTE_PATH = {
   PARKING_MILEAGE_HISTORY: '/parking/mileage/history',
   /** 관리비 상세 (메인 관리비 카드) */
   MANAGEMENT_FEE_DETAIL: '/managementFee/detail',
+
+  // 메인 메뉴 스와이퍼가 참조하는 경로 (`features/main/constants/swiperMenu.ts`)
+  /** 주차관리 */
+  PARKING: '/parking',
+  /** 소통공간 */
+  BOARD_COMMUNITY: '/board/community',
+  /** 민원공간 */
+  BOARD_COMPLAINTS: '/board/complaints',
+  /** 하자보수 */
+  REPAIR_LIST: '/repair/list',
+  /** 이사예약 */
+  MOVING_HOUSE_LIST: '/movingHouse/list',
+  /** 전자투표 */
+  VOTE_LIST: '/vote/list',
+  /** 조식예약 */
+  APT_MALL_MY_ORDER: '/aptMall/myOrder',
+  /** 설문조사 */
+  SURVEY_LIST: '/survey/list',
+  /** 공동 현관(로비폰) */
+  VISIT_LOBBY_PHONE: '/visit/lobbyPhone',
+  /** 소방 자가점검 */
+  FIRE_INSPECTION: '/fire-inspection',
+
+  // 메인 공지 Top3가 참조하는 경로
+  /** 공지사항 목록 */
+  BOARD_NOTICE: '/board/notice',
 } as const
+
+/** 공지 상세. `uuid`가 경로에 박히므로 함수로 만든다 */
+export const boardNoticeDetailPath = ({ uuid }: { uuid: string }): string => {
+  return `${ROUTE_PATH.BOARD_NOTICE}/detail/${uuid}`
+}

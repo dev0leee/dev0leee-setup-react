@@ -36,3 +36,30 @@ export interface ParkingMileage {
   remainingMileage: number
   totalMileage: number
 }
+
+/** 공지 Top3 한 건. 목록은 카테고리·제목만 쓰고 `uuid`로 상세로 간다 */
+export interface NoticeTopThreeItem {
+  uuid: string
+  categoryName?: string
+  title?: string
+}
+
+/** 쇼핑몰 SSO 토큰 4종. 그대로 외부 URL 쿼리스트링이 된다 */
+export interface ShoppingToken {
+  accessToken: string
+  expiresIn: number | string
+  refreshToken: string
+  refreshTokenExpiresIn: number | string
+}
+
+/** 메인 메뉴 스와이퍼 항목 한 건 */
+export interface SwiperMenuItem {
+  /** 없으면 고정 메뉴다 */
+  contentName?: string
+  menuName: string
+  iconName: string
+  /** 비어 있으면 라우터 이동이 아니라 자체 분기로 처리한다 */
+  menuUrl: string
+  /** `N` 배지 표시 */
+  isNew?: boolean
+}

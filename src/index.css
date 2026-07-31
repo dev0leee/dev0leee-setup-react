@@ -1010,3 +1010,21 @@ input::-webkit-search-cancel-button {
 .shake-animation {
   animation: shake 0.6s ease-in-out 2;
 }
+
+/**
+ * 메인 메뉴 스와이퍼 페이지네이션. 레거시 `MainNavigationSwiper.vue`의
+ * `<style scoped>` + `:deep()` 이식.
+ *
+ * swiper가 만드는 DOM은 우리 마크업이 아니라 컴포넌트 밖에서 밖에 못 건드린다.
+ * 레거시의 `scoped`를 대신해 **`.main-navigation-swiper` 아래로 한정**했다 —
+ * 다른 화면에 스와이퍼가 생겨도 영향을 받지 않는다.
+ *
+ * `top: 156px`은 슬라이드 높이 186px 안에서 점 위치를 잡는 값이다.
+ */
+.main-navigation-swiper .swiper-pagination-bullets {
+  top: 156px;
+}
+
+.main-navigation-swiper .swiper-pagination-bullet-active {
+  background: #0037be;
+}

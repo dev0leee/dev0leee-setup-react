@@ -1,8 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { env } from '@/config/env'
 import { AptInfoHeader } from '@/features/main/components/AptInfoHeader'
+import { MainAdvertisementBanner } from '@/features/main/components/MainAdvertisementBanner'
 import { MainCardMenus } from '@/features/main/components/MainCardMenus'
+import { MainNavigationSwiper } from '@/features/main/components/MainNavigationSwiper'
+import { MainNoticeTopThree } from '@/features/main/components/MainNoticeTopThree'
+import { MainShoppingTermsBottomSheet } from '@/features/main/components/MainShoppingTermsBottomSheet'
 import { BEACON_WORKAROUND_APT_ID } from '@/features/main/constants/main'
 import { APT_CONTENT_NAME } from '@/shared/constants/aptContent'
 import { useResidentDetailInfo } from '@/shared/hooks/useResidentDetailInfo'
@@ -61,9 +65,12 @@ const useBeaconWorkaround = ({
 /**
  * 메인 화면. 레거시 `MainView/MainView.vue` 이식 (`main.md` M1).
  *
- * ⚠️ **아직 헤더·카드까지만 이관됐다.** 메뉴 스와이퍼·광고 배너·공지 Top3·쇼핑 마케팅
- * 동의는 이어지는 단계에서 붙인다 (`progress.md`).
- * 공지 팝업(Board)·투표 대기 팝업(Vote)은 **그 도메인이 이관돼야** 붙일 수 있다.
+ * ⚠️ **공지 팝업(Board)·투표 대기 팝업(Vote)은 아직 없다** — 그 도메인이 이관돼야
+ * 붙일 수 있다. 붙일 때 **투표 팝업을 먼저, 공지 팝업을 나중에** 렌더해야 한다:
+ * 둘의 z-index가 같아 DOM 순서가 곧 우선순위이고, 레거시는 공지가 위에 오게 뒀다.
+ *
+ * ⚠️ 쇼핑 마케팅 동의 바텀시트는 **배너와 스와이퍼 두 곳**에서 열린다. 그래서 상태를
+ * 여기에 두고 콜백을 내려준다 (레거시도 `openShoppingTerms` emit 2개를 여기서 받는다).
  *
  * ⚠️ **마운트 시 앱에 권한 정보를 요청한다.** 응답(`CALLBACK_PERMISSION_INFO`)은
  * A-PASS 배지가 구독한다. 레거시는 이 화면도 응답을 구독해 `pushAuthorized`에 담았지만
@@ -72,6 +79,7 @@ const useBeaconWorkaround = ({
  */
 export const MainPage = () => {
   const { residentDetailInfo } = useResidentDetailInfo()
+  const [isShoppingTermsOpen, setIsShoppingTermsOpen] = useState(false)
 
   // 앱에 권한 정보를 요청한다. 배지도 자기 마운트에서 한 번 더 부른다(레거시 동일).
   useEffect(() => {
@@ -80,12 +88,27 @@ export const MainPage = () => {
 
   useBeaconWorkaround({ residentDetailInfo })
 
+  const openShoppingTerms = () => {
+    setIsShoppingTermsOpen(true)
+  }
+
   return (
     <div className="h-full w-full">
       <div className="h-full w-full space-y-5 overflow-auto bg-defaults-secondary-background-secondary px-5 py-6">
         <AptInfoHeader />
         <MainCardMenus />
+        <MainAdvertisementBanner onOpenShoppingTerms={openShoppingTerms} />
+        <MainNavigationSwiper onOpenShoppingTerms={openShoppingTerms} />
+        <MainNoticeTopThree />
       </div>
+
+      {isShoppingTermsOpen && (
+        <MainShoppingTermsBottomSheet
+          onClose={() => {
+            setIsShoppingTermsOpen(false)
+          }}
+        />
+      )}
     </div>
   )
 }
